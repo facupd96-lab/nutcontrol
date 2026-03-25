@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutControl — Gestión de Frutos Secos</title>
+    <meta name="description" content="Sistema de gestión integral para negocio de frutos secos. Control de ventas, stock, costos y ganancias.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-icon">🥜</span>
+                <span class="logo-text">NutControl</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-section="dashboard" id="nav-dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-section="ventas" id="nav-ventas">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">Ventas</span>
+            </a>
+            <a href="#" class="nav-item" data-section="produccion" id="nav-produccion">
+                <span class="nav-icon">🏭</span>
+                <span class="nav-label">Producción</span>
+            </a>
+            <a href="#" class="nav-item" data-section="productos" id="nav-productos">
+                <span class="nav-icon">🏷️</span>
+                <span class="nav-label">Productos</span>
+            </a>
+            <a href="#" class="nav-item" data-section="materias" id="nav-materias">
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">Materias Primas</span>
+            </a>
+            <a href="#" class="nav-item" data-section="gastos" id="nav-gastos">
+                <span class="nav-icon">💸</span>
+                <span class="nav-label">Gastos</span>
+            </a>
+            <a href="#" class="nav-item" data-section="reportes" id="nav-reportes">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">Reportes</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="storage-status" id="storage-status">
+                <div class="storage-icon">💻</div>
+                <div class="storage-text">
+                    <strong>Modo Local</strong>
+                    <span>Atado a esta PC</span>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+                <button class="btn-backup" id="btn-export" title="Exportar copia manual" style="flex:1;font-size:0.75rem;padding:0.4rem">
+                    <span>⬇️</span> Exportar
+                </button>
+                <button class="btn-backup" id="btn-import" title="Importar copia manual" style="flex:1;font-size:0.75rem;padding:0.4rem">
+                    <span>⬆️</span> Importar
+                </button>
+            </div>
+            <input type="file" id="import-file" accept=".json" style="display:none">
+        </div>
+    </aside>
+
+    <!-- Mobile Header -->
+    <header class="mobile-header" id="mobile-header">
+        <button class="hamburger" id="hamburger">☰</button>
+        <span class="mobile-title">🥜 NutControl</span>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+
+        <!-- ==================== DASHBOARD ==================== -->
+        <section class="section active" id="section-dashboard">
+            <div class="section-header">
+                <h1>Dashboard</h1>
+                <p class="section-subtitle" id="dashboard-date"></p>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card kpi-ventas">
+                    <div class="kpi-icon">🛒</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Ventas Hoy</span>
+                        <span class="kpi-value" id="kpi-ventas-hoy">$0</span>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-semana">
+                    <div class="kpi-icon">📅</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Ventas Semana</span>
+                        <span class="kpi-value" id="kpi-ventas-semana">$0</span>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-mes">
+                    <div class="kpi-icon">📆</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Ventas Mes</span>
+                        <span class="kpi-value" id="kpi-ventas-mes">$0</span>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-profit">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Profit Mes</span>
+                        <span class="kpi-value" id="kpi-profit-mes">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h3>Ventas Últimos 7 Días</h3>
+                    <canvas id="chart-ventas-semana" width="500" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Productos Más Vendidos (Mes)</h3>
+                    <canvas id="chart-productos" width="400" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Sales -->
+            <div class="card">
+                <h3>Últimas Ventas</h3>
+                <div class="table-container">
+                    <table class="data-table" id="table-ultimas-ventas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VENTAS ==================== -->
+        <section class="section" id="section-ventas">
+            <div class="section-header">
+                <h1>Registro de Ventas</h1>
+                <p class="section-subtitle">Registrá tus ventas del día rápidamente</p>
+            </div>
+
+            <!-- Quick Sale -->
+            <div class="quick-sale-grid" id="quick-sale-grid">
+                <!-- Generated by JS -->
+            </div>
+
+            <!-- Sale History -->
+            <div class="card" style="margin-top:2rem">
+                <div class="card-header-row">
+                    <h3>Historial de Ventas</h3>
+                    <div class="filter-row">
+                        <input type="date" id="filter-date-from" class="input-field input-sm">
+                        <span>a</span>
+                        <input type="date" id="filter-date-to" class="input-field input-sm">
+                        <button class="btn btn-sm" id="btn-filter-ventas">Filtrar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="table-ventas-historial">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cant.</th>
+                                <th>Precio Unit.</th>
+                                <th>Total</th>
+                                <th>Profit</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PRODUCCIÓN ==================== -->
+        <section class="section" id="section-produccion">
+            <div class="section-header">
+                <h1>Producción</h1>
+                <p class="section-subtitle">Armá tus bolsas y se descuenta la materia prima automáticamente</p>
+            </div>
+
+            <!-- Production Cards -->
+            <div class="quick-sale-grid" id="production-grid">
+                <!-- Generated by JS -->
+            </div>
+
+            <!-- Production History -->
+            <div class="card" style="margin-top:2rem">
+                <h3>Historial de Producción</h3>
+                <div class="table-container">
+                    <table class="data-table" id="table-produccion">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Bolsas Armadas</th>
+                                <th>Materia Prima Usada</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PRODUCTOS ==================== -->
+        <section class="section" id="section-productos">
+            <div class="section-header">
+                <h1>Mis Productos</h1>
+                <p class="section-subtitle">Catálogo con costos calculados automáticamente</p>
+            </div>
+
+            <div class="products-grid" id="products-grid">
+                <!-- Generated by JS -->
+            </div>
+        </section>
+
+        <!-- ==================== MATERIAS PRIMAS ==================== -->
+        <section class="section" id="section-materias">
+            <div class="section-header">
+                <h1>Materias Primas</h1>
+                <p class="section-subtitle">Actualizá los precios cuando cambien</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header-row">
+                    <h3>Ingredientes</h3>
+                    <button class="btn btn-primary" id="btn-add-materia">+ Agregar</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="table-materias">
+                        <thead>
+                            <tr>
+                                <th>Ingrediente</th>
+                                <th>Precio / kg</th>
+                                <th>Stock (g)</th>
+                                <th>Última Actualización</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 2rem">
+                <div class="card-header-row">
+                    <h3>Insumos de Empaque</h3>
+                    <button class="btn btn-primary" id="btn-add-insumo">+ Agregar</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="table-insumos">
+                        <thead>
+                            <tr>
+                                <th>Insumo</th>
+                                <th>Precio / unidad</th>
+                                <th>Stock (unidades)</th>
+                                <th>Última Actualización</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== GASTOS ==================== -->
+        <section class="section" id="section-gastos">
+            <div class="section-header">
+                <h1>Gastos</h1>
+                <p class="section-subtitle">Controlá todos tus gastos fijos y variables</p>
+            </div>
+
+            <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="kpi-card kpi-ventas">
+                    <div class="kpi-icon">📌</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Gastos Fijos</span>
+                        <span class="kpi-value" id="kpi-gastos-fijos">$0</span>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-semana">
+                    <div class="kpi-icon">🔄</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Gastos Variables (Mes)</span>
+                        <span class="kpi-value" id="kpi-gastos-variables">$0</span>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-profit">
+                    <div class="kpi-icon">📊</div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Total Gastos (Mes)</span>
+                        <span class="kpi-value" id="kpi-gastos-total">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:2rem">
+                <div class="card-header-row">
+                    <h3>Registro de Gastos</h3>
+                    <button class="btn btn-primary" id="btn-add-gasto">+ Nuevo Gasto</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="table-gastos">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Concepto</th>
+                                <th>Tipo</th>
+                                <th>Monto</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== REPORTES ==================== -->
+        <section class="section" id="section-reportes">
+            <div class="section-header">
+                <h1>Reportes</h1>
+                <p class="section-subtitle">Análisis detallado de tu negocio</p>
+            </div>
+
+            <div class="report-controls">
+                <select class="input-field" id="report-period">
+                    <option value="week">Última Semana</option>
+                    <option value="month" selected>Este Mes</option>
+                    <option value="all">Todo el Historial</option>
+                </select>
+                <button class="btn btn-primary" id="btn-generate-report">Generar Reporte</button>
+            </div>
+
+            <!-- Profit Report -->
+            <div class="card" style="margin-top:1.5rem">
+                <h3>💰 Reporte de Rentabilidad</h3>
+                <div class="report-summary" id="report-profit-summary">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+
+            <!-- Consumption Report -->
+            <div class="card" style="margin-top:1.5rem">
+                <h3>📦 Consumo de Materias Primas</h3>
+                <div class="table-container">
+                    <table class="data-table" id="table-report-consumo">
+                        <thead>
+                            <tr>
+                                <th>Ingrediente</th>
+                                <th>Consumido (g)</th>
+                                <th>Costo</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Per Product Report -->
+            <div class="card" style="margin-top:1.5rem">
+                <h3>📊 Rendimiento por Producto</h3>
+                <div class="table-container">
+                    <table class="data-table" id="table-report-productos">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Unidades Vendidas</th>
+                                <th>Ingresos</th>
+                                <th>Costo Total</th>
+                                <th>Ganancia</th>
+                                <th>Margen %</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Modal: Agregar/Editar Materia Prima -->
+    <div class="modal-overlay" id="modal-materia">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-materia-title">Agregar Materia Prima</h3>
+                <button class="modal-close" data-close="modal-materia">&times;</button>
+            </div>
+            <form id="form-materia">
+                <input type="hidden" id="materia-id">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" class="input-field" id="materia-nombre" required placeholder="Ej: Almendras">
+                </div>
+                <div class="form-group">
+                    <label>Precio por kg ($)</label>
+                    <input type="number" class="input-field" id="materia-precio" required min="0" step="1" placeholder="Ej: 23000">
+                </div>
+                <div class="form-group">
+                    <label>Stock actual (gramos)</label>
+                    <input type="number" class="input-field" id="materia-stock" min="0" step="1" placeholder="Ej: 500">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-close="modal-materia">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Agregar/Editar Insumo -->
+    <div class="modal-overlay" id="modal-insumo">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-insumo-title">Agregar Insumo</h3>
+                <button class="modal-close" data-close="modal-insumo">&times;</button>
+            </div>
+            <form id="form-insumo">
+                <input type="hidden" id="insumo-id">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" class="input-field" id="insumo-nombre" required placeholder="Ej: Bolsitas">
+                </div>
+                <div class="form-group">
+                    <label>Precio por unidad ($)</label>
+                    <input type="number" class="input-field" id="insumo-precio" required min="0" step="1" placeholder="Ej: 140">
+                </div>
+                <div class="form-group">
+                    <label>Stock actual (unidades)</label>
+                    <input type="number" class="input-field" id="insumo-stock" min="0" step="1" placeholder="Ej: 100">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-close="modal-insumo">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- Modal: Agregar Gasto -->
+    <div class="modal-overlay" id="modal-gasto">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-gasto-title">Nuevo Gasto</h3>
+                <button class="modal-close" data-close="modal-gasto">&times;</button>
+            </div>
+            <form id="form-gasto">
+                <input type="hidden" id="gasto-id">
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" class="input-field" id="gasto-fecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Concepto</label>
+                    <input type="text" class="input-field" id="gasto-concepto" required placeholder="Ej: Compra de almendras 1kg">
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select class="input-field" id="gasto-tipo" required>
+                        <option value="variable">Variable</option>
+                        <option value="fijo">Fijo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Monto ($)</label>
+                    <input type="number" class="input-field" id="gasto-monto" required min="0" step="1" placeholder="Ej: 23000">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-close="modal-gasto">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Confirmar Venta -->
+    <div class="modal-overlay" id="modal-venta">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3>Registrar Venta</h3>
+                <button class="modal-close" data-close="modal-venta">&times;</button>
+            </div>
+            <form id="form-venta">
+                <input type="hidden" id="venta-producto-id">
+                <div class="form-group">
+                    <label>Producto</label>
+                    <input type="text" class="input-field" id="venta-producto-nombre" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" class="input-field" id="venta-fecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="number" class="input-field" id="venta-cantidad" required min="1" value="1">
+                </div>
+                <div class="venta-resumen">
+                    <div class="venta-resumen-row">
+                        <span>Precio unitario:</span>
+                        <span id="venta-precio-unit">$0</span>
+                    </div>
+                    <div class="venta-resumen-row total">
+                        <span>Total:</span>
+                        <span id="venta-total">$0</span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-close="modal-venta">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">✅ Confirmar Venta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Registrar Producción -->
+    <div class="modal-overlay" id="modal-produccion">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3>Armar Bolsas</h3>
+                <button class="modal-close" data-close="modal-produccion">&times;</button>
+            </div>
+            <form id="form-produccion">
+                <input type="hidden" id="prod-producto-id">
+                <div class="form-group">
+                    <label>Producto</label>
+                    <input type="text" class="input-field" id="prod-producto-nombre" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" class="input-field" id="prod-fecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad de bolsas a armar</label>
+                    <input type="number" class="input-field" id="prod-cantidad" required min="1" value="1">
+                </div>
+                <div class="venta-resumen" id="prod-consumo-resumen">
+                    <!-- Filled by JS -->
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-close="modal-produccion">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">🏭 Confirmar Producción</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
