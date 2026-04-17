@@ -8,18 +8,22 @@
 
     // =========== DEFAULT DATA ===========
     const DEFAULT_MATERIAS = [
-        { id: 'mani', nombre: 'Maní', precioKg: 5600, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'castanas', nombre: 'Castañas de Cajú', precioKg: 23000, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'nueces', nombre: 'Nueces', precioKg: 19000, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'almendras', nombre: 'Almendras', precioKg: 23000, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'girasol', nombre: 'Semillas de Girasol', precioKg: 5300, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'mani', nombre: 'Maní Tostado', precioKg: 2857, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'castanas', nombre: 'Castañas de Cajú', precioKg: 18900, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'nueces', nombre: 'Nueces Premium', precioKg: 24000, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'nueces-ambar', nombre: 'Nueces Ámbar', precioKg: 16465, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'almendras', nombre: 'Almendras', precioKg: 25000, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'girasol', nombre: 'Semillas de Girasol', precioKg: 5880, stockG: 0, updatedAt: new Date().toISOString() },
         { id: 'pasas', nombre: 'Pasas de Uva', precioKg: 10000, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'azucar', nombre: 'Azúcar', precioKg: 1700, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'azucar', nombre: 'Azúcar', precioKg: 1500, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'chocolate', nombre: 'Chocolate Semi Amargo', precioKg: 13718, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'zapallo', nombre: 'Semillas de Zapallo', precioKg: 18918, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'chia', nombre: 'Semillas de Chía', precioKg: 11250, stockG: 0, updatedAt: new Date().toISOString() },
     ];
 
     const DEFAULT_INSUMOS = [
-        { id: 'bolsitas', nombre: 'Bolsitas', precioUnit: 140, stock: 0, updatedAt: new Date().toISOString() },
-        { id: 'etiquetas', nombre: 'Etiquetas', precioUnit: 35, stock: 0, updatedAt: new Date().toISOString() },
+        { id: 'bolsitas', nombre: 'Bolsitas Kraft', precioUnit: 132, stock: 0, updatedAt: new Date().toISOString() },
+        { id: 'etiquetas', nombre: 'Etiquetas Nimboot', precioUnit: 71, stock: 0, updatedAt: new Date().toISOString() },
     ];
 
     const DEFAULT_PRODUCTOS = [
@@ -83,6 +87,40 @@
             ingredientes: [
                 { materiaId: 'girasol', cantidadG: 60 },
                 { materiaId: 'azucar', cantidadG: 15 },
+            ],
+            insumosExtra: [
+                { insumoId: 'bolsitas', cantidad: 1 },
+                { insumoId: 'etiquetas', cantidad: 1 },
+            ],
+        },
+        {
+            id: 'mix-caramelizado',
+            nombre: 'Mix Caramelizado',
+            emoji: '🍬',
+            precioVenta: 3500,
+            pesoG: 76,
+            ingredientes: [
+                { materiaId: 'mani', cantidadG: 14 },
+                { materiaId: 'almendras', cantidadG: 14 },
+                { materiaId: 'nueces-ambar', cantidadG: 14 },
+                { materiaId: 'azucar', cantidadG: 34 },
+            ],
+            insumosExtra: [
+                { insumoId: 'bolsitas', cantidad: 1 },
+                { insumoId: 'etiquetas', cantidad: 1 },
+            ],
+        },
+        {
+            id: 'mix-chocolate',
+            nombre: 'Mix Chocolate Semi Amargo',
+            emoji: '🍫',
+            precioVenta: 3500,
+            pesoG: 75,
+            ingredientes: [
+                { materiaId: 'chocolate', cantidadG: 49 },
+                { materiaId: 'girasol', cantidadG: 15 },
+                { materiaId: 'zapallo', cantidadG: 9 },
+                { materiaId: 'chia', cantidadG: 2 },
             ],
             insumosExtra: [
                 { insumoId: 'bolsitas', cantidad: 1 },
@@ -164,6 +202,112 @@
         if (!data.ventas) data.ventas = [];
         if (!data.materias) data.materias = DEFAULT_MATERIAS;
         if (!data.insumos) data.insumos = DEFAULT_INSUMOS;
+
+        // Add missing materias primas
+        DEFAULT_MATERIAS.forEach(dm => {
+            if (!data.materias.find(m => m.id === dm.id)) {
+                data.materias.push(JSON.parse(JSON.stringify(dm)));
+            }
+        });
+        // Rename Nueces -> Nueces Premium
+        const nueces = data.materias.find(m => m.id === 'nueces');
+        if (nueces && nueces.nombre === 'Nueces') nueces.nombre = 'Nueces Premium';
+
+        // Actualizar precios confirmados
+        const almendras = data.materias.find(m => m.id === 'almendras');
+        if (almendras) almendras.precioKg = 25000;
+        const chia = data.materias.find(m => m.id === 'chia');
+        if (chia) chia.precioKg = 11250;
+
+        // Migración única para cargar 2kg de almendras comprados
+        if (!data._almendras2kgAdded) {
+            if (almendras) almendras.stockG = (almendras.stockG || 0) + 2000;
+            data.gastos.push({
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                fecha: new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0') + '-' + String(new Date().getDate()).padStart(2, '0'),
+                concepto: 'Compra Almendras (2kg)',
+                tipo: 'variable',
+                monto: 50000
+            });
+            data._almendras2kgAdded = true;
+        }
+
+        // Add missing productos
+        DEFAULT_PRODUCTOS.forEach(dp => {
+            if (!data.productos.find(p => p.id === dp.id)) {
+                const np = JSON.parse(JSON.stringify(dp));
+                np.stockBolsas = 0;
+                data.productos.push(np);
+            }
+        });
+
+        // ------------------ DATA MIGRATIONS ------------------
+        if (!data._purchasesApplied1) {
+            const dateStr = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0') + '-' + String(new Date().getDate()).padStart(2, '0');
+            const purchases = [
+                { id: 'etiquetas', type: 'insumo', qtyToAdd: 800, newUnit: 71.125 },
+                { id: 'chocolate', type: 'materia', qtyToAdd: 3000, newUnit: 13294.66 },
+                { id: 'zapallo', type: 'materia', qtyToAdd: 500, newUnit: 18334 },
+                { id: 'nueces', type: 'materia', qtyToAdd: 1000, newUnit: 24000 },
+                { id: 'girasol', type: 'materia', qtyToAdd: 3000, newUnit: 5881.66 },
+                { id: 'almendras', type: 'materia', qtyToAdd: 2000, newUnit: 24711.50 },
+                { id: 'nueces-ambar', type: 'materia', qtyToAdd: 1000, newUnit: 16465 },
+                { id: 'mani', type: 'materia', qtyToAdd: 5000, newUnit: 2857.20 },
+                { id: 'bolsitas', type: 'insumo', qtyToAdd: 500, newUnit: 146.90 },
+            ];
+            purchases.forEach(p => {
+                if (p.type === 'materia') {
+                    const item = data.materias.find(m => m.id === p.id);
+                    if (item) { item.stockG = (item.stockG || 0) + p.qtyToAdd; item.precioKg = p.newUnit; }
+                } else if (p.type === 'insumo') {
+                    const item = data.insumos.find(i => i.id === p.id);
+                    if (item) { item.stock = (item.stock || 0) + p.qtyToAdd; item.precioUnit = p.newUnit; }
+                }
+            });
+            data._purchasesApplied1 = true;
+        }
+
+        if (!data._cleanupGastos1) {
+            const badConcepts = [
+                'Compra Etiquetas Nimboot', 'Compra Chocolate Alpino Semiamargo (3kg)',
+                'Compra Semillas de Zapallo (500gr)', 'Compra Nueces Premium (1kg)',
+                'Compra Semillas de Girasol (3kg)', 'Compra Almendras (2kg)',
+                'Compra Nueces Ámbar (1kg)', 'Compra Maní Tostado (5kg)', 'Compra Bolsitas Kraft (500 unid)'
+            ];
+            data.gastos = data.gastos.filter(g => !badConcepts.includes(g.concepto));
+            const choco = data.materias.find(m => m.id === 'chocolate');
+            if (choco && choco.precioKg > 30000) choco.precioKg = 13294.66;
+            data._cleanupGastos1 = true;
+        }
+
+        if (!data._salesMigrated4) {
+            const rows = [
+                { f: '2026-03-22', p: 3 }, { f: '2026-03-23', p: 9 }, { f: '2026-03-24', p: 5 }, { f: '2026-03-25', p: 11 }, { f: '2026-03-26', p: 4 }, { f: '2026-03-27', p: 1 }, { f: '2026-03-28', p: 3 }, { f: '2026-03-29', p: 8 }, { f: '2026-03-30', p: 1, g: 6, s: 1 }, { f: '2026-03-31', p: 4, g: 5, s: 3 }, { f: '2026-04-01', p: 4, e: 3, g: 3, s: 1 }, { f: '2026-04-02', p: 1, e: 1, g: 4, s: 2 }, { f: '2026-04-03', p: 3, e: 1, g: 2, s: 2 }, { f: '2026-04-04', g: 4, s: 1 }, { f: '2026-04-05', p: 2, e: 2, g: 5, s: 6 }, { f: '2026-04-06', p: 1, e: 1, s: 8 }, { f: '2026-04-07', p: 1, e: 1, g: 5 }, { f: '2026-04-08', e: 1 }, { f: '2026-04-09', e: 1, g: 3 }, { f: '2026-04-10', p: 1, e: 1, g: 5 }, { f: '2026-04-11', p: 2, e: 1, g: 2 }, { f: '2026-04-12', p: 7, e: 2 }, { f: '2026-04-13', p: 2 }, { f: '2026-04-14', p: 3 }, { f: '2026-04-15', c: 13 }
+            ];
+            const oldPrices = { 'mani': 2857.00, 'castanas': 18900.00, 'nueces': 24000.00, 'nueces-ambar': 16465.00, 'almendras': 25000.00, 'girasol': 5880.00, 'pasas': 10000.00, 'azucar': 1500.00, 'chocolate': 13294.66, 'zapallo': 18918.00, 'chia': 11250.00, 'bolsitas': 132, 'etiquetas': 71 };
+            const productMap = { p: { id: 'mix-premium', precio: 3500 }, e: { id: 'mix-energico', precio: 3000 }, g: { id: 'castanas-caram', precio: 3000 }, s: { id: 'girasol-caram', precio: 2500 }, c: { id: 'mix-caramelizado', precio: 3500 } };
+            
+            function getOldCosto(prod) {
+                if (!prod) return 0;
+                let cost = 0;
+                if (prod.ingredientes) prod.ingredientes.forEach(i => cost += (i.cantidadG / 1000) * (oldPrices[i.materiaId] || 0));
+                if (prod.insumosExtra) prod.insumosExtra.forEach(i => cost += i.cantidad * (oldPrices[i.insumoId] || 0));
+                return cost;
+            }
+
+            data.ventas = [];
+            rows.forEach(row => {
+                Object.keys(productMap).forEach(key => {
+                    if (row[key] && row[key] > 0) {
+                        const prodId = productMap[key].id;
+                        const prod = data.productos.find(p => p.id === prodId);
+                        data.ventas.push({ id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5), productoId: prodId, fecha: row.f, cantidad: row[key], precioVenta: productMap[key].precio, costoUnitario: getOldCosto(prod) });
+                    }
+                });
+            });
+            data._salesMigrated4 = true;
+            data._ts = Date.now(); 
+        }
     }
 
     function loadState() {
@@ -201,15 +345,18 @@
             }
             if (!data.productos) return;
 
-            // Skip re-render if this change came from us
-            if (data._ts && data._ts === lastSaveTs) return;
+            // Reemplazo vital: Firebase no sobreescribirá cambios locales más recientes
+            // Si nuestro último guardado local es MÁS RECIENTE o idéntico que el Timestamp de la nube, ignoramos la nube.
+            if (data._ts && data._ts <= lastSaveTs) return;
 
             // Remote change from another device → apply it
             state = data;
             migrateState(state);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            
+            // Forzamos actualización de la vista actual
             if (currentSection) navigateTo(currentSection);
-            showToast('🔄 Datos actualizados desde otro dispositivo');
+            showToast('🔄 Datos actualizados a la versión de la nube');
         }, (error) => {
             console.error("Firebase listener error:", error);
             firebaseConnected = false;
@@ -325,33 +472,53 @@
         const now = new Date();
         $('dashboard-date').textContent = now.toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-        const todayStr = today();
-        const ventasHoy = state.ventas.filter(v => v.fecha === todayStr);
-        const totalHoy = ventasHoy.reduce((s, v) => s + (v.precioVenta * v.cantidad), 0);
+        const period = $('dashboard-period') ? $('dashboard-period').value : 'month';
+        
+        let ventasPeriodo = [];
+        let gastosPeriodo = [];
 
-        // Week
+        const todayStr = today();
         const weekAgo = new Date(now);
         weekAgo.setDate(weekAgo.getDate() - 7);
         const weekStr = weekAgo.getFullYear() + '-' + String(weekAgo.getMonth() + 1).padStart(2, '0') + '-' + String(weekAgo.getDate()).padStart(2, '0');
-        const ventasSemana = state.ventas.filter(v => v.fecha >= weekStr);
-        const totalSemana = ventasSemana.reduce((s, v) => s + (v.precioVenta * v.cantidad), 0);
-
-        // Month
         const monthStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-        const ventasMes = state.ventas.filter(v => v.fecha.startsWith(monthStr));
-        const totalMes = ventasMes.reduce((s, v) => s + (v.precioVenta * v.cantidad), 0);
-        const costoMes = ventasMes.reduce((s, v) => {
+
+        switch (period) {
+            case 'today':
+                ventasPeriodo = state.ventas.filter(v => v.fecha === todayStr);
+                gastosPeriodo = state.gastos.filter(g => g.fecha === todayStr);
+                break;
+            case 'week':
+                ventasPeriodo = state.ventas.filter(v => v.fecha >= weekStr);
+                gastosPeriodo = state.gastos.filter(g => g.fecha >= weekStr);
+                break;
+            case 'month':
+                ventasPeriodo = state.ventas.filter(v => v.fecha.startsWith(monthStr));
+                gastosPeriodo = state.gastos.filter(g => g.fecha.startsWith(monthStr));
+                break;
+            case 'all':
+                ventasPeriodo = [...state.ventas];
+                gastosPeriodo = [...state.gastos];
+                break;
+        }
+
+        const ingresos = ventasPeriodo.reduce((s, v) => s + (v.precioVenta * v.cantidad), 0);
+        const unidades = ventasPeriodo.reduce((s, v) => s + v.cantidad, 0);
+        
+        const costoProd = ventasPeriodo.reduce((s, v) => {
+            if (v.costoUnitario !== undefined) return s + (v.costoUnitario * v.cantidad);
             const prod = getProducto(v.productoId);
             return s + (prod ? calcCostoProducto(prod) * v.cantidad : 0);
         }, 0);
-        const gastosMes = state.gastos.filter(g => g.fecha.startsWith(monthStr)).reduce((s, g) => s + g.monto, 0);
-        const profitMes = totalMes - costoMes - gastosMes;
+        
+        const totalGastos = gastosPeriodo.reduce((s, g) => s + g.monto, 0);
+        const profitPeriodo = ingresos - costoProd - totalGastos;
 
-        $('kpi-ventas-hoy').textContent = formatMoney(totalHoy);
-        $('kpi-ventas-semana').textContent = formatMoney(totalSemana);
-        $('kpi-ventas-mes').textContent = formatMoney(totalMes);
-        $('kpi-profit-mes').textContent = formatMoney(profitMes);
-        $('kpi-profit-mes').style.color = profitMes >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+        $('kpi-ventas-hoy').textContent = formatMoney(ingresos);
+        $('kpi-ventas-semana').textContent = unidades.toString() + ' unid.';
+        $('kpi-ventas-mes').textContent = formatMoney(costoProd + totalGastos);
+        $('kpi-profit-mes').textContent = formatMoney(profitPeriodo);
+        $('kpi-profit-mes').style.color = profitPeriodo >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
 
         // Recent sales table
         const recent = [...state.ventas].sort((a, b) => b.fecha.localeCompare(a.fecha) || b.id.localeCompare(a.id)).slice(0, 10);
@@ -492,7 +659,7 @@
             return { nombre: p.nombre, emoji: p.emoji, qty, color: '' };
         });
 
-        const colors = ['#e8a838', '#e07830', '#4caf7d', '#5b9bd5'];
+        const colors = ['#e8a838', '#e07830', '#4caf7d', '#5b9bd5', '#e05680', '#9b59b6'];
         prodData.forEach((p, i) => p.color = colors[i % colors.length]);
 
         const total = prodData.reduce((s, p) => s + p.qty, 0);
@@ -559,8 +726,40 @@
 
     // =========== VENTAS ===========
     function renderVentas() {
+        renderBulkSale();
         renderQuickSale();
         renderVentasHistorial();
+    }
+
+    function renderBulkSale() {
+        const grid = $('bulk-sale-grid');
+        if (!grid) return;
+        $('bulk-sale-date').value = today();
+        grid.innerHTML = state.productos.map(p => {
+            return `<div class="bulk-sale-item">
+                <span class="bulk-sale-emoji">${p.emoji}</span>
+                <span class="bulk-sale-label">${p.nombre}</span>
+                <span class="bulk-sale-price">${formatMoney(p.precioVenta)}</span>
+                <div class="bulk-sale-qty">
+                    <button type="button" class="qty-btn qty-minus" data-id="${p.id}">\u2212</button>
+                    <input type="number" class="qty-input" id="bulk-qty-${p.id}" value="0" min="0" data-id="${p.id}">
+                    <button type="button" class="qty-btn qty-plus" data-id="${p.id}">+</button>
+                </div>
+            </div>`;
+        }).join('');
+
+        grid.querySelectorAll('.qty-minus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = $('bulk-qty-' + btn.dataset.id);
+                input.value = Math.max(0, (parseInt(input.value) || 0) - 1);
+            });
+        });
+        grid.querySelectorAll('.qty-plus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = $('bulk-qty-' + btn.dataset.id);
+                input.value = (parseInt(input.value) || 0) + 1;
+            });
+        });
     }
 
     function renderQuickSale() {
@@ -570,10 +769,9 @@
             const profit = p.precioVenta - costo;
             const margin = ((profit / p.precioVenta) * 100).toFixed(0);
             const stock = p.stockBolsas || 0;
-            const stockCls = stock > 0 ? 'in-stock' : 'no-stock';
-            const disabledCls = stock > 0 ? '' : 'disabled';
+            const stockCls = stock > 0 ? 'in-stock' : (stock === 0 ? 'no-stock' : 'negative-stock');
 
-            return `<div class="quick-sale-card ${disabledCls}" data-product-id="${p.id}" ${stock > 0 ? '' : 'title="No hay stock de bolsas"'}>
+            return `<div class="quick-sale-card" data-product-id="${p.id}">
                 <div class="stock-badge ${stockCls}">📦 ${stock} bolsas</div>
                 <div class="quick-sale-emoji">${p.emoji}</div>
                 <div class="quick-sale-name">${p.nombre}</div>
@@ -586,7 +784,7 @@
             </div>`;
         }).join('');
 
-        grid.querySelectorAll('.quick-sale-card:not(.disabled)').forEach(card => {
+        grid.querySelectorAll('.quick-sale-card').forEach(card => {
             card.addEventListener('click', () => {
                 const prodId = card.dataset.productId;
                 const prod = getProducto(prodId);
@@ -595,7 +793,7 @@
                 $('venta-producto-nombre').value = prod.emoji + ' ' + prod.nombre;
                 $('venta-fecha').value = today();
                 $('venta-cantidad').value = 1;
-                $('venta-cantidad').max = prod.stockBolsas || 1;
+                $('venta-cantidad').removeAttribute('max');
                 $('venta-precio-unit').textContent = formatMoney(prod.precioVenta);
                 $('venta-total').textContent = formatMoney(prod.precioVenta);
                 openModal('modal-venta');
@@ -648,34 +846,27 @@
         const container = $('prod-consumo-resumen');
 
         let html = '<strong style="display:block;margin-bottom:0.5rem">Se descontará del stock:</strong>';
-        let canProduce = true;
 
         prod.ingredientes.forEach(ing => {
             const mat = getMateria(ing.materiaId);
             const needed = ing.cantidadG * qty;
-            const hasStock = mat && mat.stockG >= needed;
-            if (!hasStock) canProduce = false;
-
-            html += `<div class="prod-consumo-item ${!hasStock ? 'no-stock-warning' : ''}">
+            html += `<div class="prod-consumo-item">
                 <span>${mat ? mat.nombre : ing.materiaId}:</span>
-                <span>${needed}g ${!hasStock ? '(Falta stock)' : ''}</span>
+                <span>${needed}g</span>
             </div>`;
         });
 
         (prod.insumosExtra || []).forEach(ins => {
             const insumo = getInsumo(ins.insumoId);
             const needed = ins.cantidad * qty;
-            const hasStock = insumo && insumo.stock >= needed;
-            if (!hasStock) canProduce = false;
-
-            html += `<div class="prod-consumo-item ${!hasStock ? 'no-stock-warning' : ''}">
+            html += `<div class="prod-consumo-item">
                 <span>${insumo ? insumo.nombre : ins.insumoId}:</span>
-                <span>${needed} unid. ${!hasStock ? '(Falta stock)' : ''}</span>
+                <span>${needed} unid.</span>
             </div>`;
         });
 
         container.innerHTML = html;
-        $('form-produccion').querySelector('button[type="submit"]').disabled = !canProduce;
+        $('form-produccion').querySelector('button[type="submit"]').disabled = false;
     }
 
     function renderProduccionHistorial() {
@@ -734,7 +925,8 @@
         }
         tbody.innerHTML = ventas.map(v => {
             const prod = getProducto(v.productoId);
-            const costo = prod ? calcCostoProducto(prod) * v.cantidad : 0;
+            const unitCost = v.costoUnitario !== undefined ? v.costoUnitario : (prod ? calcCostoProducto(prod) : 0);
+            const costo = unitCost * v.cantidad;
             const totalVenta = v.precioVenta * v.cantidad;
             const profit = totalVenta - costo;
             return `<tr>
@@ -794,10 +986,12 @@
             return `<div class="product-card">
                 <div class="product-card-header">
                     <span class="product-card-emoji">${p.emoji}</span>
-                    <div>
+                    <div style="flex:1">
                         <div class="product-card-title">${p.nombre}</div>
                         <div class="product-card-weight">${p.pesoG}g por bolsita</div>
                     </div>
+                    <button class="btn-icon edit-producto" data-id="${p.id}" title="Editar Producto">✏️</button>
+                    <button class="btn-icon delete-producto" data-id="${p.id}" title="Eliminar" style="color:var(--accent-red)">🗑️</button>
                 </div>
                 <div class="product-ingredients">
                     <h4>Ingredientes</h4>
@@ -824,6 +1018,79 @@
                 </div>
             </div>`;
         }).join('');
+
+        grid.querySelectorAll('.edit-producto').forEach(btn => {
+            btn.addEventListener('click', () => editProducto(btn.dataset.id));
+        });
+        grid.querySelectorAll('.delete-producto').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if(confirm('¿Eliminar producto?')) {
+                    state.productos = state.productos.filter(p => p.id !== btn.dataset.id);
+                    saveState();
+                    renderProductos();
+                    showToast('Producto eliminado');
+                }
+            });
+        });
+    }
+
+    function editProducto(id) {
+        const p = id ? getProducto(id) : null;
+        $('modal-producto-title').textContent = p ? 'Editar Producto' : 'Crear Producto';
+        $('producto-id').value = p ? p.id : '';
+        $('producto-nombre').value = p ? p.nombre : '';
+        $('producto-emoji').value = p ? p.emoji : '🥜';
+        $('producto-precio').value = p ? p.precioVenta : '';
+        $('producto-peso').value = p ? p.pesoG : '';
+
+        // Generate Ingredients HTML
+        const ingContainer = $('producto-ingredientes-list');
+        ingContainer.innerHTML = state.materias.map(m => {
+            const currentIng = p ? p.ingredientes.find(i => i.materiaId === m.id) : null;
+            const checked = currentIng ? 'checked' : '';
+            const qty = currentIng ? currentIng.cantidadG : '';
+            return `<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem">
+                <input type="checkbox" id="mat-${m.id}" data-id="${m.id}" class="ing-checkbox" ${checked}>
+                <label for="mat-${m.id}" style="flex:1; font-weight:500; font-size:0.9rem">${m.nombre}</label>
+                <input type="number" id="qty-mat-${m.id}" class="input-field input-sm ing-qty" placeholder="g" 
+                       style="width: 70px;" min="1" step="1" value="${qty}" ${checked ? '' : 'disabled'}>
+            </div>`;
+        }).join('');
+
+        // Toggles for ingreds
+        ingContainer.querySelectorAll('.ing-checkbox').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const input = $('qty-mat-' + e.target.dataset.id);
+                input.disabled = !e.target.checked;
+                if (!e.target.checked) input.value = '';
+                else input.focus();
+            });
+        });
+
+        // Generate Insumos HTML
+        const insContainer = $('producto-insumos-list');
+        insContainer.innerHTML = state.insumos.map(i => {
+            const currentIns = p && p.insumosExtra ? p.insumosExtra.find(x => x.insumoId === i.id) : null;
+            const checked = currentIns ? 'checked' : '';
+            const qty = currentIns ? currentIns.cantidad : '';
+            return `<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem">
+                <input type="checkbox" id="ins-${i.id}" data-id="${i.id}" class="ins-checkbox" ${checked}>
+                <label for="ins-${i.id}" style="flex:1; font-weight:500; font-size:0.9rem">${i.nombre}</label>
+                <input type="number" id="qty-ins-${i.id}" class="input-field input-sm ins-qty" placeholder="Cant." 
+                       style="width: 70px;" min="1" step="1" value="${qty}" ${checked ? '' : 'disabled'}>
+            </div>`;
+        }).join('');
+
+        insContainer.querySelectorAll('.ins-checkbox').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const input = $('qty-ins-' + e.target.dataset.id);
+                input.disabled = !e.target.checked;
+                if (!e.target.checked) input.value = '';
+                else if(!input.value) input.value = '1';
+            });
+        });
+
+        openModal('modal-producto');
     }
 
     // =========== MATERIAS PRIMAS ===========
@@ -991,6 +1258,7 @@
         // Profit summary
         const totalIngresos = filteredVentas.reduce((s, v) => s + (v.precioVenta * v.cantidad), 0);
         const totalCostoProductos = filteredVentas.reduce((s, v) => {
+            if (v.costoUnitario !== undefined) return s + (v.costoUnitario * v.cantidad);
             const prod = getProducto(v.productoId);
             return s + (prod ? calcCostoProducto(prod) * v.cantidad : 0);
         }, 0);
@@ -1054,7 +1322,7 @@
             const pVentas = filteredVentas.filter(v => v.productoId === p.id);
             const qty = pVentas.reduce((s, v) => s + v.cantidad, 0);
             const ingresos = pVentas.reduce((s, v) => s + (v.precioVenta * v.cantidad), 0);
-            const costoTotal = calcCostoProducto(p) * qty;
+            const costoTotal = pVentas.reduce((s, v) => s + ((v.costoUnitario !== undefined ? v.costoUnitario : calcCostoProducto(p)) * v.cantidad), 0);
             const ganancia = ingresos - costoTotal;
             const margin = ingresos > 0 ? ((ganancia / ingresos) * 100).toFixed(1) : 0;
             return { p, qty, ingresos, costoTotal, ganancia, margin };
@@ -1110,6 +1378,11 @@
             });
         });
 
+        // Dashboard period listener
+        if ($('dashboard-period')) {
+            $('dashboard-period').addEventListener('change', renderDashboard);
+        }
+
         // Venta form
         $('form-venta').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -1118,9 +1391,9 @@
             if (!prod) return;
             const qty = parseInt($('venta-cantidad').value);
 
+            // Stock warning (no longer blocks sales)
             if ((prod.stockBolsas || 0) < qty) {
-                showToast('No hay suficiente stock de bolsas para esta venta', true);
-                return;
+                // Allow sale even without stock — just warn
             }
 
             const venta = {
@@ -1129,6 +1402,7 @@
                 fecha: $('venta-fecha').value,
                 cantidad: qty,
                 precioVenta: prod.precioVenta,
+                costoUnitario: calcCostoProducto(prod)
             };
             state.ventas.push(venta);
 
@@ -1271,7 +1545,58 @@
             showToast('Gasto guardado');
         });
 
+        // Product form
+        if ($('form-producto')) {
+            $('form-producto').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = $('producto-id').value;
+                const data = {
+                    nombre: $('producto-nombre').value.trim(),
+                    emoji: $('producto-emoji').value.trim(),
+                    precioVenta: parseFloat($('producto-precio').value),
+                    pesoG: parseFloat($('producto-peso').value),
+                    ingredientes: [],
+                    insumosExtra: []
+                };
+
+                // Recolectar ingredientes seleccionados
+                $('producto-ingredientes-list').querySelectorAll('.ing-checkbox:checked').forEach(cb => {
+                    const matId = cb.dataset.id;
+                    const qty = parseFloat($('qty-mat-' + matId).value);
+                    if(qty > 0) data.ingredientes.push({ materiaId: matId, cantidadG: qty });
+                });
+
+                // Recolectar insumos seleccionados
+                $('producto-insumos-list').querySelectorAll('.ins-checkbox:checked').forEach(cb => {
+                    const insId = cb.dataset.id;
+                    const qty = parseFloat($('qty-ins-' + insId).value);
+                    if(qty > 0) data.insumosExtra.push({ insumoId: insId, cantidad: qty });
+                });
+
+                if (data.ingredientes.length === 0) {
+                    showToast('Debes agregar al menos 1 ingrediente', true);
+                    return;
+                }
+
+                if (id) {
+                    const p = getProducto(id);
+                    if (p) Object.assign(p, data);
+                } else {
+                    data.id = uid();
+                    data.stockBolsas = 0;
+                    state.productos.push(data);
+                }
+
+                saveState();
+                closeModal('modal-producto');
+                renderProductos();
+                showToast('Producto guardado correctamente');
+            });
+        }
+
         // Add buttons
+        if ($('btn-add-producto')) $('btn-add-producto').addEventListener('click', () => editProducto(null));
+        
         $('btn-add-materia').addEventListener('click', () => editMateria(null));
         $('btn-add-insumo').addEventListener('click', () => editInsumo(null));
         $('btn-add-gasto').addEventListener('click', () => {
@@ -1311,7 +1636,47 @@
             showToast('💾 Backup exportado correctamente');
         });
 
-        // Import
+        // Copy URL
+        if ($('btn-copy-url')) {
+            $('btn-copy-url').addEventListener('click', () => {
+                const url = 'https://facupd96-lab.github.io/nutcontrol/';
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('🔗 Link copiado al portapapeles');
+                }).catch(err => {
+                    console.error('Copy failed', err);
+                    showToast('Error al copiar link', true);
+                });
+            });
+        }
+
+        // Bulk Sale
+        if ($('btn-bulk-sale')) {
+            $('btn-bulk-sale').addEventListener('click', () => {
+                const fecha = $('bulk-sale-date').value;
+                if (!fecha) { showToast('Seleccioná una fecha', true); return; }
+                let totalUnits = 0;
+                state.productos.forEach(p => {
+                    const input = $('bulk-qty-' + p.id);
+                    const qty = parseInt(input.value) || 0;
+                    if (qty > 0) {
+                        state.ventas.push({
+                            id: uid(),
+                            productoId: p.id,
+                            fecha: fecha,
+                            cantidad: qty,
+                            precioVenta: p.precioVenta,
+                            costoUnitario: calcCostoProducto(p)
+                        });
+                        p.stockBolsas = (p.stockBolsas || 0) - qty;
+                        totalUnits += qty;
+                    }
+                });
+                if (totalUnits === 0) { showToast('No hay cantidades para registrar', true); return; }
+                saveState();
+                renderVentas();
+                showToast(`✅ ${totalUnits} ventas registradas para ${formatDate(fecha)}`);
+            });
+        }
         $('btn-import').addEventListener('click', () => $('import-file').click());
         $('import-file').addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -1347,11 +1712,14 @@
                 renderProductsChart();
             }
         });
-    }
-
     // =========== INIT ===========
     function init() {
         loadState();
+        migrateState(state);
+        // Save automatically if state was just migrated (so cloud gets the cleaned version)
+        if (state._salesMigrated4 === true && state._ts !== lastSaveTs) {
+            saveState();
+        }
         updateStorageUI();
         setupEvents();
         navigateTo('dashboard');

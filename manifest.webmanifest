@@ -1,0 +1,16 @@
+{
+  "name": "NutControl",
+  "short_name": "NutControl",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f0e0c",
+  "theme_color": "#141210",
+  "description": "Sistema de gestión integral para negocio de frutos secos.",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
