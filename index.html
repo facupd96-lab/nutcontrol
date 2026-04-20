@@ -15,8 +15,47 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon-512.png">
+    <style>
+        /* Initial Loading Screen */
+        #initial-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: #141210;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1.5rem;
+            transition: opacity 0.4s ease, visibility 0.4s;
+        }
+        .loader-icon {
+            font-size: 3.5rem;
+            animation: bounce 1.2s infinite ease-in-out;
+        }
+        .loader-text {
+            color: #f5f0e8;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        .loader-sub {
+            color: #7a6e62;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+    </style>
 </head>
-<body>
+<body class="loading-state">
+    <div id="initial-loader">
+        <div class="loader-icon">🥜</div>
+        <div class="loader-text">NutControl</div>
+        <div class="loader-sub">Sincronizando con la nube...</div>
+    </div>
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">

@@ -67,7 +67,7 @@
             id: 'castanas-caram',
             nombre: 'Castañas Caramelizadas',
             emoji: '🍯',
-            precioVenta: 3000,
+            precioVenta: 3500,
             pesoG: 65,
             ingredientes: [
                 { materiaId: 'castanas', cantidadG: 50 },
@@ -82,7 +82,7 @@
             id: 'girasol-caram',
             nombre: 'Semillas Caramelizadas',
             emoji: '🌻',
-            precioVenta: 2500,
+            precioVenta: 3000,
             pesoG: 75,
             ingredientes: [
                 { materiaId: 'girasol', cantidadG: 60 },
@@ -158,6 +158,7 @@
     let firebaseConnected = false;
     let saveTimeout = null;
     let lastSaveTs = 0;
+    let initialLoadComplete = false;
 
     function saveState() {
         lastSaveTs = Date.now();
@@ -308,45 +309,173 @@
             data._salesMigrated4 = true;
             data._ts = Date.now(); 
         }
+
+        // Actualizar precios (Abril 2026)
+        if (!data._pricesUpdatedApril2026) {
+            const pCastanas = data.productos.find(p => p.id === 'castanas-caram');
+            if (pCastanas) pCastanas.precioVenta = 3500;
+            const pGirasol = data.productos.find(p => p.id === 'girasol-caram');
+            if (pGirasol) pGirasol.precioVenta = 3000;
+            const pMixPrem = data.productos.find(p => p.id === 'mix-premium');
+            if (pMixPrem) pMixPrem.precioVenta = 3500;
+            const pMixEner = data.productos.find(p => p.id === 'mix-energico');
+            if (pMixEner) pMixEner.precioVenta = 3000;
+            const pMixCaram = data.productos.find(p => p.id === 'mix-caramelizado');
+            if (pMixCaram) pMixCaram.precioVenta = 3500;
+            const pMixChoco = data.productos.find(p => p.id === 'mix-chocolate');
+            if (pMixChoco) pMixChoco.precioVenta = 3500;
+
+            data._pricesUpdatedApril2026 = true;
+            data._ts = Date.now();
+        }
+    }
+
+    // Show/hide loading overlay
+    function showLoading(show) {
+        // First try the native loader from index.html
+        const nativeLoader = document.getElementById('initial-loader');
+        if (nativeLoader) {
+            if (!show) {
+                nativeLoader.style.opacity = '0';
+                nativeLoader.style.pointerEvents = 'none';
+                setTimeout(() => nativeLoader.style.visibility = 'hidden', 400);
+            }
+            return;
+        }
+
+        // Fallback to dynamic loader if native isn't there
+        let overlay = document.getElementById('loading-overlay');
+        if (!overlay && show) {
+            overlay = document.createElement('div');
+            overlay.id = 'loading-overlay';
+            overlay.innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
+                    <div style="font-size:3rem;animation:spin 1s linear infinite">🥜</div>
+                    <div style="font-size:1.1rem;font-weight:600;color:var(--text-primary)">Cargando datos...</div>
+                    <div style="font-size:0.85rem;color:var(--text-secondary)">Conectando con la nube</div>
+                </div>
+            `;
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg-primary,#141210);';
+            document.body.appendChild(overlay);
+        }
+        if (overlay && !show) {
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 0.3s';
+            setTimeout(() => overlay.remove(), 300);
+        }
     }
 
     function loadState() {
-        // 1) Load from localStorage for instant display
+        // Show loading overlay while we fetch from Firebase
+        showLoading(true);
+
+        // 1) Load from localStorage for instant preview (but don't navigate yet)
         const raw = localStorage.getItem(STORAGE_KEY);
+        let hasLocalData = false;
         if (raw) {
             try {
                 const parsed = JSON.parse(raw);
                 state = {
-                    materias: parsed.materias || DEFAULT_MATERIAS,
-                    insumos: parsed.insumos || DEFAULT_INSUMOS,
-                    productos: parsed.productos || DEFAULT_PRODUCTOS,
+                    materias: parsed.materias || JSON.parse(JSON.stringify(DEFAULT_MATERIAS)),
+                    insumos: parsed.insumos || JSON.parse(JSON.stringify(DEFAULT_INSUMOS)),
+                    productos: parsed.productos || JSON.parse(JSON.stringify(DEFAULT_PRODUCTOS)),
                     ventas: parsed.ventas || [],
                     gastos: parsed.gastos || [],
                     produccion: parsed.produccion || [],
                 };
+                // Copy over migration flags
+                Object.keys(parsed).forEach(k => { if (k.startsWith('_')) state[k] = parsed[k]; });
+                migrateState(state);
+                hasLocalData = true;
             } catch (err) {
                 console.error("Error loading local state", err);
-                initDefaults();
             }
-        } else {
+        }
+
+        if (!hasLocalData) {
+            // Set defaults in memory only — DO NOT save to Firebase/localStorage yet
             initDefaults();
         }
 
-        // 2) Setup Firebase real-time listener
+        // 2) Try to get Firebase data FIRST (one-time fetch, then setup listener)
+        const FIREBASE_TIMEOUT = 5000; // 5 second timeout
+        let firebaseResolved = false;
+
+        const timeoutId = setTimeout(() => {
+            if (firebaseResolved) return;
+            firebaseResolved = true;
+            console.warn("Firebase timeout — using local data");
+            showLoading(false);
+            initialLoadComplete = true;
+            // If we have local data, save it to localStorage
+            if (hasLocalData) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            }
+            if (currentSection) navigateTo(currentSection);
+            setupFirebaseListener();
+        }, FIREBASE_TIMEOUT);
+
+        dataRef.once('value').then((snapshot) => {
+            if (firebaseResolved) return;
+            firebaseResolved = true;
+            clearTimeout(timeoutId);
+
+            const data = snapshot.val();
+            firebaseConnected = true;
+            updateStorageUI();
+
+            if (data && data.productos) {
+                // Firebase has real data → USE IT (cloud is king)
+                state = data;
+                migrateState(state);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                console.log("✅ Datos cargados desde Firebase:", state.ventas.length, "ventas");
+            } else if (hasLocalData) {
+                // Firebase is empty but we have local data → push local data up
+                console.log("☁️ Firebase vacío, subiendo datos locales");
+                saveState();
+            } else {
+                // Both empty → first-time user, save defaults
+                console.log("🆕 Primera vez, guardando defaults");
+                saveState();
+            }
+
+            initialLoadComplete = true;
+            showLoading(false);
+            if (currentSection) navigateTo(currentSection);
+            setupFirebaseListener();
+        }).catch((err) => {
+            if (firebaseResolved) return;
+            firebaseResolved = true;
+            clearTimeout(timeoutId);
+            console.error("Firebase fetch error:", err);
+            firebaseConnected = false;
+            updateStorageUI();
+            showLoading(false);
+            initialLoadComplete = true;
+            if (currentSection) navigateTo(currentSection);
+            setupFirebaseListener();
+        });
+    }
+
+    function setupFirebaseListener() {
+        // Real-time listener for changes from other devices
         dataRef.on('value', (snapshot) => {
             const data = snapshot.val();
             firebaseConnected = true;
             updateStorageUI();
 
             if (!data) {
-                // Firebase is empty → push local data up (first-time migration)
-                dataRef.set(state);
+                // Firebase was emptied somehow → push our state back up
+                if (state.ventas && state.ventas.length > 0) {
+                    console.warn("⚠️ Firebase vacío pero tenemos datos locales, restaurando...");
+                    dataRef.set(state);
+                }
                 return;
             }
             if (!data.productos) return;
 
-            // Reemplazo vital: Firebase no sobreescribirá cambios locales más recientes
-            // Si nuestro último guardado local es MÁS RECIENTE o idéntico que el Timestamp de la nube, ignoramos la nube.
+            // Only ignore if we JUST saved and the cloud data is our own echo
             if (data._ts && data._ts <= lastSaveTs) return;
 
             // Remote change from another device → apply it
@@ -354,16 +483,16 @@
             migrateState(state);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
             
-            // Forzamos actualización de la vista actual
+            // Refresh the current view
             if (currentSection) navigateTo(currentSection);
-            showToast('🔄 Datos actualizados a la versión de la nube');
+            showToast('🔄 Datos actualizados desde otro dispositivo');
         }, (error) => {
             console.error("Firebase listener error:", error);
             firebaseConnected = false;
             updateStorageUI();
         });
 
-        // 3) Monitor connection status
+        // Monitor connection status
         firebase.database().ref('.info/connected').on('value', (snap) => {
             firebaseConnected = snap.val() === true;
             updateStorageUI();
@@ -378,7 +507,7 @@
         state.ventas = [];
         state.gastos = [];
         state.produccion = [];
-        saveState();
+        // DO NOT call saveState() here — wait for Firebase to respond first
     }
 
     // =========== HELPERS ===========
@@ -1712,17 +1841,14 @@
                 renderProductsChart();
             }
         });
+    }
+
     // =========== INIT ===========
     function init() {
-        loadState();
-        migrateState(state);
-        // Save automatically if state was just migrated (so cloud gets the cleaned version)
-        if (state._salesMigrated4 === true && state._ts !== lastSaveTs) {
-            saveState();
-        }
-        updateStorageUI();
         setupEvents();
         navigateTo('dashboard');
+        // loadState is async — it shows a loading overlay, fetches Firebase, then refreshes the view
+        loadState();
     }
 
     // Wait for DOM
