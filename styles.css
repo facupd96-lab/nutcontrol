@@ -301,12 +301,13 @@ body {
     font-size: 1.1rem;
 }
 
-/* ============ MAIN CONTENT ============ */
 .main-content {
     margin-left: var(--sidebar-width);
     flex: 1;
     min-height: 100vh;
     padding: 2rem 2.5rem;
+    max-width: 1400px;
+    margin-right: auto;
 }
 
 /* ============ SECTIONS ============ */
@@ -526,10 +527,23 @@ body {
 }
 
 /* ============ QUICK SALE ============ */
-.quick-sale-grid {
+.quick-sale-grid, .production-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 1.2rem;
+    justify-content: center;
+}
+
+#production-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 0.25fr));
+    justify-content: start;
+}
+
+@media (min-width: 1200px) {
+    #production-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
 }
 
 .quick-sale-card {
@@ -583,6 +597,12 @@ body {
     margin-bottom: 0.3rem;
     position: relative;
     z-index: 1;
+    white-space: normal;
+    line-height: 1.2;
+    min-height: 2.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .quick-sale-price {

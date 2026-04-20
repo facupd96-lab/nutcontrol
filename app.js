@@ -281,6 +281,27 @@
             data._cleanupGastos1 = true;
         }
 
+        // Forzar sincronización de productos faltantes (Abril 2026)
+        DEFAULT_PRODUCTOS.forEach(defProd => {
+            const exists = data.productos.some(p => p.id === defProd.id);
+            if (!exists) {
+                console.log(`➕ Añadiendo producto faltante: ${defProd.nombre}`);
+                data.productos.push(JSON.parse(JSON.stringify(defProd)));
+                data._ts = Date.now();
+            }
+        });
+
+        // Asegurar que MIX Caramelizado tiene la receta correcta (Abril 2026)
+        const mixCaram = data.productos.find(p => p.id === 'mix-caramelizado');
+        if (mixCaram && (!mixCaram.ingredientes || mixCaram.ingredientes.length === 0 || !data._mixCaramRecipeFixed)) {
+            const defMix = DEFAULT_PRODUCTOS.find(p => p.id === 'mix-caramelizado');
+            mixCaram.ingredientes = JSON.parse(JSON.stringify(defMix.ingredientes));
+            mixCaram.precioVenta = 3500;
+            mixCaram.pesoG = 70;
+            data._mixCaramRecipeFixed = true;
+            data._ts = Date.now();
+        }
+
         if (!data._salesMigrated4) {
             const rows = [
                 { f: '2026-03-22', p: 3 }, { f: '2026-03-23', p: 9 }, { f: '2026-03-24', p: 5 }, { f: '2026-03-25', p: 11 }, { f: '2026-03-26', p: 4 }, { f: '2026-03-27', p: 1 }, { f: '2026-03-28', p: 3 }, { f: '2026-03-29', p: 8 }, { f: '2026-03-30', p: 1, g: 6, s: 1 }, { f: '2026-03-31', p: 4, g: 5, s: 3 }, { f: '2026-04-01', p: 4, e: 3, g: 3, s: 1 }, { f: '2026-04-02', p: 1, e: 1, g: 4, s: 2 }, { f: '2026-04-03', p: 3, e: 1, g: 2, s: 2 }, { f: '2026-04-04', g: 4, s: 1 }, { f: '2026-04-05', p: 2, e: 2, g: 5, s: 6 }, { f: '2026-04-06', p: 1, e: 1, s: 8 }, { f: '2026-04-07', p: 1, e: 1, g: 5 }, { f: '2026-04-08', e: 1 }, { f: '2026-04-09', e: 1, g: 3 }, { f: '2026-04-10', p: 1, e: 1, g: 5 }, { f: '2026-04-11', p: 2, e: 1, g: 2 }, { f: '2026-04-12', p: 7, e: 2 }, { f: '2026-04-13', p: 2 }, { f: '2026-04-14', p: 3 }, { f: '2026-04-15', c: 13 }
