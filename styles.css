@@ -308,6 +308,7 @@ body {
     padding: 2rem 2.5rem;
     max-width: 1400px;
     margin-right: auto;
+    overflow-x: hidden;
 }
 
 /* ============ SECTIONS ============ */
@@ -527,23 +528,16 @@ body {
 }
 
 /* ============ QUICK SALE ============ */
-.quick-sale-grid, .production-grid {
+.quick-sale-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1.2rem;
-    justify-content: center;
 }
 
 #production-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 0.25fr));
-    justify-content: start;
-}
-
-@media (min-width: 1200px) {
-    #production-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    }
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
 }
 
 .quick-sale-card {
