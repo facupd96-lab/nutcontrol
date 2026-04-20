@@ -98,12 +98,12 @@
             nombre: 'Mix Caramelizado',
             emoji: '🍬',
             precioVenta: 3500,
-            pesoG: 76,
+            pesoG: 70,
             ingredientes: [
-                { materiaId: 'mani', cantidadG: 14 },
-                { materiaId: 'almendras', cantidadG: 14 },
-                { materiaId: 'nueces-ambar', cantidadG: 14 },
-                { materiaId: 'azucar', cantidadG: 34 },
+                { materiaId: 'mani', cantidadG: 15 },
+                { materiaId: 'almendras', cantidadG: 15 },
+                { materiaId: 'nueces', cantidadG: 15 },
+                { materiaId: 'azucar', cantidadG: 25 },
             ],
             insumosExtra: [
                 { insumoId: 'bolsitas', cantidad: 1 },
@@ -308,6 +308,19 @@
             });
             data._salesMigrated4 = true;
             data._ts = Date.now(); 
+        }
+
+        // Asegurar que MIX Caramelizado existe (Abril 2026)
+        if (!data._mixCaramelizadoAdded) {
+            const hasMix = data.productos.some(p => p.id === 'mix-caramelizado');
+            if (!hasMix) {
+                const defaultMix = DEFAULT_PRODUCTOS.find(p => p.id === 'mix-caramelizado');
+                if (defaultMix) {
+                    data.productos.push(JSON.parse(JSON.stringify(defaultMix)));
+                }
+            }
+            data._mixCaramelizadoAdded = true;
+            data._ts = Date.now();
         }
 
         // Actualizar precios (Abril 2026)
