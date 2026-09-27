@@ -8,125 +8,49 @@
 
     // =========== DEFAULT DATA ===========
     const DEFAULT_MATERIAS = [
-        { id: 'mani', nombre: 'Maní Tostado', precioKg: 2857, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'castanas', nombre: 'Castañas de Cajú', precioKg: 18900, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'nueces', nombre: 'Nueces Premium', precioKg: 24000, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'nueces-ambar', nombre: 'Nueces Ámbar', precioKg: 16465, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'almendras', nombre: 'Almendras', precioKg: 25000, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'girasol', nombre: 'Semillas de Girasol', precioKg: 5880, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'pasas', nombre: 'Pasas de Uva', precioKg: 10000, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'azucar', nombre: 'Azúcar', precioKg: 1500, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'chocolate', nombre: 'Chocolate Semi Amargo', precioKg: 13718, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'zapallo', nombre: 'Semillas de Zapallo', precioKg: 18918, stockG: 0, updatedAt: new Date().toISOString() },
-        { id: 'chia', nombre: 'Semillas de Chía', precioKg: 11250, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'girasol', nombre: 'Semillas de Girasol', precioKg: 6000, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'zapallo', nombre: 'Semillas de Zapallo', precioKg: 16000, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'castanas', nombre: 'Castañas de Cajú', precioKg: 24000, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'almendras', nombre: 'Almendras', precioKg: 29000, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'chocolate', nombre: 'Chocolate Alpino', precioKg: 13500, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'azucar', nombre: 'Azúcar', precioKg: 1400, stockG: 0, updatedAt: new Date().toISOString() },
+        { id: 'sal', nombre: 'Sal fina (salmuera)', precioKg: 1500, stockG: 0, updatedAt: new Date().toISOString() },
     ];
 
     const DEFAULT_INSUMOS = [
-        { id: 'bolsitas', nombre: 'Bolsitas Kraft', precioUnit: 132, stock: 0, updatedAt: new Date().toISOString() },
-        { id: 'etiquetas', nombre: 'Etiquetas Nimboot', precioUnit: 71, stock: 0, updatedAt: new Date().toISOString() },
+        { id: 'bolsitas', nombre: 'Doypack kraft 10x15 (60 g)', precioUnit: 168, stock: 0, updatedAt: new Date().toISOString() },
+        { id: 'bolsa300', nombre: 'Doypack 300 g', precioUnit: 300, stock: 0, updatedAt: new Date().toISOString() },
+        { id: 'etiquetas', nombre: 'Etiqueta Niimbot 12x40', precioUnit: 78, stock: 0, updatedAt: new Date().toISOString() },
+        { id: 'celofan', nombre: 'Celofán + tag (ramos y cajas)', precioUnit: 103, stock: 0, updatedAt: new Date().toISOString() },
     ];
 
+    const STD_INS = [{ insumoId: 'bolsitas', cantidad: 1 }, { insumoId: 'etiquetas', cantidad: 1 }];
+
     const DEFAULT_PRODUCTOS = [
-        {
-            id: 'mix-premium',
-            nombre: 'Mix Premium',
-            emoji: '👑',
-            precioVenta: 3500,
-            pesoG: 75,
-            ingredientes: [
-                { materiaId: 'castanas', cantidadG: 15 },
-                { materiaId: 'almendras', cantidadG: 15 },
-                { materiaId: 'nueces', cantidadG: 15 },
-                { materiaId: 'girasol', cantidadG: 15 },
-                { materiaId: 'mani', cantidadG: 15 },
-            ],
-            insumosExtra: [
-                { insumoId: 'bolsitas', cantidad: 1 },
-                { insumoId: 'etiquetas', cantidad: 1 },
-            ],
-        },
-        {
-            id: 'mix-energico',
-            nombre: 'Mix Enérgico',
-            emoji: '⚡',
-            precioVenta: 3000,
-            pesoG: 75,
-            ingredientes: [
-                { materiaId: 'pasas', cantidadG: 15 },
-                { materiaId: 'almendras', cantidadG: 15 },
-                { materiaId: 'nueces', cantidadG: 15 },
-                { materiaId: 'girasol', cantidadG: 15 },
-                { materiaId: 'mani', cantidadG: 15 },
-            ],
-            insumosExtra: [
-                { insumoId: 'bolsitas', cantidad: 1 },
-                { insumoId: 'etiquetas', cantidad: 1 },
-            ],
-        },
-        {
-            id: 'castanas-caram',
-            nombre: 'Castañas Caramelizadas',
-            emoji: '🍯',
-            precioVenta: 3500,
-            pesoG: 65,
-            ingredientes: [
-                { materiaId: 'castanas', cantidadG: 50 },
-                { materiaId: 'azucar', cantidadG: 15 },
-            ],
-            insumosExtra: [
-                { insumoId: 'bolsitas', cantidad: 1 },
-                { insumoId: 'etiquetas', cantidad: 1 },
-            ],
-        },
-        {
-            id: 'girasol-caram',
-            nombre: 'Semillas Caramelizadas',
-            emoji: '🌻',
-            precioVenta: 3000,
-            pesoG: 75,
-            ingredientes: [
-                { materiaId: 'girasol', cantidadG: 60 },
-                { materiaId: 'azucar', cantidadG: 15 },
-            ],
-            insumosExtra: [
-                { insumoId: 'bolsitas', cantidad: 1 },
-                { insumoId: 'etiquetas', cantidad: 1 },
-            ],
-        },
-        {
-            id: 'mix-caramelizado',
-            nombre: 'Mix Caramelizado',
-            emoji: '🍬',
-            precioVenta: 3500,
-            pesoG: 70,
-            ingredientes: [
-                { materiaId: 'mani', cantidadG: 15 },
-                { materiaId: 'almendras', cantidadG: 15 },
-                { materiaId: 'nueces', cantidadG: 15 },
-                { materiaId: 'azucar', cantidadG: 25 },
-            ],
-            insumosExtra: [
-                { insumoId: 'bolsitas', cantidad: 1 },
-                { insumoId: 'etiquetas', cantidad: 1 },
-            ],
-        },
-        {
-            id: 'mix-chocolate',
-            nombre: 'Mix Chocolate Semi Amargo',
-            emoji: '🍫',
-            precioVenta: 3500,
-            pesoG: 75,
-            ingredientes: [
-                { materiaId: 'chocolate', cantidadG: 49 },
-                { materiaId: 'girasol', cantidadG: 15 },
-                { materiaId: 'zapallo', cantidadG: 9 },
-                { materiaId: 'chia', cantidadG: 2 },
-            ],
-            insumosExtra: [
-                { insumoId: 'bolsitas', cantidad: 1 },
-                { insumoId: 'etiquetas', cantidad: 1 },
-            ],
-        },
+        { id: 'choco-semillas', nombre: 'Chocolate con semillas', emoji: '🍫', precioVenta: 4000, pesoG: 65, stockBolsas: 0,
+          ingredientes: [{ materiaId: 'girasol', cantidadG: 15 }, { materiaId: 'zapallo', cantidadG: 15 }, { materiaId: 'chocolate', cantidadG: 33 }, { materiaId: 'azucar', cantidadG: 2 }],
+          insumosExtra: STD_INS },
+        { id: 'choco-castanas', nombre: 'Chocolate con castañas', emoji: '🌰', precioVenta: 4000, pesoG: 65, stockBolsas: 0,
+          ingredientes: [{ materiaId: 'castanas', cantidadG: 30 }, { materiaId: 'chocolate', cantidadG: 33 }, { materiaId: 'azucar', cantidadG: 2 }],
+          insumosExtra: STD_INS },
+        { id: 'choco-almendras', nombre: 'Chocolate con almendras', emoji: '🥜', precioVenta: 4000, pesoG: 65, stockBolsas: 0,
+          ingredientes: [{ materiaId: 'almendras', cantidadG: 30 }, { materiaId: 'chocolate', cantidadG: 33 }, { materiaId: 'azucar', cantidadG: 2 }],
+          insumosExtra: STD_INS },
+        { id: 'choco-girasol', nombre: 'Chocolate con girasol', emoji: '🌻', precioVenta: 4000, pesoG: 65, stockBolsas: 0,
+          ingredientes: [{ materiaId: 'girasol', cantidadG: 30 }, { materiaId: 'chocolate', cantidadG: 33 }, { materiaId: 'azucar', cantidadG: 2 }],
+          insumosExtra: STD_INS },
+        { id: 'garrapinada', nombre: 'Garrapiñada de girasol', emoji: '🍬', precioVenta: 4000, pesoG: 70, stockBolsas: 0,
+          ingredientes: [{ materiaId: 'girasol', cantidadG: 48 }, { materiaId: 'azucar', cantidadG: 24 }],
+          insumosExtra: STD_INS },
+        { id: 'girasol-salado', nombre: 'Girasol salado en salmuera', emoji: '🧂', precioVenta: 4000, pesoG: 70, stockBolsas: 0,
+          ingredientes: [{ materiaId: 'girasol', cantidadG: 70 }, { materiaId: 'sal', cantidadG: 8 }],
+          insumosExtra: STD_INS },
+        { id: 'choco-300', nombre: 'Chocolate con semillas 300 g', emoji: '🎁', precioVenta: 20000, pesoG: 300, stockBolsas: 0,
+          ingredientes: [{ materiaId: 'girasol', cantidadG: 69 }, { materiaId: 'zapallo', cantidadG: 69 }, { materiaId: 'chocolate', cantidadG: 152 }, { materiaId: 'azucar', cantidadG: 9 }],
+          insumosExtra: [{ insumoId: 'bolsa300', cantidad: 1 }, { insumoId: 'etiquetas', cantidad: 1 }] },
+        { id: 'rocas-ramo', nombre: 'Rocas de choco + semillas (ramo)', emoji: '🪨', precioVenta: 4667, pesoG: 50, stockBolsas: 0,
+          ingredientes: [{ materiaId: 'girasol', cantidadG: 12 }, { materiaId: 'zapallo', cantidadG: 12 }, { materiaId: 'chocolate', cantidadG: 25 }, { materiaId: 'azucar', cantidadG: 1 }],
+          insumosExtra: [{ insumoId: 'celofan', cantidad: 1 }] },
     ];
 
     // =========== STATE ===========
@@ -196,172 +120,20 @@
     }
 
     function migrateState(data) {
+        // Solo normaliza la forma del estado. Nada de migraciones de datos:
+        // los precios, productos y ventas se cargan desde la app o por importación.
         if (!data) return;
-        data.productos.forEach(p => { if (p.stockBolsas === undefined) p.stockBolsas = 0; });
-        if (!data.produccion) data.produccion = [];
-        if (!data.gastos) data.gastos = [];
+        if (!data.materias) data.materias = JSON.parse(JSON.stringify(DEFAULT_MATERIAS));
+        if (!data.insumos) data.insumos = JSON.parse(JSON.stringify(DEFAULT_INSUMOS));
+        if (!data.productos) data.productos = JSON.parse(JSON.stringify(DEFAULT_PRODUCTOS));
         if (!data.ventas) data.ventas = [];
-        if (!data.materias) data.materias = DEFAULT_MATERIAS;
-        if (!data.insumos) data.insumos = DEFAULT_INSUMOS;
-
-        // Add missing materias primas
-        DEFAULT_MATERIAS.forEach(dm => {
-            if (!data.materias.find(m => m.id === dm.id)) {
-                data.materias.push(JSON.parse(JSON.stringify(dm)));
-            }
+        if (!data.gastos) data.gastos = [];
+        if (!data.produccion) data.produccion = [];
+        data.productos.forEach(p => {
+            if (p.stockBolsas === undefined) p.stockBolsas = 0;
+            if (!p.ingredientes) p.ingredientes = [];
+            if (!p.insumosExtra) p.insumosExtra = [];
         });
-        // Rename Nueces -> Nueces Premium
-        const nueces = data.materias.find(m => m.id === 'nueces');
-        if (nueces && nueces.nombre === 'Nueces') nueces.nombre = 'Nueces Premium';
-
-        // Actualizar precios confirmados
-        const almendras = data.materias.find(m => m.id === 'almendras');
-        if (almendras) almendras.precioKg = 25000;
-        const chia = data.materias.find(m => m.id === 'chia');
-        if (chia) chia.precioKg = 11250;
-
-        // Migración única para cargar 2kg de almendras comprados
-        if (!data._almendras2kgAdded) {
-            if (almendras) almendras.stockG = (almendras.stockG || 0) + 2000;
-            data.gastos.push({
-                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-                fecha: new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0') + '-' + String(new Date().getDate()).padStart(2, '0'),
-                concepto: 'Compra Almendras (2kg)',
-                tipo: 'variable',
-                monto: 50000
-            });
-            data._almendras2kgAdded = true;
-        }
-
-        // Add missing productos
-        DEFAULT_PRODUCTOS.forEach(dp => {
-            if (!data.productos.find(p => p.id === dp.id)) {
-                const np = JSON.parse(JSON.stringify(dp));
-                np.stockBolsas = 0;
-                data.productos.push(np);
-            }
-        });
-
-        // ------------------ DATA MIGRATIONS ------------------
-        if (!data._purchasesApplied1) {
-            const dateStr = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0') + '-' + String(new Date().getDate()).padStart(2, '0');
-            const purchases = [
-                { id: 'etiquetas', type: 'insumo', qtyToAdd: 800, newUnit: 71.125 },
-                { id: 'chocolate', type: 'materia', qtyToAdd: 3000, newUnit: 13294.66 },
-                { id: 'zapallo', type: 'materia', qtyToAdd: 500, newUnit: 18334 },
-                { id: 'nueces', type: 'materia', qtyToAdd: 1000, newUnit: 24000 },
-                { id: 'girasol', type: 'materia', qtyToAdd: 3000, newUnit: 5881.66 },
-                { id: 'almendras', type: 'materia', qtyToAdd: 2000, newUnit: 24711.50 },
-                { id: 'nueces-ambar', type: 'materia', qtyToAdd: 1000, newUnit: 16465 },
-                { id: 'mani', type: 'materia', qtyToAdd: 5000, newUnit: 2857.20 },
-                { id: 'bolsitas', type: 'insumo', qtyToAdd: 500, newUnit: 146.90 },
-            ];
-            purchases.forEach(p => {
-                if (p.type === 'materia') {
-                    const item = data.materias.find(m => m.id === p.id);
-                    if (item) { item.stockG = (item.stockG || 0) + p.qtyToAdd; item.precioKg = p.newUnit; }
-                } else if (p.type === 'insumo') {
-                    const item = data.insumos.find(i => i.id === p.id);
-                    if (item) { item.stock = (item.stock || 0) + p.qtyToAdd; item.precioUnit = p.newUnit; }
-                }
-            });
-            data._purchasesApplied1 = true;
-        }
-
-        if (!data._cleanupGastos1) {
-            const badConcepts = [
-                'Compra Etiquetas Nimboot', 'Compra Chocolate Alpino Semiamargo (3kg)',
-                'Compra Semillas de Zapallo (500gr)', 'Compra Nueces Premium (1kg)',
-                'Compra Semillas de Girasol (3kg)', 'Compra Almendras (2kg)',
-                'Compra Nueces Ámbar (1kg)', 'Compra Maní Tostado (5kg)', 'Compra Bolsitas Kraft (500 unid)'
-            ];
-            data.gastos = data.gastos.filter(g => !badConcepts.includes(g.concepto));
-            const choco = data.materias.find(m => m.id === 'chocolate');
-            if (choco && choco.precioKg > 30000) choco.precioKg = 13294.66;
-            data._cleanupGastos1 = true;
-        }
-
-        // Forzar sincronización de productos faltantes (Abril 2026)
-        DEFAULT_PRODUCTOS.forEach(defProd => {
-            const exists = data.productos.some(p => p.id === defProd.id);
-            if (!exists) {
-                console.log(`➕ Añadiendo producto faltante: ${defProd.nombre}`);
-                data.productos.push(JSON.parse(JSON.stringify(defProd)));
-                data._ts = Date.now();
-            }
-        });
-
-        // Asegurar que MIX Caramelizado tiene la receta correcta (Abril 2026)
-        const mixCaram = data.productos.find(p => p.id === 'mix-caramelizado');
-        if (mixCaram && (!mixCaram.ingredientes || mixCaram.ingredientes.length === 0 || !data._mixCaramRecipeFixed)) {
-            const defMix = DEFAULT_PRODUCTOS.find(p => p.id === 'mix-caramelizado');
-            mixCaram.ingredientes = JSON.parse(JSON.stringify(defMix.ingredientes));
-            mixCaram.precioVenta = 3500;
-            mixCaram.pesoG = 70;
-            data._mixCaramRecipeFixed = true;
-            data._ts = Date.now();
-        }
-
-        if (!data._salesMigrated4) {
-            const rows = [
-                { f: '2026-03-22', p: 3 }, { f: '2026-03-23', p: 9 }, { f: '2026-03-24', p: 5 }, { f: '2026-03-25', p: 11 }, { f: '2026-03-26', p: 4 }, { f: '2026-03-27', p: 1 }, { f: '2026-03-28', p: 3 }, { f: '2026-03-29', p: 8 }, { f: '2026-03-30', p: 1, g: 6, s: 1 }, { f: '2026-03-31', p: 4, g: 5, s: 3 }, { f: '2026-04-01', p: 4, e: 3, g: 3, s: 1 }, { f: '2026-04-02', p: 1, e: 1, g: 4, s: 2 }, { f: '2026-04-03', p: 3, e: 1, g: 2, s: 2 }, { f: '2026-04-04', g: 4, s: 1 }, { f: '2026-04-05', p: 2, e: 2, g: 5, s: 6 }, { f: '2026-04-06', p: 1, e: 1, s: 8 }, { f: '2026-04-07', p: 1, e: 1, g: 5 }, { f: '2026-04-08', e: 1 }, { f: '2026-04-09', e: 1, g: 3 }, { f: '2026-04-10', p: 1, e: 1, g: 5 }, { f: '2026-04-11', p: 2, e: 1, g: 2 }, { f: '2026-04-12', p: 7, e: 2 }, { f: '2026-04-13', p: 2 }, { f: '2026-04-14', p: 3 }, { f: '2026-04-15', c: 13 }
-            ];
-            const oldPrices = { 'mani': 2857.00, 'castanas': 18900.00, 'nueces': 24000.00, 'nueces-ambar': 16465.00, 'almendras': 25000.00, 'girasol': 5880.00, 'pasas': 10000.00, 'azucar': 1500.00, 'chocolate': 13294.66, 'zapallo': 18918.00, 'chia': 11250.00, 'bolsitas': 132, 'etiquetas': 71 };
-            const productMap = { p: { id: 'mix-premium', precio: 3500 }, e: { id: 'mix-energico', precio: 3000 }, g: { id: 'castanas-caram', precio: 3000 }, s: { id: 'girasol-caram', precio: 2500 }, c: { id: 'mix-caramelizado', precio: 3500 } };
-            
-            function getOldCosto(prod) {
-                if (!prod) return 0;
-                let cost = 0;
-                if (prod.ingredientes) prod.ingredientes.forEach(i => cost += (i.cantidadG / 1000) * (oldPrices[i.materiaId] || 0));
-                if (prod.insumosExtra) prod.insumosExtra.forEach(i => cost += i.cantidad * (oldPrices[i.insumoId] || 0));
-                return cost;
-            }
-
-            data.ventas = [];
-            rows.forEach(row => {
-                Object.keys(productMap).forEach(key => {
-                    if (row[key] && row[key] > 0) {
-                        const prodId = productMap[key].id;
-                        const prod = data.productos.find(p => p.id === prodId);
-                        data.ventas.push({ id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5), productoId: prodId, fecha: row.f, cantidad: row[key], precioVenta: productMap[key].precio, costoUnitario: getOldCosto(prod) });
-                    }
-                });
-            });
-            data._salesMigrated4 = true;
-            data._ts = Date.now(); 
-        }
-
-        // Asegurar que MIX Caramelizado existe (Abril 2026)
-        if (!data._mixCaramelizadoAdded) {
-            const hasMix = data.productos.some(p => p.id === 'mix-caramelizado');
-            if (!hasMix) {
-                const defaultMix = DEFAULT_PRODUCTOS.find(p => p.id === 'mix-caramelizado');
-                if (defaultMix) {
-                    data.productos.push(JSON.parse(JSON.stringify(defaultMix)));
-                }
-            }
-            data._mixCaramelizadoAdded = true;
-            data._ts = Date.now();
-        }
-
-        // Actualizar precios (Abril 2026)
-        if (!data._pricesUpdatedApril2026) {
-            const pCastanas = data.productos.find(p => p.id === 'castanas-caram');
-            if (pCastanas) pCastanas.precioVenta = 3500;
-            const pGirasol = data.productos.find(p => p.id === 'girasol-caram');
-            if (pGirasol) pGirasol.precioVenta = 3000;
-            const pMixPrem = data.productos.find(p => p.id === 'mix-premium');
-            if (pMixPrem) pMixPrem.precioVenta = 3500;
-            const pMixEner = data.productos.find(p => p.id === 'mix-energico');
-            if (pMixEner) pMixEner.precioVenta = 3000;
-            const pMixCaram = data.productos.find(p => p.id === 'mix-caramelizado');
-            if (pMixCaram) pMixCaram.precioVenta = 3500;
-            const pMixChoco = data.productos.find(p => p.id === 'mix-chocolate');
-            if (pMixChoco) pMixChoco.precioVenta = 3500;
-
-            data._pricesUpdatedApril2026 = true;
-            data._ts = Date.now();
-        }
     }
 
     // Show/hide loading overlay
@@ -1877,10 +1649,180 @@
         });
     }
 
+    // =========== PANTALLA "HOY" — carga rápida de ventas ===========
+    // Se abre al iniciar. Un toque = una venta. Sin stock, sin producción.
+    var HOY = (function () {
+        var comboBuf = [];
+        var PRECIO_COMBO = Math.round(10000 / 3);
+        var root = null;
+
+        function activos() {
+            return state.productos.filter(function (p) {
+                return p.nombre.indexOf('(discontinuado)') === -1 && p.id !== 'rocas-ramo';
+            });
+        }
+        function ventasDeHoy() {
+            var h = today();
+            return state.ventas.filter(function (v) { return v.fecha === h; });
+        }
+        function estilos() {
+            if (document.getElementById('hoy-css')) return;
+            var s = document.createElement('style');
+            s.id = 'hoy-css';
+            s.textContent = [
+                '#hoy-overlay{position:fixed;inset:0;z-index:9000;background:#141210;color:#f5f0e8;',
+                'display:flex;flex-direction:column;font-family:Inter,system-ui,sans-serif;overflow:hidden}',
+                '#hoy-top{padding:18px 18px 12px;border-bottom:1px solid #2a2621;flex:0 0 auto}',
+                '#hoy-top h2{margin:0;font-size:1.35rem;font-weight:700;letter-spacing:-.02em}',
+                '#hoy-fecha{color:#7a6e62;font-size:.82rem;margin-top:2px}',
+                '#hoy-combo{margin:14px 0 0;width:100%;padding:16px;border-radius:14px;border:2px solid #3d3630;',
+                'background:#1e1b18;color:#f5f0e8;font-size:1rem;font-weight:600;cursor:pointer;transition:.15s}',
+                '#hoy-combo.on{background:#c8963e;border-color:#c8963e;color:#1a1512}',
+                '#hoy-combo small{display:block;font-weight:400;font-size:.78rem;opacity:.75;margin-top:3px}',
+                '#hoy-grid{flex:1 1 auto;overflow-y:auto;padding:14px 18px 18px;display:grid;gap:10px;',
+                '-webkit-overflow-scrolling:touch}',
+                '.hoy-btn{display:flex;align-items:center;gap:12px;width:100%;padding:16px 14px;border-radius:14px;',
+                'border:1px solid #2a2621;background:#1e1b18;color:#f5f0e8;font-size:1rem;text-align:left;cursor:pointer;',
+                'font-family:inherit;transition:.12s;min-height:64px}',
+                '.hoy-btn:active{transform:scale(.975);background:#272320}',
+                '.hoy-btn .em{font-size:1.5rem;flex:0 0 auto}',
+                '.hoy-btn .nm{flex:1 1 auto;font-weight:600;line-height:1.25}',
+                '.hoy-btn .nm b{display:block;font-weight:400;font-size:.78rem;color:#7a6e62;margin-top:2px}',
+                '.hoy-btn .ct{flex:0 0 auto;min-width:34px;height:34px;border-radius:17px;background:#2f2a25;',
+                'display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.92rem;padding:0 9px}',
+                '.hoy-btn .ct.z{opacity:.28}',
+                '#hoy-bot{flex:0 0 auto;border-top:1px solid #2a2621;padding:14px 18px;',
+                'padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));background:#1a1714}',
+                '#hoy-tot{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}',
+                '#hoy-tot span{color:#7a6e62;font-size:.85rem}',
+                '#hoy-tot b{font-size:1.5rem;font-weight:700}',
+                '#hoy-acc{display:flex;gap:9px}',
+                '#hoy-acc button{flex:1;padding:13px;border-radius:12px;border:1px solid #2a2621;background:#1e1b18;',
+                'color:#b3a99c;font-size:.88rem;font-family:inherit;cursor:pointer;font-weight:500}',
+                '#hoy-acc button:active{background:#272320}',
+                '@media(min-width:700px){#hoy-grid{grid-template-columns:1fr 1fr}#hoy-overlay{max-width:640px;margin:0 auto;',
+                'border-left:1px solid #2a2621;border-right:1px solid #2a2621}}'
+            ].join('');
+            document.head.appendChild(s);
+        }
+
+        function registrar(pid, precio) {
+            var prod = getProducto(pid);
+            if (!prod) return;
+            state.ventas.push({
+                id: uid(), productoId: pid, fecha: today(), cantidad: 1,
+                precioVenta: precio, costoUnitario: calcCostoProducto(prod)
+            });
+            prod.stockBolsas = (prod.stockBolsas || 0) - 1;
+            saveState();
+        }
+
+        function tap(pid) {
+            if (comboBuf.length || document.getElementById('hoy-combo').classList.contains('on')) {
+                comboBuf.push(pid);
+                if (comboBuf.length >= 3) {
+                    // el tercero absorbe el redondeo para que el combo sume exacto $10.000
+                    comboBuf.forEach(function (id, k) {
+                        registrar(id, k === 2 ? 10000 - 2 * PRECIO_COMBO : PRECIO_COMBO);
+                    });
+                    comboBuf = [];
+                    document.getElementById('hoy-combo').classList.remove('on');
+                    showToast('Combo cargado · $10.000');
+                }
+            } else {
+                registrar(pid, getProducto(pid).precioVenta);
+            }
+            pintar();
+        }
+
+        function deshacer() {
+            if (comboBuf.length) { comboBuf = []; document.getElementById('hoy-combo').classList.remove('on'); pintar(); return; }
+            var hs = ventasDeHoy();
+            if (!hs.length) { showToast('No hay nada para deshacer hoy', true); return; }
+            var ult = hs[hs.length - 1];
+            var i = state.ventas.indexOf(ult);
+            if (i > -1) {
+                var pr = getProducto(ult.productoId);
+                if (pr) pr.stockBolsas = (pr.stockBolsas || 0) + ult.cantidad;
+                state.ventas.splice(i, 1);
+                saveState(); pintar(); showToast('Última venta borrada');
+            }
+        }
+
+        function pintar() {
+            if (!root) return;
+            var hs = ventasDeHoy();
+            var uds = hs.reduce(function (s, v) { return s + v.cantidad; }, 0);
+            var tot = hs.reduce(function (s, v) { return s + v.cantidad * v.precioVenta; }, 0);
+            var porProd = {};
+            hs.forEach(function (v) { porProd[v.productoId] = (porProd[v.productoId] || 0) + v.cantidad; });
+
+            var cb = document.getElementById('hoy-combo');
+            if (comboBuf.length) {
+                cb.innerHTML = 'Combo: ' + comboBuf.length + ' de 3<small>Tocá ' + (3 - comboBuf.length) + ' bolsita' + (3 - comboBuf.length > 1 ? 's' : '') + ' más</small>';
+                cb.classList.add('on');
+            } else if (cb.classList.contains('on')) {
+                cb.innerHTML = 'Combo activado<small>Tocá las 3 bolsitas que se lleva</small>';
+            } else {
+                cb.innerHTML = 'Cargar un combo 3 &times; $10.000<small>Después tocá las 3 bolsitas, aunque sean distintas</small>';
+            }
+
+            document.getElementById('hoy-grid').innerHTML = activos().map(function (p) {
+                var c = porProd[p.id] || 0;
+                return '<button class="hoy-btn" data-pid="' + p.id + '">' +
+                    '<span class="em">' + (p.emoji || '') + '</span>' +
+                    '<span class="nm">' + p.nombre + '<b>' + formatMoney(p.precioVenta) + ' suelta</b></span>' +
+                    '<span class="ct' + (c ? '' : ' z') + '">' + c + '</span></button>';
+            }).join('');
+
+            document.getElementById('hoy-tot').innerHTML =
+                '<span>' + uds + ' bolsita' + (uds === 1 ? '' : 's') + ' hoy</span><b>' + formatMoney(tot) + '</b>';
+        }
+
+        function abrir() {
+            estilos();
+            if (root) { root.style.display = 'flex'; pintar(); return; }
+            root = document.createElement('div');
+            root.id = 'hoy-overlay';
+            var f = new Date();
+            var dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+            var meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            root.innerHTML =
+                '<div id="hoy-top"><h2>¿Qué vendiste?</h2>' +
+                '<div id="hoy-fecha">' + dias[f.getDay()].charAt(0).toUpperCase() + dias[f.getDay()].slice(1) +
+                ' ' + f.getDate() + ' de ' + meses[f.getMonth()] + '</div>' +
+                '<button id="hoy-combo"></button></div>' +
+                '<div id="hoy-grid"></div>' +
+                '<div id="hoy-bot"><div id="hoy-tot"></div>' +
+                '<div id="hoy-acc"><button id="hoy-undo">Deshacer</button>' +
+                '<button id="hoy-close">Ver los números</button></div></div>';
+            document.body.appendChild(root);
+
+            document.getElementById('hoy-grid').addEventListener('click', function (e) {
+                var b = e.target.closest('.hoy-btn');
+                if (b) tap(b.dataset.pid);
+            });
+            document.getElementById('hoy-combo').addEventListener('click', function () {
+                this.classList.toggle('on'); comboBuf = []; pintar();
+            });
+            document.getElementById('hoy-undo').addEventListener('click', deshacer);
+            document.getElementById('hoy-close').addEventListener('click', function () {
+                root.style.display = 'none';
+                navigateTo('dashboard');
+            });
+            pintar();
+        }
+
+        return { abrir: abrir, pintar: pintar };
+    })();
+
+    window.abrirHoy = HOY.abrir;
+
     // =========== INIT ===========
     function init() {
         setupEvents();
         navigateTo('dashboard');
+        setTimeout(function () { try { HOY.abrir(); } catch (e) { console.warn(e); } }, 120);
         // loadState is async — it shows a loading overlay, fetches Firebase, then refreshes the view
         loadState();
     }
