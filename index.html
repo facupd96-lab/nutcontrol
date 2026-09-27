@@ -49,11 +49,36 @@ h2{font-family:var(--disp);font-weight:600;font-size:1.3rem;margin:0 0 3px;lette
 section+section{margin-top:30px}
 
 /* ---------- VENDER ---------- */
-#combo{width:100%;padding:15px;border-radius:13px;border:2px solid var(--line2);background:var(--surface);
-  font-size:1rem;font-weight:600;margin-bottom:14px;transition:.13s;text-align:center}
-#combo:hover{border-color:var(--accent)}
-#combo.on{background:var(--accent);border-color:var(--accent);color:#1A1509}
-#combo small{display:block;font-weight:400;font-size:.79rem;opacity:.72;margin-top:3px}
+#ticket{position:sticky;bottom:0;margin-top:16px;background:var(--surface);border:1px solid var(--line2);
+  border-radius:14px;padding:14px 16px;box-shadow:0 -10px 30px -18px rgba(0,0,0,.9)}
+#ticket-vacio{color:var(--ink3);font-size:.9rem;text-align:center;padding:6px 0}
+#ticket-items{display:grid;gap:5px;margin-bottom:10px}
+.ti{display:flex;align-items:center;gap:9px;font-size:.9rem}
+.ti .q{flex:0 0 auto;min-width:26px;height:24px;padding:0 7px;border-radius:12px;background:var(--raise);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem}
+.ti .nn{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ti .x{flex:0 0 auto;border:0;background:transparent;color:var(--ink3);padding:2px 6px;border-radius:5px;font-size:1rem;line-height:1}
+.ti .x:hover{color:var(--neg);background:var(--surface2)}
+#ticket-pie{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding-top:10px;border-top:1px dashed var(--line2)}
+#ticket-det{font-size:.8rem;color:var(--accent);line-height:1.4}
+#ticket-tot{text-align:right;margin-left:auto}
+#ticket-tot span{display:block;font-size:.75rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+#ticket-tot b{font-family:var(--disp);font-size:1.75rem;font-weight:700;line-height:1.1}
+#ticket-acc{display:flex;gap:9px;margin-top:12px}
+#btn-cobrar{flex:1;padding:15px;border-radius:12px;border:0;background:var(--accent);color:#17120A;
+  font-size:1.05rem;font-weight:700;transition:.13s}
+#btn-cobrar:hover{filter:brightness(1.08)}
+#btn-cobrar:active{transform:scale(.99)}
+#btn-cobrar:disabled{opacity:.3;cursor:default;filter:none}
+#resumen-dia{margin-top:18px;display:flex;gap:1px;background:var(--line);border:1px solid var(--line);
+  border-radius:11px;overflow:hidden;flex-wrap:wrap}
+#resumen-dia div{flex:1 1 130px;background:var(--surface);padding:12px 14px}
+#resumen-dia .lb{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3)}
+#resumen-dia .vl{font-family:var(--disp);font-size:1.28rem;font-weight:700;margin-top:3px}
+#dia-pie{margin-top:11px;font-size:.82rem;color:var(--ink3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.linkb{background:none;border:0;padding:0;color:var(--ink2);text-decoration:underline;font-size:.82rem}
+.linkb:hover{color:var(--accent)}
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:11px}
 .pbtn{display:flex;align-items:center;gap:12px;padding:15px 14px;border-radius:13px;border:1px solid var(--line);
   background:var(--surface);text-align:left;transition:.12s;min-height:70px;width:100%}
@@ -137,15 +162,28 @@ input[type=number]{width:96px;text-align:right}
     <!-- ============ VENDER ============ -->
     <div class="page on" id="p-vender">
       <h2>¿Qué vendiste?</h2>
-      <p class="lead">Un clic por bolsita. Para el combo, activalo primero y después tocá las tres, aunque sean distintas.</p>
-      <button id="combo"></button>
+      <p class="lead">Tocá lo que se lleva y cobrá. Si son 3 bolsitas, el combo se aplica solo.</p>
       <div id="grid"></div>
-      <div id="barra">
-        <div class="tot"><span id="barra-uds">0 bolsitas hoy</span><b class="num" id="barra-tot">$0</b></div>
-        <button class="gh" id="btn-undo">Deshacer última</button>
-        <button class="gh" id="btn-otro-dia">Cargar otro día</button>
+
+      <div id="ticket">
+        <div id="ticket-vacio">Tocá los productos que se lleva el cliente.</div>
+        <div id="ticket-items"></div>
+        <div id="ticket-pie">
+          <div id="ticket-det"></div>
+          <div id="ticket-tot"><span>Total a cobrar</span><b class="num" id="tk-total">$0</b></div>
+        </div>
+        <div id="ticket-acc">
+          <button class="gh" id="btn-cancelar">Cancelar</button>
+          <button id="btn-cobrar">Cobrar</button>
+        </div>
       </div>
-      <div class="nota" id="nota-dia"></div>
+
+      <div id="resumen-dia"></div>
+      <div id="dia-pie">
+        <span id="dia-txt"></span>
+        <button class="linkb" id="btn-otro-dia">cambiar día</button>
+        <button class="linkb" id="btn-undo">deshacer última venta</button>
+      </div>
     </div>
 
     <!-- ============ NÚMEROS ============ -->
@@ -191,7 +229,7 @@ input[type=number]{width:96px;text-align:right}
       <p class="lead">Acá mandás vos: cambiá el nombre, el costo o el precio y se recalcula todo, incluido el histórico. Destildá <b>En venta</b> para sacarlo de la pantalla de venta sin perder el historial.</p>
       <div class="filtros"><button class="gh" id="btn-nuevo">+ Agregar producto</button></div>
       <div class="tw"><table id="t-cat">
-        <thead><tr><th style="width:52px"></th><th>Producto</th><th>Costo</th><th>Precio</th><th>Ganancia</th><th>Margen</th><th>En venta</th><th></th></tr></thead>
+        <thead><tr><th style="width:52px"></th><th>Producto</th><th>Costo</th><th>Precio</th><th>Ganancia</th><th>Margen</th><th title="Entra en el combo 3x$10.000">Combo</th><th>En venta</th><th></th></tr></thead>
         <tbody></tbody></table></div>
       <div class="nota"><b>Cómo se calculó cada costo:</b> materia prima más el doypack ($168) y la etiqueta ($78). Por ejemplo el chocolate con girasol y zapallo sale de una tanda de 930 g de semillas más 1 kg de chocolate Alpino, que rinde 30 bolsitas.<br><br>
       Un producto que ya tiene ventas cargadas <b>no se puede borrar</b>, porque se rompería el historial: destildalo y listo. Los que nunca vendiste se borran sin problema.</div>
@@ -235,7 +273,7 @@ try {
   }
 } catch (e) {}
 
-var SEED = {"p":[{"id":"choco-semillas","n":"Chocolate con girasol y zapallo","e":"🍫","pv":4000,"c":1024,"on":true},{"id":"choco-castanas","n":"Chocolate con castañas, girasol y zapallo","e":"🌰","pv":4000,"c":1214,"on":true},{"id":"choco-almendras","n":"Chocolate con almendra sola","e":"🥜","pv":4000,"c":1564,"on":true},{"id":"garrapinada","n":"Garrapiñada de girasol","e":"🍬","pv":4000,"c":568,"on":true},{"id":"girasol-salado","n":"Girasol salado en salmuera","e":"🧂","pv":4000,"c":678,"on":true},{"id":"caju-salado","n":"Castaña salada en salmuera","e":"🌰","pv":4000,"c":1938,"on":true},{"id":"choco-300","n":"Bolsa grande 300 g","e":"🎁","pv":20000,"c":6461,"on":false},{"id":"rocas-ramo","n":"Rocas de choco + semillas (ramo)","e":"🪨","pv":4667,"c":706,"on":false},{"id":"mix-premium","n":"Mix Premium","e":"👑","pv":3500,"c":1534,"on":false},{"id":"mix-energico","n":"Mix Enérgico","e":"⚡","pv":3000,"c":1324,"on":false},{"id":"castanas-caram","n":"Castañas Caramelizadas","e":"🍯","pv":3500,"c":1467,"on":false},{"id":"girasol-caram","n":"Semillas Caramelizadas","e":"🌻","pv":3000,"c":627,"on":false},{"id":"mix-caramelizado","n":"Mix Caramelizado","e":"🍬","pv":3500,"c":1119,"on":false}],"v":[["2026-03-22","mix-premium",3,3500],["2026-03-23","mix-premium",9,3500],["2026-03-24","mix-premium",5,3500],["2026-03-25","mix-premium",11,3500],["2026-03-26","mix-premium",4,3500],["2026-03-27","mix-premium",1,3500],["2026-03-28","mix-premium",3,3500],["2026-03-29","mix-premium",8,3500],["2026-03-30","castanas-caram",6,3000],["2026-03-30","girasol-caram",1,2500],["2026-03-30","mix-premium",1,3500],["2026-03-31","castanas-caram",5,3000],["2026-03-31","girasol-caram",3,2500],["2026-03-31","mix-premium",4,3500],["2026-04-01","castanas-caram",3,3000],["2026-04-01","girasol-caram",1,2500],["2026-04-01","mix-energico",3,3000],["2026-04-01","mix-premium",4,3500],["2026-04-02","castanas-caram",4,3000],["2026-04-02","girasol-caram",2,2500],["2026-04-02","mix-energico",1,3000],["2026-04-02","mix-premium",1,3500],["2026-04-03","castanas-caram",2,3000],["2026-04-03","girasol-caram",2,2500],["2026-04-03","mix-energico",1,3000],["2026-04-03","mix-premium",3,3500],["2026-04-04","castanas-caram",4,3000],["2026-04-04","girasol-caram",1,2500],["2026-04-05","castanas-caram",5,3000],["2026-04-05","girasol-caram",6,2500],["2026-04-05","mix-energico",2,3000],["2026-04-05","mix-premium",2,3500],["2026-04-06","girasol-caram",8,2500],["2026-04-06","mix-energico",1,3000],["2026-04-06","mix-premium",1,3500],["2026-04-07","castanas-caram",5,3000],["2026-04-07","mix-energico",1,3000],["2026-04-07","mix-premium",1,3500],["2026-04-08","mix-energico",1,3000],["2026-04-09","castanas-caram",3,3000],["2026-04-09","mix-energico",1,3000],["2026-04-10","castanas-caram",5,3000],["2026-04-10","mix-energico",1,3000],["2026-04-10","mix-premium",1,3500],["2026-04-11","castanas-caram",2,3000],["2026-04-11","mix-energico",1,3000],["2026-04-11","mix-premium",2,3500],["2026-04-12","mix-energico",2,3000],["2026-04-12","mix-premium",7,3500],["2026-04-13","mix-premium",2,3500],["2026-04-14","mix-premium",3,3500],["2026-04-15","mix-caramelizado",13,3500],["2026-05-22","choco-300",5,20000],["2026-05-22","choco-semillas",9,4000],["2026-05-22","choco-semillas",22,3333],["2026-05-22","garrapinada",1,4000],["2026-05-22","garrapinada",2,3333],["2026-05-29","choco-semillas",9,4000],["2026-05-29","choco-semillas",22,3333],["2026-05-29","garrapinada",1,4000],["2026-05-29","garrapinada",2,3333],["2026-06-05","choco-300",5,20000],["2026-06-05","choco-semillas",9,4000],["2026-06-05","choco-semillas",22,3333],["2026-06-05","garrapinada",1,4000],["2026-06-05","garrapinada",2,3333],["2026-06-12","choco-semillas",9,4000],["2026-06-12","choco-semillas",22,3333],["2026-06-12","garrapinada",1,4000],["2026-06-12","garrapinada",2,3333],["2026-06-19","choco-300",5,20000],["2026-06-19","choco-semillas",9,4000],["2026-06-19","choco-semillas",22,3333],["2026-06-19","garrapinada",1,4000],["2026-06-19","garrapinada",2,3333],["2026-06-26","choco-semillas",9,4000],["2026-06-26","choco-semillas",22,3333],["2026-06-26","garrapinada",1,4000],["2026-06-26","garrapinada",2,3333],["2026-07-03","choco-300",5,20000],["2026-07-03","choco-semillas",9,4000],["2026-07-03","choco-semillas",22,3333],["2026-07-03","garrapinada",1,4000],["2026-07-03","garrapinada",2,3333],["2026-07-10","choco-semillas",9,4000],["2026-07-10","choco-semillas",22,3333],["2026-07-10","garrapinada",1,4000],["2026-07-10","garrapinada",2,3333],["2026-07-17","choco-300",5,20000],["2026-07-17","choco-semillas",9,4000],["2026-07-17","choco-semillas",22,3333],["2026-07-17","garrapinada",1,3333],["2026-07-17","garrapinada",1,4000],["2026-07-24","choco-semillas",9,4000],["2026-07-24","choco-semillas",22,3333],["2026-07-24","garrapinada",1,3333],["2026-07-24","garrapinada",1,4000],["2026-07-31","choco-semillas",9,4000],["2026-07-31","choco-semillas",22,3333],["2026-07-31","garrapinada",1,3333],["2026-07-31","garrapinada",1,4000],["2026-08-07","choco-semillas",13,4000],["2026-08-07","choco-semillas",31,3333],["2026-08-07","garrapinada",1,4000],["2026-08-07","garrapinada",3,3333],["2026-08-14","choco-semillas",13,4000],["2026-08-14","choco-semillas",31,3333],["2026-08-14","garrapinada",1,4000],["2026-08-14","garrapinada",3,3333],["2026-08-21","choco-semillas",13,4000],["2026-08-21","choco-semillas",31,3333],["2026-08-21","garrapinada",1,4000],["2026-08-21","garrapinada",3,3333],["2026-08-28","choco-semillas",13,4000],["2026-08-28","choco-semillas",31,3333],["2026-08-28","garrapinada",1,4000],["2026-08-28","garrapinada",3,3333],["2026-09-04","choco-semillas",13,4000],["2026-09-04","choco-semillas",31,3333],["2026-09-04","garrapinada",1,4000],["2026-09-04","garrapinada",3,3333],["2026-09-11","choco-semillas",13,4000],["2026-09-11","choco-semillas",30,3333],["2026-09-11","garrapinada",1,4000],["2026-09-11","garrapinada",3,3333],["2026-09-18","choco-semillas",13,4000],["2026-09-18","choco-semillas",30,3333],["2026-09-18","garrapinada",1,4000],["2026-09-18","garrapinada",2,3333],["2026-09-25","choco-semillas",13,4000],["2026-09-25","choco-semillas",30,3333],["2026-09-25","garrapinada",1,4000],["2026-09-25","garrapinada",2,3333]]};
+var SEED = {"p":[{"id":"choco-semillas","n":"Chocolate con girasol y zapallo","e":"🍫","pv":4000,"c":1024,"on":true,"cb":1},{"id":"choco-castanas","n":"Chocolate con castañas, girasol y zapallo","e":"🌰","pv":4000,"c":1214,"on":true,"cb":1},{"id":"choco-almendras","n":"Chocolate con almendra sola","e":"🥜","pv":4000,"c":1564,"on":true,"cb":1},{"id":"garrapinada","n":"Garrapiñada de girasol","e":"🍬","pv":4000,"c":568,"on":true,"cb":1},{"id":"girasol-salado","n":"Girasol salado en salmuera","e":"🧂","pv":4000,"c":678,"on":true,"cb":1},{"id":"caju-salado","n":"Castaña salada en salmuera","e":"🌰","pv":4000,"c":1938,"on":true,"cb":1},{"id":"choco-300","n":"Bolsa grande 300 g","e":"🎁","pv":20000,"c":6461,"on":false,"cb":0},{"id":"rocas-ramo","n":"Rocas de choco + semillas (ramo)","e":"🪨","pv":4667,"c":706,"on":false,"cb":0},{"id":"mix-premium","n":"Mix Premium","e":"👑","pv":3500,"c":1534,"on":false,"cb":0},{"id":"mix-energico","n":"Mix Enérgico","e":"⚡","pv":3000,"c":1324,"on":false,"cb":0},{"id":"castanas-caram","n":"Castañas Caramelizadas","e":"🍯","pv":3500,"c":1467,"on":false,"cb":0},{"id":"girasol-caram","n":"Semillas Caramelizadas","e":"🌻","pv":3000,"c":627,"on":false,"cb":0},{"id":"mix-caramelizado","n":"Mix Caramelizado","e":"🍬","pv":3500,"c":1119,"on":false,"cb":0}],"v":[["2026-03-22","mix-premium",3,3500],["2026-03-23","mix-premium",9,3500],["2026-03-24","mix-premium",5,3500],["2026-03-25","mix-premium",11,3500],["2026-03-26","mix-premium",4,3500],["2026-03-27","mix-premium",1,3500],["2026-03-28","mix-premium",3,3500],["2026-03-29","mix-premium",8,3500],["2026-03-30","castanas-caram",6,3000],["2026-03-30","girasol-caram",1,2500],["2026-03-30","mix-premium",1,3500],["2026-03-31","castanas-caram",5,3000],["2026-03-31","girasol-caram",3,2500],["2026-03-31","mix-premium",4,3500],["2026-04-01","castanas-caram",3,3000],["2026-04-01","girasol-caram",1,2500],["2026-04-01","mix-energico",3,3000],["2026-04-01","mix-premium",4,3500],["2026-04-02","castanas-caram",4,3000],["2026-04-02","girasol-caram",2,2500],["2026-04-02","mix-energico",1,3000],["2026-04-02","mix-premium",1,3500],["2026-04-03","castanas-caram",2,3000],["2026-04-03","girasol-caram",2,2500],["2026-04-03","mix-energico",1,3000],["2026-04-03","mix-premium",3,3500],["2026-04-04","castanas-caram",4,3000],["2026-04-04","girasol-caram",1,2500],["2026-04-05","castanas-caram",5,3000],["2026-04-05","girasol-caram",6,2500],["2026-04-05","mix-energico",2,3000],["2026-04-05","mix-premium",2,3500],["2026-04-06","girasol-caram",8,2500],["2026-04-06","mix-energico",1,3000],["2026-04-06","mix-premium",1,3500],["2026-04-07","castanas-caram",5,3000],["2026-04-07","mix-energico",1,3000],["2026-04-07","mix-premium",1,3500],["2026-04-08","mix-energico",1,3000],["2026-04-09","castanas-caram",3,3000],["2026-04-09","mix-energico",1,3000],["2026-04-10","castanas-caram",5,3000],["2026-04-10","mix-energico",1,3000],["2026-04-10","mix-premium",1,3500],["2026-04-11","castanas-caram",2,3000],["2026-04-11","mix-energico",1,3000],["2026-04-11","mix-premium",2,3500],["2026-04-12","mix-energico",2,3000],["2026-04-12","mix-premium",7,3500],["2026-04-13","mix-premium",2,3500],["2026-04-14","mix-premium",3,3500],["2026-04-15","mix-caramelizado",13,3500],["2026-05-22","choco-300",5,20000],["2026-05-22","choco-semillas",9,4000],["2026-05-22","choco-semillas",22,3333],["2026-05-22","garrapinada",1,4000],["2026-05-22","garrapinada",2,3333],["2026-05-29","choco-semillas",9,4000],["2026-05-29","choco-semillas",22,3333],["2026-05-29","garrapinada",1,4000],["2026-05-29","garrapinada",2,3333],["2026-06-05","choco-300",5,20000],["2026-06-05","choco-semillas",9,4000],["2026-06-05","choco-semillas",22,3333],["2026-06-05","garrapinada",1,4000],["2026-06-05","garrapinada",2,3333],["2026-06-12","choco-semillas",9,4000],["2026-06-12","choco-semillas",22,3333],["2026-06-12","garrapinada",1,4000],["2026-06-12","garrapinada",2,3333],["2026-06-19","choco-300",5,20000],["2026-06-19","choco-semillas",9,4000],["2026-06-19","choco-semillas",22,3333],["2026-06-19","garrapinada",1,4000],["2026-06-19","garrapinada",2,3333],["2026-06-26","choco-semillas",9,4000],["2026-06-26","choco-semillas",22,3333],["2026-06-26","garrapinada",1,4000],["2026-06-26","garrapinada",2,3333],["2026-07-03","choco-300",5,20000],["2026-07-03","choco-semillas",9,4000],["2026-07-03","choco-semillas",22,3333],["2026-07-03","garrapinada",1,4000],["2026-07-03","garrapinada",2,3333],["2026-07-10","choco-semillas",9,4000],["2026-07-10","choco-semillas",22,3333],["2026-07-10","garrapinada",1,4000],["2026-07-10","garrapinada",2,3333],["2026-07-17","choco-300",5,20000],["2026-07-17","choco-semillas",9,4000],["2026-07-17","choco-semillas",22,3333],["2026-07-17","garrapinada",1,3333],["2026-07-17","garrapinada",1,4000],["2026-07-24","choco-semillas",9,4000],["2026-07-24","choco-semillas",22,3333],["2026-07-24","garrapinada",1,3333],["2026-07-24","garrapinada",1,4000],["2026-07-31","choco-semillas",9,4000],["2026-07-31","choco-semillas",22,3333],["2026-07-31","garrapinada",1,3333],["2026-07-31","garrapinada",1,4000],["2026-08-07","choco-semillas",13,4000],["2026-08-07","choco-semillas",31,3333],["2026-08-07","garrapinada",1,4000],["2026-08-07","garrapinada",3,3333],["2026-08-14","choco-semillas",13,4000],["2026-08-14","choco-semillas",31,3333],["2026-08-14","garrapinada",1,4000],["2026-08-14","garrapinada",3,3333],["2026-08-21","choco-semillas",13,4000],["2026-08-21","choco-semillas",31,3333],["2026-08-21","garrapinada",1,4000],["2026-08-21","garrapinada",3,3333],["2026-08-28","choco-semillas",13,4000],["2026-08-28","choco-semillas",31,3333],["2026-08-28","garrapinada",1,4000],["2026-08-28","garrapinada",3,3333],["2026-09-04","choco-semillas",13,4000],["2026-09-04","choco-semillas",31,3333],["2026-09-04","garrapinada",1,4000],["2026-09-04","garrapinada",3,3333],["2026-09-11","choco-semillas",13,4000],["2026-09-11","choco-semillas",30,3333],["2026-09-11","garrapinada",1,4000],["2026-09-11","garrapinada",3,3333],["2026-09-18","choco-semillas",13,4000],["2026-09-18","choco-semillas",30,3333],["2026-09-18","garrapinada",1,4000],["2026-09-18","garrapinada",2,3333],["2026-09-25","choco-semillas",13,4000],["2026-09-25","choco-semillas",30,3333],["2026-09-25","garrapinada",1,4000],["2026-09-25","garrapinada",2,3333]]};
 var KEY = 'nutcontrol_v3';
 var COMBO3 = 10000;
 var CORTE_REAL = '2026-09-27'; // desde acá, ventas cargadas a mano
@@ -292,73 +330,114 @@ document.querySelectorAll('.tab').forEach(function (b) {
 });
 
 // ---------- VENDER ----------
+var ticket = [];   // ids de producto en la venta en curso
+
 function activos() { return db.p.filter(function (p) { return p.on; }); }
 function ventasDe(f) { return db.v.filter(function (v) { return v[0] === f; }); }
 
-function registrar(pid, precio) {
-  db.v.push([fechaCarga, pid, 1, precio]);
-  guardar(); pintarVender();
+// El combo se aplica solo: cada 3 bolsitas combinables valen $10.000.
+function calcularTicket() {
+  var comb = [], otros = [];
+  ticket.forEach(function (id) { var p = prod(id); if (!p) return; (p.cb ? comb : otros).push(p); });
+  var grupos = Math.floor(comb.length / 3);
+  var sueltas = comb.length - grupos * 3;
+  var total = grupos * COMBO3;
+  comb.slice(grupos * 3).forEach(function (p) { total += p.pv; });
+  otros.forEach(function (p) { total += p.pv; });
+  return { total: total, grupos: grupos, sueltas: sueltas, otros: otros.length, comb: comb, resto: otros };
 }
-function tap(pid) {
-  if (comboOn) {
-    comboBuf.push(pid);
-    if (comboBuf.length >= 3) {
-      var u = Math.round(COMBO3 / 3);
-      comboBuf.forEach(function (id, k) { db.v.push([fechaCarga, id, 1, k === 2 ? COMBO3 - 2 * u : u]); });
-      comboBuf = []; comboOn = false;
-      guardar(); toast('Combo cargado · ' + plata(COMBO3));
-    }
-  } else {
-    registrar(pid, prod(pid).pv);
-    return;
-  }
-  pintarVender();
-}
-function deshacer() {
-  if (comboBuf.length) { comboBuf = []; comboOn = false; pintarVender(); return; }
-  var idx = -1;
-  for (var i = db.v.length - 1; i >= 0; i--) if (db.v[i][0] === fechaCarga) { idx = i; break; }
-  if (idx < 0) { toast('No hay nada para deshacer en ese día'); return; }
-  db.v.splice(idx, 1); guardar(); pintarVender(); toast('Venta borrada');
-}
-function pintarVender() {
-  var hs = ventasDe(fechaCarga);
-  var uds = 0, tot = 0, porP = {};
-  hs.forEach(function (v) { uds += v[2]; tot += v[2] * v[3]; porP[v[1]] = (porP[v[1]] || 0) + v[2]; });
 
-  var cb = $('combo');
-  cb.classList.toggle('on', comboOn);
-  if (comboBuf.length) {
-    var falta = 3 - comboBuf.length;
-    cb.innerHTML = 'Combo: ' + comboBuf.length + ' de 3<small>Tocá ' + falta + ' bolsita' + (falta > 1 ? 's' : '') + ' más</small>';
-  } else if (comboOn) {
-    cb.innerHTML = 'Combo activado<small>Tocá las 3 bolsitas que se lleva</small>';
-  } else {
-    cb.innerHTML = 'Cargar un combo 3 × ' + plata(COMBO3) + '<small>Después tocá las 3 bolsitas, aunque sean distintas</small>';
-  }
+function pintarTicket() {
+  var vacio = ticket.length === 0;
+  $('ticket-vacio').hidden = !vacio;
+  $('ticket-items').hidden = vacio;
+  $('ticket-pie').hidden = vacio;
+  $('btn-cobrar').disabled = vacio;
+  $('btn-cancelar').hidden = vacio;
+  if (vacio) { $('btn-cobrar').textContent = 'Cobrar'; $('ticket-items').innerHTML = ''; return; }
 
-  $('grid').innerHTML = activos().map(function (p) {
-    var c = porP[p.id] || 0;
-    return '<button class="pbtn" data-pid="' + p.id + '"><span class="em">' + p.e + '</span>' +
-      '<span class="tx"><b>' + p.n + '</b><i>' + plata(p.pv) + ' · te deja ' + plata(p.pv - p.c) + '</i></span>' +
-      '<span class="ct' + (c ? '' : ' z') + '">' + c + '</span></button>';
+  var conteo = {}, orden = [];
+  ticket.forEach(function (id) { if (!conteo[id]) { conteo[id] = 0; orden.push(id); } conteo[id]++; });
+  $('ticket-items').innerHTML = orden.map(function (id) {
+    var p = prod(id);
+    return '<div class="ti"><span class="q">' + conteo[id] + '</span>' +
+      '<span class="nn">' + p.e + ' ' + p.n + '</span>' +
+      '<button class="x" data-quitar="' + id + '" title="Sacar uno">×</button></div>';
   }).join('');
 
-  $('barra-uds').textContent = uds + (uds === 1 ? ' bolsita' : ' bolsitas');
-  $('barra-tot').textContent = plata(tot);
-  var gan = hs.reduce(function (s, v) { return s + v[2] * (v[3] - costoDe(v[1])); }, 0);
-  $('nota-dia').innerHTML = fechaCarga === hoy()
-    ? 'Cargando <b>' + fechaLarga(fechaCarga) + '</b>. Ganancia del día: <b>' + plata(gan) + '</b>.'
-    : 'Estás cargando <b>' + fechaLarga(fechaCarga) + '</b>, que no es hoy. Ganancia de ese día: <b>' + plata(gan) + '</b>.';
+  var t = calcularTicket();
+  var det = [];
+  if (t.grupos) det.push(t.grupos + (t.grupos === 1 ? ' combo de 3 · ' : ' combos de 3 · ') + plata(t.grupos * COMBO3));
+  if (t.sueltas) det.push(t.sueltas + (t.sueltas === 1 ? ' suelta' : ' sueltas'));
+  if (t.otros) det.push(t.otros + (t.otros === 1 ? ' fuera del combo' : ' fuera del combo'));
+  $('ticket-det').innerHTML = det.join('<br>');
+  $('tk-total').textContent = plata(t.total);
+  $('btn-cobrar').textContent = 'Cobrar ' + plata(t.total);
 }
+
+function cobrar() {
+  if (!ticket.length) return;
+  var t = calcularTicket();
+  var u = Math.round(COMBO3 / 3);
+  var enCombo = t.grupos * 3;
+  t.comb.forEach(function (p, k) {
+    var precio;
+    if (k < enCombo) precio = (k % 3 === 2) ? COMBO3 - 2 * u : u;  // el 3ro de cada combo cierra el redondeo
+    else precio = p.pv;
+    db.v.push([fechaCarga, p.id, 1, precio]);
+  });
+  t.resto.forEach(function (p) { db.v.push([fechaCarga, p.id, 1, p.pv]); });
+  ticket = [];
+  guardar(); pintarVender();
+  toast('Cobrado ' + plata(t.total));
+}
+
+function deshacerUltima() {
+  var idx = -1;
+  for (var i = db.v.length - 1; i >= 0; i--) if (db.v[i][0] === fechaCarga) { idx = i; break; }
+  if (idx < 0) { toast('No hay ventas cargadas ese día'); return; }
+  db.v.splice(idx, 1); guardar(); pintarVender(); toast('Se borró la última');
+}
+
+function pintarVender() {
+  var hs = ventasDe(fechaCarga);
+  var uds = 0, tot = 0, gan = 0;
+  hs.forEach(function (v) { uds += v[2]; tot += v[2] * v[3]; gan += v[2] * (v[3] - costoDe(v[1])); });
+
+  $('grid').innerHTML = activos().map(function (p) {
+    var enT = 0; ticket.forEach(function (x) { if (x === p.id) enT++; });
+    return '<button class="pbtn" data-pid="' + p.id + '"><span class="em">' + p.e + '</span>' +
+      '<span class="tx"><b>' + p.n + '</b><i>' + plata(p.pv) + ' · te deja ' + plata(p.pv - p.c) + '</i></span>' +
+      '<span class="ct' + (enT ? '' : ' z') + '">' + enT + '</span></button>';
+  }).join('');
+
+  $('resumen-dia').innerHTML =
+    '<div><div class="lb">Vendido</div><div class="vl num">' + uds + (uds === 1 ? ' bolsita' : ' bolsitas') + '</div></div>' +
+    '<div><div class="lb">Cobrado</div><div class="vl num">' + plata(tot) + '</div></div>' +
+    '<div><div class="lb">Ganancia</div><div class="vl num" style="color:var(--accent)">' + plata(gan) + '</div></div>';
+
+  $('dia-txt').textContent = fechaCarga === hoy()
+    ? 'Cargando hoy, ' + fechaLarga(fechaCarga) + '.'
+    : '⚠ Estás cargando ' + fechaLarga(fechaCarga) + ', que no es hoy.';
+  pintarTicket();
+}
+
 $('grid').addEventListener('click', function (e) {
-  var b = e.target.closest('.pbtn'); if (b) tap(b.dataset.pid);
+  var b = e.target.closest('.pbtn'); if (!b) return;
+  ticket.push(b.dataset.pid); pintarVender();
 });
-$('combo').addEventListener('click', function () { comboOn = !comboOn; comboBuf = []; pintarVender(); });
-$('btn-undo').addEventListener('click', deshacer);
+$('ticket-items').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-quitar]'); if (!b) return;
+  var i = ticket.lastIndexOf(b.dataset.quitar);
+  if (i > -1) ticket.splice(i, 1);
+  pintarVender();
+});
+$('btn-cobrar').addEventListener('click', cobrar);
+$('btn-cancelar').addEventListener('click', function () { ticket = []; pintarVender(); });
+$('btn-undo').addEventListener('click', deshacerUltima);
 $('btn-otro-dia').addEventListener('click', function () {
   var f = window.prompt('¿Qué día querés cargar? (formato 2026-09-25)', fechaCarga);
-  if (f && /^\d{4}-\d{2}-\d{2}$/.test(f)) { fechaCarga = f; pintarVender(); toast('Cargando ' + fechaCorta(f)); }
+  if (f && /^\d{4}-\d{2}-\d{2}$/.test(f)) { fechaCarga = f; ticket = []; pintarVender(); toast('Cargando ' + fechaCorta(f)); }
 });
 
 // ---------- NÚMEROS ----------
@@ -447,6 +526,7 @@ function pintarCatalogo() {
       '<td><input type="number" data-i="' + i + '" data-f="pv" value="' + p.pv + '" step="100" min="0"></td>' +
       '<td class="num ' + (g >= 0 ? 'pos' : 'neg') + '">' + plata(g) + '</td>' +
       '<td class="num">' + (p.pv ? Math.round(g / p.pv * 100) : 0) + '%</td>' +
+      '<td><input type="checkbox" data-i="' + i + '" data-f="cb"' + (p.cb ? ' checked' : '') + '></td>' +
       '<td><input type="checkbox" data-i="' + i + '" data-f="on"' + (p.on ? ' checked' : '') + '></td>' +
       '<td>' + accion + '</td></tr>';
   }).join('');
@@ -455,6 +535,7 @@ $('t-cat').addEventListener('change', function (e) {
   var el = e.target; if (el.dataset.i === undefined) return;
   var p = db.p[+el.dataset.i], f = el.dataset.f;
   if (f === 'on') p.on = el.checked;
+  else if (f === 'cb') p.cb = el.checked ? 1 : 0;
   else if (f === 'n') { var t = el.value.trim(); if (t) p.n = t; }
   else if (f === 'e') { p.e = el.value.trim() || '•'; }
   else { var n = parseFloat(el.value); if (!isNaN(n) && n >= 0) p[f] = Math.round(n); }
@@ -471,7 +552,7 @@ $('t-cat').addEventListener('click', function (e) {
 });
 $('btn-nuevo').addEventListener('click', function () {
   var id = 'p' + Date.now().toString(36);
-  db.p.unshift({ id: id, n: 'Producto nuevo', e: '🥜', pv: 4000, c: 1000, on: true });
+  db.p.unshift({ id: id, n: 'Producto nuevo', e: '🥜', pv: 4000, c: 1000, on: true, cb: 1 });
   borrarArmado = null; guardar(); pintarCatalogo(); pintarVender();
   toast('Listo: cambiale el nombre, el costo y el precio');
   var inp = $('t-cat').querySelector('input[data-f="n"]');
