@@ -1,728 +1,542 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NutControl — Gestión de Frutos Secos</title>
-    <meta name="description" content="Sistema de gestión integral para negocio de frutos secos. Control de ventas, stock, costos y ganancias.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <!-- PWA / Mobile tags -->
-    <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#141210">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-512.png">
-    <style>
-        /* Initial Loading Screen */
-        #initial-loader {
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            background: #141210;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 1.5rem;
-            transition: opacity 0.4s ease, visibility 0.4s;
-        }
-        .loader-icon {
-            font-size: 3.5rem;
-            animation: bounce 1.2s infinite ease-in-out;
-        }
-        .loader-text {
-            color: #f5f0e8;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-        }
-        .loader-sub {
-            color: #7a6e62;
-            font-size: 0.85rem;
-            font-family: 'Inter', sans-serif;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-20px) scale(1.1); }
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16140F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥜</text></svg>">
+<title>NutControl</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
+<style>
+:root{
+  --bg:#16140F; --surface:#201D18; --surface2:#2A261F; --raise:#332E25;
+  --ink:#F3EFE7; --ink2:#A79E90; --ink3:#6F6559;
+  --line:#322D25; --line2:#443D32;
+  --accent:#C99A3F; --accent-dim:#3A2E16;
+  --pos:#6BA87F; --neg:#C97A5C;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --disp:'Fraunces',Georgia,serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow:hidden}
+.num{font-variant-numeric:tabular-nums}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+input,select{font-family:inherit;font-size:inherit;color:var(--ink);background:var(--surface2);
+  border:1px solid var(--line2);border-radius:8px;padding:8px 10px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* ---------- LAYOUT ---------- */
+#app{display:flex;flex-direction:column;height:100%}
+#nav{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:12px 20px;
+  padding-top:calc(12px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);background:var(--surface)}
+#nav .logo{font-family:var(--disp);font-weight:700;font-size:1.15rem;letter-spacing:-.02em;margin-right:16px;white-space:nowrap}
+#nav .logo span{color:var(--accent)}
+.tab{padding:8px 15px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--ink2);font-weight:500}
+.tab:hover{background:var(--surface2);color:var(--ink)}
+.tab.on{background:var(--raise);color:var(--ink);border-color:var(--line2)}
+#nav .spacer{flex:1}
+#nav .hoy{font-size:.85rem;color:var(--ink3);white-space:nowrap}
+main{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}
+.page{display:none;padding:22px 20px 40px;max-width:1120px;margin:0 auto}
+.page.on{display:block}
+h2{font-family:var(--disp);font-weight:600;font-size:1.3rem;margin:0 0 3px;letter-spacing:-.01em}
+.lead{color:var(--ink2);font-size:.88rem;margin:0 0 18px}
+section+section{margin-top:30px}
+
+/* ---------- VENDER ---------- */
+#combo{width:100%;padding:15px;border-radius:13px;border:2px solid var(--line2);background:var(--surface);
+  font-size:1rem;font-weight:600;margin-bottom:14px;transition:.13s;text-align:center}
+#combo:hover{border-color:var(--accent)}
+#combo.on{background:var(--accent);border-color:var(--accent);color:#1A1509}
+#combo small{display:block;font-weight:400;font-size:.79rem;opacity:.72;margin-top:3px}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:11px}
+.pbtn{display:flex;align-items:center;gap:12px;padding:15px 14px;border-radius:13px;border:1px solid var(--line);
+  background:var(--surface);text-align:left;transition:.12s;min-height:70px;width:100%}
+.pbtn:hover{background:var(--surface2);border-color:var(--line2);transform:translateY(-1px)}
+.pbtn:active{transform:translateY(0) scale(.985)}
+.pbtn .em{font-size:1.45rem;flex:0 0 auto;line-height:1}
+.pbtn .tx{flex:1 1 auto;min-width:0}
+.pbtn .tx b{display:block;font-weight:600;font-size:.95rem;line-height:1.25}
+.pbtn .tx i{font-style:normal;font-size:.76rem;color:var(--ink3)}
+.pbtn .ct{flex:0 0 auto;min-width:32px;height:32px;padding:0 9px;border-radius:16px;background:var(--raise);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
+.pbtn .ct.z{opacity:.25}
+#barra{position:sticky;bottom:0;margin-top:18px;background:var(--surface);border:1px solid var(--line);
+  border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+#barra .tot{flex:1 1 auto;display:flex;align-items:baseline;gap:12px}
+#barra .tot span{color:var(--ink2);font-size:.86rem}
+#barra .tot b{font-family:var(--disp);font-size:1.5rem;font-weight:700}
+.gh{padding:9px 15px;border-radius:9px;border:1px solid var(--line2);background:var(--surface2);font-size:.86rem;font-weight:500}
+.gh:hover{background:var(--raise)}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:22px}
+.kpi{background:var(--surface);padding:15px 16px}
+.kpi .lb{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-bottom:6px}
+.kpi .vl{font-family:var(--disp);font-size:1.62rem;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.kpi .ft{font-size:.75rem;color:var(--ink3);margin-top:3px}
+.kpi.g{background:var(--accent-dim)} .kpi.g .vl{color:var(--accent)}
+
+/* ---------- TABLAS ---------- */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:.88rem;min-width:520px}
+th,td{padding:10px 14px;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+thead th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);font-weight:600;
+  border-bottom:1px solid var(--line2);background:var(--surface2);position:sticky;top:0}
+tbody tr+tr td{border-top:1px solid var(--line)}
+tbody tr:hover td{background:var(--surface2)}
+td.pos{color:var(--pos)} td.neg{color:var(--neg)}
+tfoot td{border-top:2px solid var(--line2);font-weight:700;background:var(--surface2)}
+.bar{height:7px;border-radius:4px;background:var(--accent);min-width:3px;display:block}
+.del{padding:3px 9px;border-radius:6px;border:1px solid var(--line2);background:transparent;color:var(--ink3);font-size:.75rem}
+.del:hover{color:var(--neg);border-color:var(--neg)}
+.off td{opacity:.42}
+.filtros{display:flex;gap:9px;align-items:end;flex-wrap:wrap;margin-bottom:14px}
+.filtros label{display:block;font-size:.72rem;color:var(--ink3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.chip{padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:600;background:var(--raise);color:var(--ink2)}
+.chip.est{background:#3A2E16;color:var(--accent)}
+.nota{font-size:.82rem;color:var(--ink2);margin-top:12px;padding-left:12px;border-left:2px solid var(--accent)}
+.nota b{color:var(--ink)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:26px;background:var(--raise);color:var(--ink);
+  padding:11px 20px;border-radius:10px;border:1px solid var(--line2);font-size:.88rem;font-weight:500;
+  opacity:0;pointer-events:none;transition:.22s;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(-6px)}
+input[type=number]{width:96px;text-align:right}
+@media(max-width:640px){
+  #nav{padding:10px 12px;overflow-x:auto}
+  #nav .logo{font-size:1rem;margin-right:8px}
+  #nav .hoy{display:none}
+  .tab{padding:7px 11px;font-size:.88rem}
+  .page{padding:16px 12px 34px}
+  #grid{grid-template-columns:1fr}
+  .kpi .vl{font-size:1.4rem}
+}
+</style>
+
 </head>
-<body class="loading-state">
-    <div id="initial-loader">
-        <div class="loader-icon">🥜</div>
-        <div class="loader-text">NutControl</div>
-        <div class="loader-sub">Sincronizando con la nube...</div>
-    </div>
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <span class="logo-icon">🥜</span>
-                <span class="logo-text">NutControl</span>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="#" class="nav-item active" data-section="dashboard" id="nav-dashboard">
-                <span class="nav-icon">📊</span>
-                <span class="nav-label">Dashboard</span>
-            </a>
-            <a href="#" class="nav-item" data-section="ventas" id="nav-ventas">
-                <span class="nav-icon">🛒</span>
-                <span class="nav-label">Ventas</span>
-            </a>
-            <a href="#" class="nav-item" data-section="produccion" id="nav-produccion">
-                <span class="nav-icon">🏭</span>
-                <span class="nav-label">Producción</span>
-            </a>
-            <a href="#" class="nav-item" data-section="productos" id="nav-productos">
-                <span class="nav-icon">🏷️</span>
-                <span class="nav-label">Productos</span>
-            </a>
-            <a href="#" class="nav-item" data-section="materias" id="nav-materias">
-                <span class="nav-icon">📦</span>
-                <span class="nav-label">Materias Primas</span>
-            </a>
-            <a href="#" class="nav-item" data-section="gastos" id="nav-gastos">
-                <span class="nav-icon">💸</span>
-                <span class="nav-label">Gastos</span>
-            </a>
-            <a href="#" class="nav-item" data-section="reportes" id="nav-reportes">
-                <span class="nav-icon">📈</span>
-                <span class="nav-label">Reportes</span>
-            </a>
-        </nav>
-        <div class="sidebar-footer">
-            <div class="storage-status" id="storage-status">
-                <div class="storage-icon">💻</div>
-                <div class="storage-text">
-                    <strong>Modo Local</strong>
-                    <span>Atado a esta PC</span>
-                </div>
-            </div>
+<body>
+<div id="app">
+  <nav id="nav">
+    <div class="logo">Nut<span>Control</span></div>
+    <button class="tab on" data-p="vender">Vender</button>
+    <button class="tab" data-p="numeros">Números</button>
+    <button class="tab" data-p="productos">Productos</button>
+    <button class="tab" data-p="historial">Historial</button>
+    <div class="spacer"></div>
+    <div class="hoy" id="fecha-hoy"></div>
+  </nav>
 
-            <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem">
-                <button class="btn-backup" id="btn-copy-url" title="Copiar link para abrir en el celular" style="background: var(--accent-amber-soft); border-color: var(--accent-amber); color: var(--accent-amber)">
-                    <span>🔗</span> Copiar Link App
-                </button>
-                <div style="display:flex;gap:0.5rem;">
-                    <button class="btn-backup" id="btn-export" title="Exportar copia manual" style="flex:1;font-size:0.75rem;padding:0.4rem">
-                        <span>⬇️</span> Exportar
-                    </button>
-                    <button class="btn-backup" id="btn-import" title="Importar copia manual" style="flex:1;font-size:0.75rem;padding:0.4rem">
-                        <span>⬆️</span> Importar
-                    </button>
-                </div>
-            </div>
-            <input type="file" id="import-file" accept=".json" style="display:none">
-        </div>
-    </aside>
-
-    <!-- Mobile Header -->
-    <header class="mobile-header" id="mobile-header">
-        <button class="hamburger" id="hamburger">☰</button>
-        <span class="mobile-title">🥜 NutControl</span>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main-content" id="main-content">
-
-        <!-- ==================== DASHBOARD ==================== -->
-        <section class="section active" id="section-dashboard">
-            <div class="section-header">
-                <div>
-                    <h1>Dashboard</h1>
-                    <p class="section-subtitle" id="dashboard-date"></p>
-                </div>
-                <div>
-                    <select class="input-field" id="dashboard-period" style="font-weight: 500; min-width: 150px;">
-                        <option value="today">Ventas de Hoy</option>
-                        <option value="week">Esta Semana</option>
-                        <option value="month" selected>Este Mes</option>
-                        <option value="all">Histórico Total</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- KPI Cards -->
-            <div class="kpi-grid">
-                <div class="kpi-card kpi-ventas">
-                    <div class="kpi-icon">🛒</div>
-                    <div class="kpi-info">
-                        <span class="kpi-label" id="kpi-label-1">Ventas Período</span>
-                        <span class="kpi-value" id="kpi-ventas-hoy">$0</span>
-                    </div>
-                </div>
-                <div class="kpi-card kpi-semana">
-                    <div class="kpi-icon">📈</div>
-                    <div class="kpi-info">
-                        <span class="kpi-label" id="kpi-label-2">Unidades</span>
-                        <span class="kpi-value" id="kpi-ventas-semana">0</span>
-                    </div>
-                </div>
-                <div class="kpi-card kpi-mes">
-                    <div class="kpi-icon">📉</div>
-                    <div class="kpi-info">
-                        <span class="kpi-label" id="kpi-label-3">Costo / Gastos</span>
-                        <span class="kpi-value" id="kpi-ventas-mes">$0</span>
-                    </div>
-                </div>
-                <div class="kpi-card kpi-profit">
-                    <div class="kpi-icon">💰</div>
-                    <div class="kpi-info">
-                        <span class="kpi-label" id="kpi-label-4">Profit Período</span>
-                        <span class="kpi-value" id="kpi-profit-mes">$0</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts Row -->
-            <div class="charts-row">
-                <div class="chart-card">
-                    <h3>Ventas Últimos 7 Días</h3>
-                    <canvas id="chart-ventas-semana" width="500" height="250"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3>Productos Más Vendidos (Mes)</h3>
-                    <canvas id="chart-productos" width="400" height="250"></canvas>
-                </div>
-            </div>
-
-            <!-- Recent Sales -->
-            <div class="card">
-                <h3>Últimas Ventas</h3>
-                <div class="table-container">
-                    <table class="data-table" id="table-ultimas-ventas">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ==================== VENTAS ==================== -->
-        <section class="section" id="section-ventas">
-            <div class="section-header">
-                <h1>Registro de Ventas</h1>
-                <p class="section-subtitle">Registrá tus ventas del día rápidamente</p>
-            </div>
-
-            <!-- Carga Rápida del Día -->
-            <div class="card bulk-sale-card">
-                <div class="card-header-row">
-                    <h3>⚡ Carga Rápida del Día</h3>
-                    <div class="filter-row">
-                        <label for="bulk-sale-date" style="white-space:nowrap;font-size:0.85rem;color:var(--text-secondary)">Fecha:</label>
-                        <input type="date" id="bulk-sale-date" class="input-field input-sm">
-                    </div>
-                </div>
-                <div class="bulk-sale-grid" id="bulk-sale-grid">
-                    <!-- Generated by JS -->
-                </div>
-                <div class="form-actions" style="margin-top:1rem;justify-content:center">
-                    <button class="btn btn-primary btn-lg" id="btn-bulk-sale">✅ Registrar Ventas del Día</button>
-                </div>
-            </div>
-
-            <!-- Quick Sale Individual -->
-            <h3 style="margin-top:2rem;color:var(--text-secondary);font-size:0.9rem">O registrá ventas individuales:</h3>
-            <div class="quick-sale-grid" id="quick-sale-grid">
-                <!-- Generated by JS -->
-            </div>
-
-            <!-- Sale History -->
-            <div class="card" style="margin-top:2rem">
-                <div class="card-header-row">
-                    <h3>Historial de Ventas</h3>
-                    <div class="filter-row">
-                        <input type="date" id="filter-date-from" class="input-field input-sm">
-                        <span>a</span>
-                        <input type="date" id="filter-date-to" class="input-field input-sm">
-                        <button class="btn btn-sm" id="btn-filter-ventas">Filtrar</button>
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table class="data-table" id="table-ventas-historial">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Producto</th>
-                                <th>Cant.</th>
-                                <th>Precio Unit.</th>
-                                <th>Total</th>
-                                <th>Profit</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ==================== PRODUCCIÓN ==================== -->
-        <section class="section" id="section-produccion">
-            <div class="section-header">
-                <h1>Producción</h1>
-                <p class="section-subtitle">Armá tus bolsas y se descuenta la materia prima automáticamente</p>
-            </div>
-
-            <!-- Production Cards -->
-            <div class="quick-sale-grid" id="production-grid">
-                <!-- Generated by JS -->
-            </div>
-
-            <!-- Production History -->
-            <div class="card" style="margin-top:2rem">
-                <h3>Historial de Producción</h3>
-                <div class="table-container">
-                    <table class="data-table" id="table-produccion">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Producto</th>
-                                <th>Bolsas Armadas</th>
-                                <th>Materia Prima Usada</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ==================== PRODUCTOS ==================== -->
-        <section class="section" id="section-productos">
-            <div class="section-header">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h1>Mis Productos</h1>
-                        <p class="section-subtitle">Catálogo con costos calculados automáticamente</p>
-                    </div>
-                    <button class="btn btn-primary" id="btn-add-producto">+ Nuevo Producto</button>
-                </div>
-            </div>
-
-            <div class="products-grid" id="products-grid">
-                <!-- Generated by JS -->
-            </div>
-        </section>
-
-        <!-- ==================== MATERIAS PRIMAS ==================== -->
-        <section class="section" id="section-materias">
-            <div class="section-header">
-                <h1>Materias Primas</h1>
-                <p class="section-subtitle">Actualizá los precios cuando cambien</p>
-            </div>
-
-            <div class="card">
-                <div class="card-header-row">
-                    <h3>Ingredientes</h3>
-                    <button class="btn btn-primary" id="btn-add-materia">+ Agregar</button>
-                </div>
-                <div class="table-container">
-                    <table class="data-table" id="table-materias">
-                        <thead>
-                            <tr>
-                                <th>Ingrediente</th>
-                                <th>Precio / kg</th>
-                                <th>Stock (g)</th>
-                                <th>Última Actualización</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="card" style="margin-top: 2rem">
-                <div class="card-header-row">
-                    <h3>Insumos de Empaque</h3>
-                    <button class="btn btn-primary" id="btn-add-insumo">+ Agregar</button>
-                </div>
-                <div class="table-container">
-                    <table class="data-table" id="table-insumos">
-                        <thead>
-                            <tr>
-                                <th>Insumo</th>
-                                <th>Precio / unidad</th>
-                                <th>Stock (unidades)</th>
-                                <th>Última Actualización</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ==================== GASTOS ==================== -->
-        <section class="section" id="section-gastos">
-            <div class="section-header">
-                <h1>Gastos</h1>
-                <p class="section-subtitle">Controlá todos tus gastos fijos y variables</p>
-            </div>
-
-            <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                <div class="kpi-card kpi-ventas">
-                    <div class="kpi-icon">📌</div>
-                    <div class="kpi-info">
-                        <span class="kpi-label">Gastos Fijos</span>
-                        <span class="kpi-value" id="kpi-gastos-fijos">$0</span>
-                    </div>
-                </div>
-                <div class="kpi-card kpi-semana">
-                    <div class="kpi-icon">🔄</div>
-                    <div class="kpi-info">
-                        <span class="kpi-label">Gastos Variables (Mes)</span>
-                        <span class="kpi-value" id="kpi-gastos-variables">$0</span>
-                    </div>
-                </div>
-                <div class="kpi-card kpi-profit">
-                    <div class="kpi-icon">📊</div>
-                    <div class="kpi-info">
-                        <span class="kpi-label">Total Gastos (Mes)</span>
-                        <span class="kpi-value" id="kpi-gastos-total">$0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card" style="margin-top:2rem">
-                <div class="card-header-row">
-                    <h3>Registro de Gastos</h3>
-                    <button class="btn btn-primary" id="btn-add-gasto">+ Nuevo Gasto</button>
-                </div>
-                <div class="table-container">
-                    <table class="data-table" id="table-gastos">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Concepto</th>
-                                <th>Tipo</th>
-                                <th>Monto</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ==================== REPORTES ==================== -->
-        <section class="section" id="section-reportes">
-            <div class="section-header">
-                <h1>Reportes</h1>
-                <p class="section-subtitle">Análisis detallado de tu negocio</p>
-            </div>
-
-            <div class="report-controls">
-                <select class="input-field" id="report-period">
-                    <option value="week">Última Semana</option>
-                    <option value="month" selected>Este Mes</option>
-                    <option value="all">Todo el Historial</option>
-                </select>
-                <button class="btn btn-primary" id="btn-generate-report">Generar Reporte</button>
-            </div>
-
-            <!-- Profit Report -->
-            <div class="card" style="margin-top:1.5rem">
-                <h3>💰 Reporte de Rentabilidad</h3>
-                <div class="report-summary" id="report-profit-summary">
-                    <!-- Generated by JS -->
-                </div>
-            </div>
-
-            <!-- Consumption Report -->
-            <div class="card" style="margin-top:1.5rem">
-                <h3>📦 Consumo de Materias Primas</h3>
-                <div class="table-container">
-                    <table class="data-table" id="table-report-consumo">
-                        <thead>
-                            <tr>
-                                <th>Ingrediente</th>
-                                <th>Consumido (g)</th>
-                                <th>Costo</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Per Product Report -->
-            <div class="card" style="margin-top:1.5rem">
-                <h3>📊 Rendimiento por Producto</h3>
-                <div class="table-container">
-                    <table class="data-table" id="table-report-productos">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Unidades Vendidas</th>
-                                <th>Ingresos</th>
-                                <th>Costo Total</th>
-                                <th>Ganancia</th>
-                                <th>Margen %</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- ==================== MODALS ==================== -->
-
-    <!-- Modal: Agregar/Editar Materia Prima -->
-    <div class="modal-overlay" id="modal-materia">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modal-materia-title">Agregar Materia Prima</h3>
-                <button class="modal-close" data-close="modal-materia">&times;</button>
-            </div>
-            <form id="form-materia">
-                <input type="hidden" id="materia-id">
-                <div class="form-group">
-                    <label>Nombre</label>
-                    <input type="text" class="input-field" id="materia-nombre" required placeholder="Ej: Almendras">
-                </div>
-                <div class="form-group">
-                    <label>Precio por kg ($)</label>
-                    <input type="number" class="input-field" id="materia-precio" required min="0" step="1" placeholder="Ej: 23000">
-                </div>
-                <div class="form-group">
-                    <label>Stock actual (gramos)</label>
-                    <input type="number" class="input-field" id="materia-stock" min="0" step="1" placeholder="Ej: 500">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" data-close="modal-materia">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
+  <main>
+    <!-- ============ VENDER ============ -->
+    <div class="page on" id="p-vender">
+      <h2>¿Qué vendiste?</h2>
+      <p class="lead">Un clic por bolsita. Para el combo, activalo primero y después tocá las tres, aunque sean distintas.</p>
+      <button id="combo"></button>
+      <div id="grid"></div>
+      <div id="barra">
+        <div class="tot"><span id="barra-uds">0 bolsitas hoy</span><b class="num" id="barra-tot">$0</b></div>
+        <button class="gh" id="btn-undo">Deshacer última</button>
+        <button class="gh" id="btn-otro-dia">Cargar otro día</button>
+      </div>
+      <div class="nota" id="nota-dia"></div>
     </div>
 
-    <!-- Modal: Agregar/Editar Insumo -->
-    <div class="modal-overlay" id="modal-insumo">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modal-insumo-title">Agregar Insumo</h3>
-                <button class="modal-close" data-close="modal-insumo">&times;</button>
-            </div>
-            <form id="form-insumo">
-                <input type="hidden" id="insumo-id">
-                <div class="form-group">
-                    <label>Nombre</label>
-                    <input type="text" class="input-field" id="insumo-nombre" required placeholder="Ej: Bolsitas">
-                </div>
-                <div class="form-group">
-                    <label>Precio por unidad ($)</label>
-                    <input type="number" class="input-field" id="insumo-precio" required min="0" step="1" placeholder="Ej: 140">
-                </div>
-                <div class="form-group">
-                    <label>Stock actual (unidades)</label>
-                    <input type="number" class="input-field" id="insumo-stock" min="0" step="1" placeholder="Ej: 100">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" data-close="modal-insumo">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
+    <!-- ============ NÚMEROS ============ -->
+    <div class="page" id="p-numeros">
+      <h2>Los números</h2>
+      <p class="lead">Todo se calcula solo con el costo de cada producto. No hay que cargar stock ni materia prima.</p>
+      <div class="filtros">
+        <div><label for="f-periodo">Período</label>
+          <select id="f-periodo">
+            <option value="7">Últimos 7 días</option>
+            <option value="30" selected>Últimos 30 días</option>
+            <option value="90">Últimos 90 días</option>
+            <option value="0">Todo</option>
+          </select></div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="lb">Bolsitas</div><div class="vl num" id="k-uds">0</div><div class="ft" id="k-uds-ft"></div></div>
+        <div class="kpi"><div class="lb">Facturación</div><div class="vl num" id="k-ing">$0</div><div class="ft">lo que entró</div></div>
+        <div class="kpi"><div class="lb">Costo</div><div class="vl num" id="k-cost">$0</div><div class="ft">insumos y packaging</div></div>
+        <div class="kpi g"><div class="lb">Ganancia</div><div class="vl num" id="k-gan">$0</div><div class="ft" id="k-mg"></div></div>
+      </div>
+
+      <section>
+        <h2>Por producto</h2>
+        <p class="lead">Ordenado por lo que te deja cada uno.</p>
+        <div class="tw"><table id="t-prod">
+          <thead><tr><th>Producto</th><th>Bolsitas</th><th>Facturación</th><th>Ganancia</th><th>Margen</th><th></th></tr></thead>
+          <tbody></tbody><tfoot></tfoot></table></div>
+      </section>
+
+      <section>
+        <h2>Mes a mes</h2>
+        <p class="lead">Los meses marcados como estimados se reconstruyeron desde las bolsitas compradas, no son ventas cargadas una por una.</p>
+        <div class="tw"><table id="t-mes">
+          <thead><tr><th>Mes</th><th>Bolsitas</th><th>Facturación</th><th>Ganancia</th><th>Por semana</th><th></th></tr></thead>
+          <tbody></tbody></table></div>
+      </section>
     </div>
 
-
-
-    <!-- Modal: Agregar Gasto -->
-    <div class="modal-overlay" id="modal-gasto">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modal-gasto-title">Nuevo Gasto</h3>
-                <button class="modal-close" data-close="modal-gasto">&times;</button>
-            </div>
-            <form id="form-gasto">
-                <input type="hidden" id="gasto-id">
-                <div class="form-group">
-                    <label>Fecha</label>
-                    <input type="date" class="input-field" id="gasto-fecha" required>
-                </div>
-                <div class="form-group">
-                    <label>Concepto</label>
-                    <input type="text" class="input-field" id="gasto-concepto" required placeholder="Ej: Compra de almendras 1kg">
-                </div>
-                <div class="form-group">
-                    <label>Tipo</label>
-                    <select class="input-field" id="gasto-tipo" required>
-                        <option value="variable">Variable</option>
-                        <option value="fijo">Fijo</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Monto ($)</label>
-                    <input type="number" class="input-field" id="gasto-monto" required min="0" step="1" placeholder="Ej: 23000">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" data-close="modal-gasto">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
+    <!-- ============ PRODUCTOS ============ -->
+    <div class="page" id="p-productos">
+      <h2>Productos</h2>
+      <p class="lead">Acá mandás vos: cambiá el nombre, el costo o el precio y se recalcula todo, incluido el histórico. Destildá <b>En venta</b> para sacarlo de la pantalla de venta sin perder el historial.</p>
+      <div class="filtros"><button class="gh" id="btn-nuevo">+ Agregar producto</button></div>
+      <div class="tw"><table id="t-cat">
+        <thead><tr><th style="width:52px"></th><th>Producto</th><th>Costo</th><th>Precio</th><th>Ganancia</th><th>Margen</th><th>En venta</th><th></th></tr></thead>
+        <tbody></tbody></table></div>
+      <div class="nota"><b>Cómo se calculó cada costo:</b> materia prima más el doypack ($168) y la etiqueta ($78). Por ejemplo el chocolate con girasol y zapallo sale de una tanda de 930 g de semillas más 1 kg de chocolate Alpino, que rinde 30 bolsitas.<br><br>
+      Un producto que ya tiene ventas cargadas <b>no se puede borrar</b>, porque se rompería el historial: destildalo y listo. Los que nunca vendiste se borran sin problema.</div>
     </div>
 
-    <!-- Modal: Confirmar Venta -->
-    <div class="modal-overlay" id="modal-venta">
-        <div class="modal modal-sm">
-            <div class="modal-header">
-                <h3>Registrar Venta</h3>
-                <button class="modal-close" data-close="modal-venta">&times;</button>
-            </div>
-            <form id="form-venta">
-                <input type="hidden" id="venta-producto-id">
-                <div class="form-group">
-                    <label>Producto</label>
-                    <input type="text" class="input-field" id="venta-producto-nombre" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Fecha</label>
-                    <input type="date" class="input-field" id="venta-fecha" required>
-                </div>
-                <div class="form-group">
-                    <label>Cantidad</label>
-                    <input type="number" class="input-field" id="venta-cantidad" required min="1" value="1">
-                </div>
-                <div class="venta-resumen">
-                    <div class="venta-resumen-row">
-                        <span>Precio unitario:</span>
-                        <span id="venta-precio-unit">$0</span>
-                    </div>
-                    <div class="venta-resumen-row total">
-                        <span>Total:</span>
-                        <span id="venta-total">$0</span>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" data-close="modal-venta">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">✅ Confirmar Venta</button>
-                </div>
-            </form>
-        </div>
+    <!-- ============ HISTORIAL ============ -->
+    <div class="page" id="p-historial">
+      <h2>Historial</h2>
+      <p class="lead">Todas las ventas registradas. Podés borrar una si te equivocaste.</p>
+      <div class="filtros">
+        <div><label for="f-desde">Desde</label><input type="date" id="f-desde"></div>
+        <div><label for="f-hasta">Hasta</label><input type="date" id="f-hasta"></div>
+        <button class="gh" id="btn-limpiar-f">Ver todo</button>
+        <div class="spacer" style="flex:1"></div>
+        <button class="gh" id="btn-export">Descargar backup</button>
+        <button class="gh" id="btn-import">Restaurar backup</button>
+        <input type="file" id="file-import" accept=".json" hidden>
+      </div>
+      <div class="tw"><table id="t-hist">
+        <thead><tr><th>Fecha</th><th>Producto</th><th>Cant.</th><th>Precio</th><th>Total</th><th></th></tr></thead>
+        <tbody></tbody></table></div>
+      <div class="nota"><b>Hacé backup una vez por semana.</b> Los datos se guardan en este navegador. Si borrás los datos del sitio o cambiás de dispositivo, sin backup los perdés.</div>
     </div>
+  </main>
+</div>
+<div id="toast"></div>
 
-    <!-- Modal: Registrar Producción -->
-    <div class="modal-overlay" id="modal-produccion">
-        <div class="modal modal-sm">
-            <div class="modal-header">
-                <h3>Armar Bolsas</h3>
-                <button class="modal-close" data-close="modal-produccion">&times;</button>
-            </div>
-            <form id="form-produccion">
-                <input type="hidden" id="prod-producto-id">
-                <div class="form-group">
-                    <label>Producto</label>
-                    <input type="text" class="input-field" id="prod-producto-nombre" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Fecha</label>
-                    <input type="date" class="input-field" id="prod-fecha" required>
-                </div>
-                <div class="form-group">
-                    <label>Cantidad de bolsas a armar</label>
-                    <input type="number" class="input-field" id="prod-cantidad" required min="1" value="1">
-                </div>
-                <div class="venta-resumen" id="prod-consumo-resumen">
-                    <!-- Filled by JS -->
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" data-close="modal-produccion">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">🏭 Confirmar Producción</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<script>
+(function () {
+'use strict';
 
-    <!-- Modal: Agregar/Editar Producto -->
-    <div class="modal-overlay" id="modal-producto">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modal-producto-title">Crear Producto</h3>
-                <button class="modal-close" data-close="modal-producto">&times;</button>
-            </div>
-            <form id="form-producto">
-                <input type="hidden" id="producto-id">
-                
-                <div style="display:flex; gap:1rem;">
-                    <div class="form-group" style="flex:1">
-                        <label>Nombre del Mix/Producto</label>
-                        <input type="text" class="input-field" id="producto-nombre" required placeholder="Ej: Mix Keto">
-                    </div>
-                    <div class="form-group" style="width: 80px;">
-                        <label>Emoji</label>
-                        <input type="text" class="input-field" id="producto-emoji" required placeholder="🥑" maxlength="2">
-                    </div>
-                </div>
+// Limpia el service worker y los caches de la versión vieja de la app.
+try {
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations()
+      .then(function (rs) { rs.forEach(function (r) { r.unregister(); }); })
+      .catch(function () {});
+  }
+  if (window.caches) {
+    caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }).catch(function () {});
+  }
+} catch (e) {}
 
-                <div style="display:flex; gap:1rem;">
-                    <div class="form-group" style="flex:1">
-                        <label>Precio de Venta ($)</label>
-                        <input type="number" class="input-field" id="producto-precio" required min="0" step="1">
-                    </div>
-                    <div class="form-group" style="flex:1">
-                        <label>Peso Total (g) por bolsita</label>
-                        <input type="number" class="input-field" id="producto-peso" required min="1" step="1">
-                    </div>
-                </div>
+var SEED = {"p":[{"id":"choco-semillas","n":"Chocolate con girasol y zapallo","e":"🍫","pv":4000,"c":1024,"on":true},{"id":"choco-castanas","n":"Chocolate con castañas, girasol y zapallo","e":"🌰","pv":4000,"c":1214,"on":true},{"id":"choco-almendras","n":"Chocolate con almendra sola","e":"🥜","pv":4000,"c":1564,"on":true},{"id":"garrapinada","n":"Garrapiñada de girasol","e":"🍬","pv":4000,"c":568,"on":true},{"id":"girasol-salado","n":"Girasol salado en salmuera","e":"🧂","pv":4000,"c":678,"on":true},{"id":"caju-salado","n":"Castaña salada en salmuera","e":"🌰","pv":4000,"c":1938,"on":true},{"id":"choco-300","n":"Bolsa grande 300 g","e":"🎁","pv":20000,"c":6461,"on":false},{"id":"rocas-ramo","n":"Rocas de choco + semillas (ramo)","e":"🪨","pv":4667,"c":706,"on":false},{"id":"mix-premium","n":"Mix Premium","e":"👑","pv":3500,"c":1534,"on":false},{"id":"mix-energico","n":"Mix Enérgico","e":"⚡","pv":3000,"c":1324,"on":false},{"id":"castanas-caram","n":"Castañas Caramelizadas","e":"🍯","pv":3500,"c":1467,"on":false},{"id":"girasol-caram","n":"Semillas Caramelizadas","e":"🌻","pv":3000,"c":627,"on":false},{"id":"mix-caramelizado","n":"Mix Caramelizado","e":"🍬","pv":3500,"c":1119,"on":false}],"v":[["2026-03-22","mix-premium",3,3500],["2026-03-23","mix-premium",9,3500],["2026-03-24","mix-premium",5,3500],["2026-03-25","mix-premium",11,3500],["2026-03-26","mix-premium",4,3500],["2026-03-27","mix-premium",1,3500],["2026-03-28","mix-premium",3,3500],["2026-03-29","mix-premium",8,3500],["2026-03-30","castanas-caram",6,3000],["2026-03-30","girasol-caram",1,2500],["2026-03-30","mix-premium",1,3500],["2026-03-31","castanas-caram",5,3000],["2026-03-31","girasol-caram",3,2500],["2026-03-31","mix-premium",4,3500],["2026-04-01","castanas-caram",3,3000],["2026-04-01","girasol-caram",1,2500],["2026-04-01","mix-energico",3,3000],["2026-04-01","mix-premium",4,3500],["2026-04-02","castanas-caram",4,3000],["2026-04-02","girasol-caram",2,2500],["2026-04-02","mix-energico",1,3000],["2026-04-02","mix-premium",1,3500],["2026-04-03","castanas-caram",2,3000],["2026-04-03","girasol-caram",2,2500],["2026-04-03","mix-energico",1,3000],["2026-04-03","mix-premium",3,3500],["2026-04-04","castanas-caram",4,3000],["2026-04-04","girasol-caram",1,2500],["2026-04-05","castanas-caram",5,3000],["2026-04-05","girasol-caram",6,2500],["2026-04-05","mix-energico",2,3000],["2026-04-05","mix-premium",2,3500],["2026-04-06","girasol-caram",8,2500],["2026-04-06","mix-energico",1,3000],["2026-04-06","mix-premium",1,3500],["2026-04-07","castanas-caram",5,3000],["2026-04-07","mix-energico",1,3000],["2026-04-07","mix-premium",1,3500],["2026-04-08","mix-energico",1,3000],["2026-04-09","castanas-caram",3,3000],["2026-04-09","mix-energico",1,3000],["2026-04-10","castanas-caram",5,3000],["2026-04-10","mix-energico",1,3000],["2026-04-10","mix-premium",1,3500],["2026-04-11","castanas-caram",2,3000],["2026-04-11","mix-energico",1,3000],["2026-04-11","mix-premium",2,3500],["2026-04-12","mix-energico",2,3000],["2026-04-12","mix-premium",7,3500],["2026-04-13","mix-premium",2,3500],["2026-04-14","mix-premium",3,3500],["2026-04-15","mix-caramelizado",13,3500],["2026-05-22","choco-300",5,20000],["2026-05-22","choco-semillas",9,4000],["2026-05-22","choco-semillas",22,3333],["2026-05-22","garrapinada",1,4000],["2026-05-22","garrapinada",2,3333],["2026-05-29","choco-semillas",9,4000],["2026-05-29","choco-semillas",22,3333],["2026-05-29","garrapinada",1,4000],["2026-05-29","garrapinada",2,3333],["2026-06-05","choco-300",5,20000],["2026-06-05","choco-semillas",9,4000],["2026-06-05","choco-semillas",22,3333],["2026-06-05","garrapinada",1,4000],["2026-06-05","garrapinada",2,3333],["2026-06-12","choco-semillas",9,4000],["2026-06-12","choco-semillas",22,3333],["2026-06-12","garrapinada",1,4000],["2026-06-12","garrapinada",2,3333],["2026-06-19","choco-300",5,20000],["2026-06-19","choco-semillas",9,4000],["2026-06-19","choco-semillas",22,3333],["2026-06-19","garrapinada",1,4000],["2026-06-19","garrapinada",2,3333],["2026-06-26","choco-semillas",9,4000],["2026-06-26","choco-semillas",22,3333],["2026-06-26","garrapinada",1,4000],["2026-06-26","garrapinada",2,3333],["2026-07-03","choco-300",5,20000],["2026-07-03","choco-semillas",9,4000],["2026-07-03","choco-semillas",22,3333],["2026-07-03","garrapinada",1,4000],["2026-07-03","garrapinada",2,3333],["2026-07-10","choco-semillas",9,4000],["2026-07-10","choco-semillas",22,3333],["2026-07-10","garrapinada",1,4000],["2026-07-10","garrapinada",2,3333],["2026-07-17","choco-300",5,20000],["2026-07-17","choco-semillas",9,4000],["2026-07-17","choco-semillas",22,3333],["2026-07-17","garrapinada",1,3333],["2026-07-17","garrapinada",1,4000],["2026-07-24","choco-semillas",9,4000],["2026-07-24","choco-semillas",22,3333],["2026-07-24","garrapinada",1,3333],["2026-07-24","garrapinada",1,4000],["2026-07-31","choco-semillas",9,4000],["2026-07-31","choco-semillas",22,3333],["2026-07-31","garrapinada",1,3333],["2026-07-31","garrapinada",1,4000],["2026-08-07","choco-semillas",13,4000],["2026-08-07","choco-semillas",31,3333],["2026-08-07","garrapinada",1,4000],["2026-08-07","garrapinada",3,3333],["2026-08-14","choco-semillas",13,4000],["2026-08-14","choco-semillas",31,3333],["2026-08-14","garrapinada",1,4000],["2026-08-14","garrapinada",3,3333],["2026-08-21","choco-semillas",13,4000],["2026-08-21","choco-semillas",31,3333],["2026-08-21","garrapinada",1,4000],["2026-08-21","garrapinada",3,3333],["2026-08-28","choco-semillas",13,4000],["2026-08-28","choco-semillas",31,3333],["2026-08-28","garrapinada",1,4000],["2026-08-28","garrapinada",3,3333],["2026-09-04","choco-semillas",13,4000],["2026-09-04","choco-semillas",31,3333],["2026-09-04","garrapinada",1,4000],["2026-09-04","garrapinada",3,3333],["2026-09-11","choco-semillas",13,4000],["2026-09-11","choco-semillas",30,3333],["2026-09-11","garrapinada",1,4000],["2026-09-11","garrapinada",3,3333],["2026-09-18","choco-semillas",13,4000],["2026-09-18","choco-semillas",30,3333],["2026-09-18","garrapinada",1,4000],["2026-09-18","garrapinada",2,3333],["2026-09-25","choco-semillas",13,4000],["2026-09-25","choco-semillas",30,3333],["2026-09-25","garrapinada",1,4000],["2026-09-25","garrapinada",2,3333]]};
+var KEY = 'nutcontrol_v3';
+var COMBO3 = 10000;
+var CORTE_REAL = '2026-09-27'; // desde acá, ventas cargadas a mano
 
-                <div class="form-group">
-                    <label style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">Receta (Ingredientes)</label>
-                    <div id="producto-ingredientes-list" style="max-height: 200px; overflow-y: auto;">
-                        <!-- Generated by JS -->
-                    </div>
-                </div>
+var db = cargar();
+var comboBuf = [];
+var comboOn = false;
+var fechaCarga = hoy();
 
-                <div class="form-group">
-                    <label style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">Insumos y Packaging</label>
-                    <div id="producto-insumos-list" style="max-height: 150px; overflow-y: auto;">
-                        <!-- Generated by JS -->
-                    </div>
-                </div>
+// ---------- almacenamiento ----------
+function hoy() { var d = new Date(); return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()); }
+function p2(n) { return n < 10 ? '0' + n : '' + n; }
+function cargar() {
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) { var o = JSON.parse(raw); if (o && o.p && o.v) return o; }
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(SEED));
+}
+function guardar() {
+  try { localStorage.setItem(KEY, JSON.stringify(db)); }
+  catch (e) { toast('No se pudo guardar. Descargá un backup por las dudas.'); }
+}
 
-                <div class="form-actions" style="margin-top: 1rem;">
-                    <button type="button" class="btn btn-secondary" data-close="modal-producto">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar Producto</button>
-                </div>
-            </form>
-        </div>
-    </div>
+// ---------- helpers ----------
+function $(id) { return document.getElementById(id); }
+function plata(n) { return '$' + Math.round(n).toLocaleString('es-AR'); }
+function prod(id) { for (var i = 0; i < db.p.length; i++) if (db.p[i].id === id) return db.p[i]; return null; }
+function costoDe(id) { var p = prod(id); return p ? p.c : 0; }
+function fechaLarga(f) {
+  var ds = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  var ms = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  var d = new Date(f + 'T12:00:00');
+  return ds[d.getDay()] + ' ' + d.getDate() + ' de ' + ms[d.getMonth()];
+}
+function fechaCorta(f) { var x = f.split('-'); return x[2] + '/' + x[1]; }
+function toast(m) {
+  var t = $('toast'); t.textContent = m; t.classList.add('on');
+  clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('on'); }, 2100);
+}
 
-    <!-- Toast Notification -->
-    <div class="toast" id="toast">
-        <span id="toast-message"></span>
-    </div>
+// ---------- navegación ----------
+document.querySelectorAll('.tab').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('on'); });
+    document.querySelectorAll('.page').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    $('p-' + b.dataset.p).classList.add('on');
+    document.querySelector('main').scrollTop = 0;
+    if (b.dataset.p === 'numeros') pintarNumeros();
+    if (b.dataset.p === 'productos') pintarCatalogo();
+    if (b.dataset.p === 'historial') pintarHistorial();
+  });
+});
 
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-    <script src="app.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW Registered', reg))
-                    .catch(err => console.log('SW Reg Failed', err));
-            });
-        }
-    </script>
+// ---------- VENDER ----------
+function activos() { return db.p.filter(function (p) { return p.on; }); }
+function ventasDe(f) { return db.v.filter(function (v) { return v[0] === f; }); }
+
+function registrar(pid, precio) {
+  db.v.push([fechaCarga, pid, 1, precio]);
+  guardar(); pintarVender();
+}
+function tap(pid) {
+  if (comboOn) {
+    comboBuf.push(pid);
+    if (comboBuf.length >= 3) {
+      var u = Math.round(COMBO3 / 3);
+      comboBuf.forEach(function (id, k) { db.v.push([fechaCarga, id, 1, k === 2 ? COMBO3 - 2 * u : u]); });
+      comboBuf = []; comboOn = false;
+      guardar(); toast('Combo cargado · ' + plata(COMBO3));
+    }
+  } else {
+    registrar(pid, prod(pid).pv);
+    return;
+  }
+  pintarVender();
+}
+function deshacer() {
+  if (comboBuf.length) { comboBuf = []; comboOn = false; pintarVender(); return; }
+  var idx = -1;
+  for (var i = db.v.length - 1; i >= 0; i--) if (db.v[i][0] === fechaCarga) { idx = i; break; }
+  if (idx < 0) { toast('No hay nada para deshacer en ese día'); return; }
+  db.v.splice(idx, 1); guardar(); pintarVender(); toast('Venta borrada');
+}
+function pintarVender() {
+  var hs = ventasDe(fechaCarga);
+  var uds = 0, tot = 0, porP = {};
+  hs.forEach(function (v) { uds += v[2]; tot += v[2] * v[3]; porP[v[1]] = (porP[v[1]] || 0) + v[2]; });
+
+  var cb = $('combo');
+  cb.classList.toggle('on', comboOn);
+  if (comboBuf.length) {
+    var falta = 3 - comboBuf.length;
+    cb.innerHTML = 'Combo: ' + comboBuf.length + ' de 3<small>Tocá ' + falta + ' bolsita' + (falta > 1 ? 's' : '') + ' más</small>';
+  } else if (comboOn) {
+    cb.innerHTML = 'Combo activado<small>Tocá las 3 bolsitas que se lleva</small>';
+  } else {
+    cb.innerHTML = 'Cargar un combo 3 × ' + plata(COMBO3) + '<small>Después tocá las 3 bolsitas, aunque sean distintas</small>';
+  }
+
+  $('grid').innerHTML = activos().map(function (p) {
+    var c = porP[p.id] || 0;
+    return '<button class="pbtn" data-pid="' + p.id + '"><span class="em">' + p.e + '</span>' +
+      '<span class="tx"><b>' + p.n + '</b><i>' + plata(p.pv) + ' · te deja ' + plata(p.pv - p.c) + '</i></span>' +
+      '<span class="ct' + (c ? '' : ' z') + '">' + c + '</span></button>';
+  }).join('');
+
+  $('barra-uds').textContent = uds + (uds === 1 ? ' bolsita' : ' bolsitas');
+  $('barra-tot').textContent = plata(tot);
+  var gan = hs.reduce(function (s, v) { return s + v[2] * (v[3] - costoDe(v[1])); }, 0);
+  $('nota-dia').innerHTML = fechaCarga === hoy()
+    ? 'Cargando <b>' + fechaLarga(fechaCarga) + '</b>. Ganancia del día: <b>' + plata(gan) + '</b>.'
+    : 'Estás cargando <b>' + fechaLarga(fechaCarga) + '</b>, que no es hoy. Ganancia de ese día: <b>' + plata(gan) + '</b>.';
+}
+$('grid').addEventListener('click', function (e) {
+  var b = e.target.closest('.pbtn'); if (b) tap(b.dataset.pid);
+});
+$('combo').addEventListener('click', function () { comboOn = !comboOn; comboBuf = []; pintarVender(); });
+$('btn-undo').addEventListener('click', deshacer);
+$('btn-otro-dia').addEventListener('click', function () {
+  var f = window.prompt('¿Qué día querés cargar? (formato 2026-09-25)', fechaCarga);
+  if (f && /^\d{4}-\d{2}-\d{2}$/.test(f)) { fechaCarga = f; pintarVender(); toast('Cargando ' + fechaCorta(f)); }
+});
+
+// ---------- NÚMEROS ----------
+function rango() {
+  var d = parseInt($('f-periodo').value, 10);
+  if (!d) return db.v.slice();
+  var lim = new Date(); lim.setDate(lim.getDate() - d);
+  var ls = lim.getFullYear() + '-' + p2(lim.getMonth() + 1) + '-' + p2(lim.getDate());
+  return db.v.filter(function (v) { return v[0] >= ls; });
+}
+function pintarNumeros() {
+  var vs = rango();
+  var uds = 0, ing = 0, cost = 0, porP = {};
+  vs.forEach(function (v) {
+    var c = costoDe(v[1]);
+    uds += v[2]; ing += v[2] * v[3]; cost += v[2] * c;
+    if (!porP[v[1]]) porP[v[1]] = { u: 0, i: 0, g: 0 };
+    porP[v[1]].u += v[2]; porP[v[1]].i += v[2] * v[3]; porP[v[1]].g += v[2] * (v[3] - c);
+  });
+  var gan = ing - cost;
+  $('k-uds').textContent = uds.toLocaleString('es-AR');
+  $('k-uds-ft').textContent = vs.length + ' registros';
+  $('k-ing').textContent = plata(ing);
+  $('k-cost').textContent = plata(cost);
+  $('k-gan').textContent = plata(gan);
+  $('k-mg').textContent = ing ? Math.round(gan / ing * 100) + '% de margen' : '';
+
+  var filas = Object.keys(porP).map(function (id) {
+    var p = prod(id); var d = porP[id];
+    return { n: p ? p.e + ' ' + p.n : id, u: d.u, i: d.i, g: d.g, m: d.i ? d.g / d.i : 0 };
+  }).sort(function (a, b) { return b.g - a.g; });
+  var maxG = filas.length ? filas[0].g : 1;
+  var tb = $('t-prod').querySelector('tbody');
+  tb.innerHTML = filas.length ? filas.map(function (f) {
+    return '<tr><td>' + f.n + '</td><td class="num">' + f.u + '</td><td class="num">' + plata(f.i) +
+      '</td><td class="num pos">' + plata(f.g) + '</td><td class="num">' + Math.round(f.m * 100) + '%</td>' +
+      '<td style="width:120px"><span class="bar" style="width:' + Math.max(3, f.g / maxG * 100) + '%"></span></td></tr>';
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:26px">Sin ventas en el período</td></tr>';
+  $('t-prod').querySelector('tfoot').innerHTML = filas.length
+    ? '<tr><td>Total</td><td class="num">' + uds + '</td><td class="num">' + plata(ing) +
+      '</td><td class="num">' + plata(gan) + '</td><td class="num">' + (ing ? Math.round(gan / ing * 100) : 0) + '%</td><td></td></tr>' : '';
+
+  // mes a mes (siempre todo el historial)
+  var meses = {};
+  db.v.forEach(function (v) {
+    var k = v[0].slice(0, 7);
+    if (!meses[k]) meses[k] = { u: 0, i: 0, g: 0, real: 0, dias: {} };
+    var c = costoDe(v[1]);
+    meses[k].u += v[2]; meses[k].i += v[2] * v[3]; meses[k].g += v[2] * (v[3] - c);
+    meses[k].dias[v[0]] = 1;
+    if (v[0] >= CORTE_REAL) meses[k].real = 1;
+  });
+  var MN = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  var ks = Object.keys(meses).sort();
+  var maxM = 1; ks.forEach(function (k) { if (meses[k].g > maxM) maxM = meses[k].g; });
+  $('t-mes').querySelector('tbody').innerHTML = ks.map(function (k) {
+    var m = meses[k];
+    var nd = Object.keys(m.dias).length;
+    var semanal = nd > 1 ? m.u / (nd / 7) : m.u;
+    // un mes con ventas solo los viernes es reconstruido, no cargado a mano
+    var estimado = k >= '2026-05' && k < CORTE_REAL.slice(0, 7) ? 1 : 0;
+    return '<tr><td>' + MN[parseInt(k.slice(5), 10) - 1] + ' ' + k.slice(0, 4) +
+      (estimado ? ' <span class="chip est">estimado</span>' : '') +
+      '</td><td class="num">' + m.u + '</td><td class="num">' + plata(m.i) +
+      '</td><td class="num pos">' + plata(m.g) + '</td><td class="num">' + Math.round(semanal) +
+      '</td><td style="width:120px"><span class="bar" style="width:' + Math.max(3, m.g / maxM * 100) + '%"></span></td></tr>';
+  }).join('');
+}
+$('f-periodo').addEventListener('change', pintarNumeros);
+
+// ---------- PRODUCTOS ----------
+function ventasDeProd(id) { var n = 0; db.v.forEach(function (v) { if (v[1] === id) n += v[2]; }); return n; }
+var borrarArmado = null;
+
+function pintarCatalogo() {
+  $('t-cat').querySelector('tbody').innerHTML = db.p.map(function (p, i) {
+    var g = p.pv - p.c;
+    var nv = ventasDeProd(p.id);
+    var accion = nv
+      ? '<span class="chip" title="No se puede borrar sin romper el historial">' + nv + ' vendidas</span>'
+      : '<button class="del" data-del="' + i + '">' + (borrarArmado === i ? '¿Seguro?' : 'Borrar') + '</button>';
+    return '<tr class="' + (p.on ? '' : 'off') + '">' +
+      '<td><input type="text" data-i="' + i + '" data-f="e" value="' + p.e + '" maxlength="3" style="width:46px;text-align:center;padding:6px"></td>' +
+      '<td><input type="text" data-i="' + i + '" data-f="n" value="' + p.n.replace(/"/g, '&quot;') + '" style="width:100%;min-width:190px"></td>' +
+      '<td><input type="number" data-i="' + i + '" data-f="c" value="' + p.c + '" step="10" min="0"></td>' +
+      '<td><input type="number" data-i="' + i + '" data-f="pv" value="' + p.pv + '" step="100" min="0"></td>' +
+      '<td class="num ' + (g >= 0 ? 'pos' : 'neg') + '">' + plata(g) + '</td>' +
+      '<td class="num">' + (p.pv ? Math.round(g / p.pv * 100) : 0) + '%</td>' +
+      '<td><input type="checkbox" data-i="' + i + '" data-f="on"' + (p.on ? ' checked' : '') + '></td>' +
+      '<td>' + accion + '</td></tr>';
+  }).join('');
+}
+$('t-cat').addEventListener('change', function (e) {
+  var el = e.target; if (el.dataset.i === undefined) return;
+  var p = db.p[+el.dataset.i], f = el.dataset.f;
+  if (f === 'on') p.on = el.checked;
+  else if (f === 'n') { var t = el.value.trim(); if (t) p.n = t; }
+  else if (f === 'e') { p.e = el.value.trim() || '•'; }
+  else { var n = parseFloat(el.value); if (!isNaN(n) && n >= 0) p[f] = Math.round(n); }
+  borrarArmado = null;
+  guardar(); pintarCatalogo(); pintarVender(); toast('Guardado');
+});
+$('t-cat').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-del]'); if (!b) return;
+  var i = +b.dataset.del;
+  if (borrarArmado !== i) { borrarArmado = i; pintarCatalogo(); return; }
+  var n = db.p[i].n;
+  db.p.splice(i, 1); borrarArmado = null;
+  guardar(); pintarCatalogo(); pintarVender(); toast('Se borró ' + n);
+});
+$('btn-nuevo').addEventListener('click', function () {
+  var id = 'p' + Date.now().toString(36);
+  db.p.unshift({ id: id, n: 'Producto nuevo', e: '🥜', pv: 4000, c: 1000, on: true });
+  borrarArmado = null; guardar(); pintarCatalogo(); pintarVender();
+  toast('Listo: cambiale el nombre, el costo y el precio');
+  var inp = $('t-cat').querySelector('input[data-f="n"]');
+  if (inp) { inp.focus(); inp.select(); }
+});
+
+// ---------- HISTORIAL ----------
+function pintarHistorial() {
+  var d = $('f-desde').value, h = $('f-hasta').value;
+  var vs = db.v.map(function (v, i) { return { i: i, v: v }; })
+    .filter(function (x) { return (!d || x.v[0] >= d) && (!h || x.v[0] <= h); })
+    .sort(function (a, b) { return a.v[0] < b.v[0] ? 1 : a.v[0] > b.v[0] ? -1 : b.i - a.i; })
+    .slice(0, 400);
+  $('t-hist').querySelector('tbody').innerHTML = vs.length ? vs.map(function (x) {
+    var p = prod(x.v[1]);
+    return '<tr><td class="num">' + fechaCorta(x.v[0]) + '</td><td>' + (p ? p.e + ' ' + p.n : x.v[1]) +
+      '</td><td class="num">' + x.v[2] + '</td><td class="num">' + plata(x.v[3]) +
+      '</td><td class="num">' + plata(x.v[2] * x.v[3]) +
+      '</td><td><button class="del" data-i="' + x.i + '">Borrar</button></td></tr>';
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:26px">Sin ventas en ese rango</td></tr>';
+}
+$('t-hist').addEventListener('click', function (e) {
+  if (!e.target.classList.contains('del')) return;
+  db.v.splice(+e.target.dataset.i, 1); guardar(); pintarHistorial(); pintarVender(); toast('Venta borrada');
+});
+$('f-desde').addEventListener('change', pintarHistorial);
+$('f-hasta').addEventListener('change', pintarHistorial);
+$('btn-limpiar-f').addEventListener('click', function () { $('f-desde').value = ''; $('f-hasta').value = ''; pintarHistorial(); });
+
+$('btn-export').addEventListener('click', function () {
+  var txt = JSON.stringify(db);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(function () {
+      toast('Backup copiado. Pegalo en un mail o en el Drive y guardalo.');
+    }).catch(bajar);
+  } else bajar();
+  function bajar() {
+    try {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([txt], { type: 'application/json' }));
+      a.download = 'nutcontrol_' + hoy() + '.json'; a.click();
+      toast('Backup descargado');
+    } catch (e) { window.prompt('Copiá este texto y guardalo:', txt); }
+  }
+});
+$('btn-import').addEventListener('click', function () { $('file-import').click(); });
+$('file-import').addEventListener('change', function (e) {
+  var f = e.target.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function (ev) {
+    try {
+      var o = JSON.parse(ev.target.result);
+      if (o && o.p && o.v) { db = o; guardar(); pintarTodo(); toast('Backup restaurado'); }
+      else toast('Ese archivo no tiene el formato correcto');
+    } catch (x) { toast('No se pudo leer el archivo'); }
+  };
+  r.readAsText(f);
+});
+
+// ---------- arranque ----------
+function pintarTodo() { pintarVender(); pintarNumeros(); pintarCatalogo(); pintarHistorial(); }
+$('fecha-hoy').textContent = fechaLarga(hoy()).charAt(0).toUpperCase() + fechaLarga(hoy()).slice(1);
+pintarTodo();
+})();
+</script>
+
 </body>
 </html>
