@@ -21,6 +21,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;
   -webkit-font-smoothing:antialiased;overflow:hidden}
@@ -287,11 +288,21 @@ var fechaCarga = hoy();
 function hoy() { var d = new Date(); return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()); }
 function p2(n) { return n < 10 ? '0' + n : '' + n; }
 function cargar() {
+  var o = null;
   try {
     var raw = localStorage.getItem(KEY);
-    if (raw) { var o = JSON.parse(raw); if (o && o.p && o.v) return o; }
+    if (raw) { var x = JSON.parse(raw); if (x && x.p && x.v) o = x; }
   } catch (e) {}
-  return JSON.parse(JSON.stringify(SEED));
+  if (!o) o = JSON.parse(JSON.stringify(SEED));
+  // Normaliza datos que vengan de una versión anterior.
+  o.p.forEach(function (p) {
+    if (p.cb === undefined) p.cb = (p.pv === 4000) ? 1 : 0;
+    if (p.on === undefined) p.on = true;
+    if (!p.e) p.e = '•';
+    p.c = +p.c || 0; p.pv = +p.pv || 0;
+  });
+  o.v = o.v.filter(function (v) { return v && v.length >= 4; });
+  return o;
 }
 function guardar() {
   try { localStorage.setItem(KEY, JSON.stringify(db)); }
@@ -380,23 +391,38 @@ function cobrar() {
   var t = calcularTicket();
   var u = Math.round(COMBO3 / 3);
   var enCombo = t.grupos * 3;
+  var tk = 't' + Date.now().toString(36);   // agrupa todas las líneas de esta misma venta
   t.comb.forEach(function (p, k) {
-    var precio;
-    if (k < enCombo) precio = (k % 3 === 2) ? COMBO3 - 2 * u : u;  // el 3ro de cada combo cierra el redondeo
-    else precio = p.pv;
-    db.v.push([fechaCarga, p.id, 1, precio]);
+    var precio = (k < enCombo) ? ((k % 3 === 2) ? COMBO3 - 2 * u : u) : p.pv;
+    db.v.push([fechaCarga, p.id, 1, precio, tk]);
   });
-  t.resto.forEach(function (p) { db.v.push([fechaCarga, p.id, 1, p.pv]); });
+  t.resto.forEach(function (p) { db.v.push([fechaCarga, p.id, 1, p.pv, tk]); });
   ticket = [];
   guardar(); pintarVender();
   toast('Cobrado ' + plata(t.total));
 }
 
+// Borra la ÚLTIMA VENTA COMPLETA del día, no una bolsita suelta.
 function deshacerUltima() {
   var idx = -1;
   for (var i = db.v.length - 1; i >= 0; i--) if (db.v[i][0] === fechaCarga) { idx = i; break; }
   if (idx < 0) { toast('No hay ventas cargadas ese día'); return; }
-  db.v.splice(idx, 1); guardar(); pintarVender(); toast('Se borró la última');
+  var tk = db.v[idx][4];
+  var borradas, monto = 0;
+  if (tk) {
+    var quedan = [];
+    borradas = 0;
+    db.v.forEach(function (v) {
+      if (v[4] === tk) { borradas += v[2]; monto += v[2] * v[3]; }
+      else quedan.push(v);
+    });
+    db.v = quedan;
+  } else {
+    borradas = db.v[idx][2]; monto = db.v[idx][2] * db.v[idx][3];
+    db.v.splice(idx, 1);
+  }
+  guardar(); pintarVender();
+  toast('Venta borrada: ' + borradas + (borradas === 1 ? ' bolsita · ' : ' bolsitas · ') + plata(monto));
 }
 
 function pintarVender() {
@@ -411,10 +437,15 @@ function pintarVender() {
       '<span class="ct' + (enT ? '' : ' z') + '">' + enT + '</span></button>';
   }).join('');
 
+  var tks = {}, sueltas = 0;
+  hs.forEach(function (v) { if (v[4]) tks[v[4]] = 1; else sueltas++; });
+  var nVentas = Object.keys(tks).length + sueltas;
   $('resumen-dia').innerHTML =
-    '<div><div class="lb">Vendido</div><div class="vl num">' + uds + (uds === 1 ? ' bolsita' : ' bolsitas') + '</div></div>' +
+    '<div><div class="lb">Ventas</div><div class="vl num">' + nVentas + '</div></div>' +
+    '<div><div class="lb">Bolsitas</div><div class="vl num">' + uds + '</div></div>' +
     '<div><div class="lb">Cobrado</div><div class="vl num">' + plata(tot) + '</div></div>' +
-    '<div><div class="lb">Ganancia</div><div class="vl num" style="color:var(--accent)">' + plata(gan) + '</div></div>';
+    '<div><div class="lb">Ganancia</div><div class="vl num" style="color:var(--accent)">' + plata(gan) + '</div></div>' +
+    '<div><div class="lb">Ticket promedio</div><div class="vl num">' + (nVentas ? plata(tot / nVentas) : '$0') + '</div></div>';
 
   $('dia-txt').textContent = fechaCarga === hoy()
     ? 'Cargando hoy, ' + fechaLarga(fechaCarga) + '.'
@@ -534,7 +565,7 @@ function pintarCatalogo() {
 $('t-cat').addEventListener('change', function (e) {
   var el = e.target; if (el.dataset.i === undefined) return;
   var p = db.p[+el.dataset.i], f = el.dataset.f;
-  if (f === 'on') p.on = el.checked;
+  if (f === 'on') { p.on = el.checked; if (!p.on) ticket = ticket.filter(function (x) { return x !== p.id; }); }
   else if (f === 'cb') p.cb = el.checked ? 1 : 0;
   else if (f === 'n') { var t = el.value.trim(); if (t) p.n = t; }
   else if (f === 'e') { p.e = el.value.trim() || '•'; }
@@ -546,8 +577,9 @@ $('t-cat').addEventListener('click', function (e) {
   var b = e.target.closest('[data-del]'); if (!b) return;
   var i = +b.dataset.del;
   if (borrarArmado !== i) { borrarArmado = i; pintarCatalogo(); return; }
-  var n = db.p[i].n;
+  var n = db.p[i].n, idBorrado = db.p[i].id;
   db.p.splice(i, 1); borrarArmado = null;
+  ticket = ticket.filter(function (x) { return x !== idBorrado; });
   guardar(); pintarCatalogo(); pintarVender(); toast('Se borró ' + n);
 });
 $('btn-nuevo').addEventListener('click', function () {
