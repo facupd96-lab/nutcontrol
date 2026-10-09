@@ -1,400 +1,1023 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
-    <style>
-      body{
-        font-family: Arial, sans-serif;
-        background: #f3f3f3;
-        margin: 0;
-        padding: 0;
-      }
-      .contenedor{
-        max-width: 800px;
-        margin: 20px auto;
-        background: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        padding: 20px 24px 30px;
-      }
-      h2{
-        margin-top: 0;
-        margin-bottom: 6px;
-      }
-      p{
-        margin-top: 4px;
-        margin-bottom: 8px;
-      }
-      table{
-        border-collapse: collapse;
-        width: 100%;
-        margin-top: 10px;
-        font-size: 14px;
-      }
-      th, td{
-        border: 1px solid #ddd;
-        padding: 6px;
-        text-align: center;
-      }
-      th{
-        background: #f0f0f0;
-      }
-      input[type="number"]{
-        width: 75px;
-        font-size: 14px;
-        text-align: center;
-        padding: 4px;
-        box-sizing: border-box;
-      }
-      input[type="text"]{
-        font-size: 14px;
-        padding: 4px 6px;
-      }
-      .fila-total{
-        margin-top: 12px;
-        font-size: 18px;
-        font-weight: bold;
-        text-align: right;
-      }
-      .btn{
-        padding: 10px 20px;
-        margin-top: 12px;
-        cursor: pointer;
-        background: #1976d2;
-        border: none;
-        border-radius: 4px;
-        color: #fff;
-        font-size: 15px;
-      }
-      .btn:hover{
-        background: #155a9c;
-      }
-      .btn-toggle-otros{
-        display: block;
-        width: 100%;
-        margin-top: 10px;
-        padding: 8px 12px;
-        background: #eef3f8;
-        color: #1976d2;
-        border: 1px dashed #1976d2;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 13px;
-        transition: background 0.2s;
-      }
-      .btn-toggle-otros:hover{
-        background: #dbe8f5;
-      }
-      #ticket{
-        margin-top: 20px;
-        border-top: 2px solid #000;
-        padding-top: 10px;
-        display: none;
-      }
-      #mensaje{
-        margin-top: 10px;
-        color: red;
-        font-weight: bold;
-      }
-      #stockAviso{
-        margin-top: 6px;
-        color: #c47a00;
-        font-weight: bold;
-      }
-      .encabezado-form{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 10px;
-      }
-      .encabezado-form > div{
-        margin-top: 4px;
-      }
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16140F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#129373;</text></svg>">
+<title>NutControl</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
+<style>
+:root{
+  --bg:#16140F; --surface:#201D18; --surface2:#2A261F; --raise:#332E25;
+  --ink:#F3EFE7; --ink2:#A79E90; --ink3:#6F6559;
+  --line:#322D25; --line2:#443D32;
+  --accent:#C99A3F; --accent-dim:#3A2E16;
+  --pos:#6BA87F; --neg:#C97A5C;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --disp:'Fraunces',Georgia,serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow:hidden}
+.num{font-variant-numeric:tabular-nums}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+input,select{font-family:inherit;font-size:inherit;color:var(--ink);background:var(--surface2);
+  border:1px solid var(--line2);border-radius:8px;padding:8px 10px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 
-      .stock-cell{
-        font-weight: bold;
-        color: #333;
-      }
+/* ---------- LAYOUT ---------- */
+#app{display:flex;flex-direction:column;height:100%}
+#nav{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:12px 20px;
+  padding-top:calc(12px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);background:var(--surface)}
+#nav .logo{font-family:var(--disp);font-weight:700;font-size:1.15rem;letter-spacing:-.02em;margin-right:16px;white-space:nowrap}
+#nav .logo span{color:var(--accent)}
+.tab{padding:8px 15px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--ink2);font-weight:500}
+.tab:hover{background:var(--surface2);color:var(--ink)}
+.tab.on{background:var(--raise);color:var(--ink);border-color:var(--line2)}
+#nav .spacer{flex:1}
+#nav .hoy{font-size:.85rem;color:var(--ink3);white-space:nowrap}
+#abrmay:not(:empty){border:1px solid #4A3A18;background:var(--accent-dim);border-radius:12px;
+  padding:14px 16px;margin-bottom:14px}
+#abrmay .amt{font-family:var(--disp);font-weight:600;font-size:1rem;color:var(--accent);margin-bottom:5px}
+#abrmay p{margin:0 0 12px;font-size:.85rem;color:var(--ink2);line-height:1.5}
+#abrmay b{color:var(--ink)}
+#abrmay button{padding:10px 18px;border-radius:9px;border:0;background:var(--accent);color:#17120A;font-weight:700;font-size:.88rem}
+#abrmay.listo{border-color:var(--line2);background:var(--surface)}
+#abrmay.listo .amt{color:var(--ink)}
+#abrmay.listo button{background:transparent;border:1px solid var(--line2);color:var(--ink2);font-weight:500}
+#abrmay.listo button:hover{color:var(--neg);border-color:var(--neg)}
+#bkbox{border:1px solid var(--line2);background:var(--surface);border-radius:12px;padding:14px 16px;margin-bottom:18px}
+#bkbox .bkt{font-family:var(--disp);font-weight:600;font-size:1rem;margin-bottom:5px}
+#bkbox p{margin:0 0 12px;font-size:.85rem;color:var(--ink2);line-height:1.5}
+#bkbox .bka{display:flex;gap:8px;flex-wrap:wrap}
+#pegar-box{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line2)}
+#pegar-txt{width:100%;font-family:ui-monospace,Menlo,monospace;font-size:.76rem;margin-bottom:9px;resize:vertical;
+  background:var(--surface2);color:var(--ink);border:1px solid var(--line2);border-radius:8px;padding:9px 10px}
+main{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}
+.page{display:none;padding:22px 20px 40px;max-width:1120px;margin:0 auto}
+.page.on{display:block}
+h2{font-family:var(--disp);font-weight:600;font-size:1.3rem;margin:0 0 3px;letter-spacing:-.01em}
+.lead{color:var(--ink2);font-size:.88rem;margin:0 0 18px}
+section+section{margin-top:30px}
 
-      /* SOLO imprimir el ticket */
-      @media print {
-        body{
-          background:#ffffff;
-        }
-        .contenedor > *{
-          display:none !important;
-        }
-        .contenedor #ticket{
-          display:block !important;
-          border-top:none;
-          margin-top:0;
-          padding-top:0;
-        }
-        .btn, .btn-toggle-otros{
-          display:none !important;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="contenedor">
-      <h2>Venta de formularios</h2>
-      <p><b>Pasos:</b> 1) Escriba las cantidades.  2) Verifique el total.  3) Haga clic en <b>Emitir ticket</b>.</p>
+/* ---------- VENDER ---------- */
+#ticket{position:sticky;bottom:0;margin-top:16px;background:var(--surface);border:1px solid var(--line2);
+  border-radius:14px;padding:14px 16px;box-shadow:0 -10px 30px -18px rgba(0,0,0,.9)}
+#ticket-vacio{color:var(--ink3);font-size:.9rem;text-align:center;padding:6px 0}
+#ticket-items{display:grid;gap:5px;margin-bottom:10px}
+.ti{display:flex;align-items:center;gap:9px;font-size:.9rem}
+.ti .q{flex:0 0 auto;min-width:26px;height:24px;padding:0 7px;border-radius:12px;background:var(--raise);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem}
+.ti .nn{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ti .x{flex:0 0 auto;border:0;background:transparent;color:var(--ink3);padding:2px 6px;border-radius:5px;font-size:1rem;line-height:1}
+.ti .x:hover{color:var(--neg);background:var(--surface2)}
+#ticket-pie{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding-top:10px;border-top:1px dashed var(--line2)}
+#ticket-det{font-size:.8rem;color:var(--accent);line-height:1.4}
+#ticket-tot{text-align:right;margin-left:auto}
+#ticket-tot span{display:block;font-size:.75rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+#ticket-tot b{font-family:var(--disp);font-size:1.75rem;font-weight:700;line-height:1.1}
+#ticket-acc{display:flex;gap:9px;margin-top:12px}
+#btn-cobrar{flex:1;padding:15px;border-radius:12px;border:0;background:var(--accent);color:#17120A;
+  font-size:1.05rem;font-weight:700;transition:.13s}
+#btn-cobrar:hover{filter:brightness(1.08)}
+#btn-cobrar:active{transform:scale(.99)}
+#btn-cobrar:disabled{opacity:.3;cursor:default;filter:none}
+#resumen-dia{margin-top:18px;display:flex;gap:1px;background:var(--line);border:1px solid var(--line);
+  border-radius:11px;overflow:hidden;flex-wrap:wrap}
+#resumen-dia div{flex:1 1 130px;background:var(--surface);padding:12px 14px}
+#resumen-dia .lb{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3)}
+#resumen-dia .vl{font-family:var(--disp);font-size:1.28rem;font-weight:700;margin-top:3px}
+#dia-pie{margin-top:11px;font-size:.82rem;color:var(--ink3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.linkb{background:none;border:0;padding:0;color:var(--ink2);text-decoration:underline;font-size:.82rem}
+.linkb:hover{color:var(--accent)}
+/* ---------- selector de día ---------- */
+#diabar{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:12px 14px;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px}
+#diabar label{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-bottom:5px}
+#diabar input[type=date]{font-variant-numeric:tabular-nums;min-width:160px}
+#dia-largo{font-size:.78rem;color:var(--ink3);margin-top:5px}
+#diabar .dbq{display:flex;gap:6px;margin-left:auto}
+#diabar .dbq .gh{padding:9px 13px}
+#diabar .dbq .gh.on{background:var(--accent);color:#17120A;border-color:var(--accent);font-weight:700}
+#dia-aviso{margin:-2px 0 14px;padding:11px 14px;border-radius:10px;background:var(--accent-dim);
+  border:1px solid #4A3A18;color:var(--accent);font-size:.85rem}
+#dia-aviso b{color:var(--ink)}
+#dia-aviso .linkb{color:var(--accent);margin-left:4px}
 
-      <form id="ventaForm" onsubmit="enviarVenta(); return false;">
-        <div class="encabezado-form">
-          <div>
-            <label>Cliente (opcional): 
-              <input type="text" name="cliente" placeholder="Nombre / CUIT">
-            </label>
-          </div>
-          <div class="fila-total">
-            Total actual: $ <span id="totalActual">0</span>
-          </div>
+/* ---------- ventas del día ---------- */
+#lista-dia{display:grid;gap:9px}
+.vcard{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px}
+.vcard .vh{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.vcard .vt{font-size:.72rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em}
+.vcard .vm{margin-left:auto;font-family:var(--disp);font-weight:700;font-size:1.08rem;white-space:nowrap}
+.vcard ul{margin:0;padding:0;list-style:none;display:grid;gap:3px}
+.vcard li{font-size:.88rem;display:flex;gap:9px;align-items:baseline}
+.vcard li .q{color:var(--ink3);flex:0 0 auto}
+.vcard li b{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vcard .va{display:flex;gap:7px;margin-top:11px;padding-top:10px;border-top:1px dashed var(--line2)}
+.vcard .va .gh{padding:7px 13px;font-size:.81rem}
+.vcard .va .gh.rojo{color:var(--neg);border-color:#4A2E26}
+.vacio{text-align:center;color:var(--ink3);font-size:.88rem;padding:24px;border:1px dashed var(--line2);border-radius:12px}
+tr.clic{cursor:pointer}
+tr.clic:hover td{background:var(--raise)}
+tr.hl td{background:var(--accent-dim)}
+
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:11px}
+.pwrap{display:flex;gap:7px;min-width:0}
+.p3{flex:0 0 50px;border-radius:13px;border:1px solid var(--line2);background:var(--surface2);
+  color:var(--ink2);font-size:.86rem;font-weight:700;line-height:1.1}
+.p3:hover{background:var(--raise);color:var(--accent);border-color:var(--accent)}
+.p3:active{transform:scale(.97)}
+.pbtn{display:flex;align-items:center;gap:12px;padding:15px 14px;border-radius:13px;border:1px solid var(--line);
+  background:var(--surface);text-align:left;transition:.12s;min-height:70px;flex:1 1 auto;min-width:0}
+.pbtn:hover{background:var(--surface2);border-color:var(--line2);transform:translateY(-1px)}
+.pbtn:active{transform:translateY(0) scale(.985)}
+.pbtn .em{font-size:1.45rem;flex:0 0 auto;line-height:1}
+.pbtn .tx{flex:1 1 auto;min-width:0}
+.pbtn .tx b{display:block;font-weight:600;font-size:.95rem;line-height:1.25}
+.pbtn .tx i{font-style:normal;font-size:.76rem;color:var(--ink3)}
+.pbtn .ct{flex:0 0 auto;min-width:32px;height:32px;padding:0 9px;border-radius:16px;background:var(--raise);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
+.pbtn .ct.z{opacity:.25}
+#barra{position:sticky;bottom:0;margin-top:18px;background:var(--surface);border:1px solid var(--line);
+  border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+#barra .tot{flex:1 1 auto;display:flex;align-items:baseline;gap:12px}
+#barra .tot span{color:var(--ink2);font-size:.86rem}
+#barra .tot b{font-family:var(--disp);font-size:1.5rem;font-weight:700}
+.gh{padding:9px 15px;border-radius:9px;border:1px solid var(--line2);background:var(--surface2);font-size:.86rem;font-weight:500}
+.gh:hover{background:var(--raise)}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:22px}
+.kpi{background:var(--surface);padding:15px 16px}
+.kpi .lb{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-bottom:6px}
+.kpi .vl{font-family:var(--disp);font-size:1.62rem;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.kpi .ft{font-size:.75rem;color:var(--ink3);margin-top:3px}
+.kpi.g{background:var(--accent-dim)} .kpi.g .vl{color:var(--accent)}
+
+/* ---------- TABLAS ---------- */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:.88rem;min-width:520px}
+th,td{padding:10px 14px;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+thead th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);font-weight:600;
+  border-bottom:1px solid var(--line2);background:var(--surface2);position:sticky;top:0}
+tbody tr+tr td{border-top:1px solid var(--line)}
+tbody tr:hover td{background:var(--surface2)}
+td.pos{color:var(--pos)} td.neg{color:var(--neg)}
+tfoot td{border-top:2px solid var(--line2);font-weight:700;background:var(--surface2)}
+.bar{height:7px;border-radius:4px;background:var(--accent);min-width:3px;display:block}
+.del{padding:3px 9px;border-radius:6px;border:1px solid var(--line2);background:transparent;color:var(--ink3);font-size:.75rem}
+.del:hover{color:var(--neg);border-color:var(--neg)}
+.off td{opacity:.42}
+.filtros{display:flex;gap:9px;align-items:end;flex-wrap:wrap;margin-bottom:14px}
+.filtros label{display:block;font-size:.72rem;color:var(--ink3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.chip{padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:600;background:var(--raise);color:var(--ink2)}
+.chip.est{background:#3A2E16;color:var(--accent)}
+.nota{font-size:.82rem;color:var(--ink2);margin-top:12px;padding-left:12px;border-left:2px solid var(--accent)}
+.nota b{color:var(--ink)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:26px;background:var(--raise);color:var(--ink);
+  padding:11px 20px;border-radius:10px;border:1px solid var(--line2);font-size:.88rem;font-weight:500;
+  opacity:0;pointer-events:none;transition:.22s;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(-6px)}
+input[type=number]{width:96px;text-align:right}
+@media(max-width:640px){
+  #nav{padding:10px 12px;overflow-x:auto}
+  #nav .logo{font-size:1rem;margin-right:8px}
+  #nav .hoy{display:none}
+  .tab{padding:7px 11px;font-size:.88rem}
+  .page{padding:16px 12px 34px}
+  #grid{grid-template-columns:1fr}
+  .kpi .vl{font-size:1.4rem}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav id="nav">
+    <div class="logo">Nut<span>Control</span></div>
+    <button class="tab on" data-p="vender">Vender</button>
+    <button class="tab" data-p="numeros">Números</button>
+    <button class="tab" data-p="productos">Productos</button>
+    <button class="tab" data-p="historial">Historial</button>
+    <div class="spacer"></div>
+    <div class="hoy" id="fecha-hoy"></div>
+  </nav>
+
+  <main>
+    <!-- ============ VENDER ============ -->
+    <div class="page on" id="p-vender">
+      <h2>¿Qué vendiste?</h2>
+      <p class="lead">Tocá lo que se lleva y cobrá. Si son 3 bolsitas, el combo se aplica solo. Con <b>+3</b> cargás un combo entero de una.</p>
+
+      <div id="diabar">
+        <div>
+          <label for="dia-sel">Día que estás cargando</label>
+          <input type="date" id="dia-sel">
+          <div id="dia-largo"></div>
         </div>
+        <div class="dbq">
+          <button class="gh" data-dia="-1" title="Un día para atrás">◀</button>
+          <button class="gh" data-dia="ayer">Ayer</button>
+          <button class="gh" data-dia="hoy">Hoy</button>
+          <button class="gh" data-dia="1" title="Un día para adelante">▶</button>
+        </div>
+      </div>
+      <div id="dia-aviso" hidden></div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Descripción</th>
-              <th>Precio</th>
-              <th>Stock disp.</th>
-              <th>Cantidad</th>
-            </tr>
-          </thead>
-          <!-- Formularios Principales -->
-          <tbody>
-            <? 
-               var codigosPrincipales = ['F08', 'F12', '59U', 'F02', 'F04'];
-               var sinStockArray = ['08D', 'TP', '11', '57'];
-               var otros = [];
-               for (var i = 0; i < productos.length; i++) {
-                 var p = productos[i];
-                 var cod = String(p[0]).trim().toUpperCase();
-                 if (codigosPrincipales.indexOf(cod) !== -1) {
-            ?>
-              <tr>
-                <td><b><?= p[0] ?></b></td>
-                <td><?= p[1] ?></td>
-                <td>$ <?= p[2] ?></td>
-                <td class="stock-cell"><?= p[4] ?></td>
-                <td>
-                  <input
-                    type="number"
-                    min="0"
-                    value="0"
-                    name="cant_<?= p[0] ?>"
-                    data-precio="<?= p[2] ?>"
-                  >
-                </td>
-              </tr>
-            <? 
-                 } else {
-                   otros.push(p);
-                 }
-               } 
-            ?>
-          </tbody>
-
-          <!-- Formularios Secundarios Desplegables (08D, TP, 11, 57, etc.) -->
-          <tbody id="tablaOtrosFormularios" style="display: none; background: #fafafa;">
-            <? for (var j = 0; j < otros.length; j++) {
-                 var o = otros[j]; 
-                 var esSinStock = sinStockArray.indexOf(String(o[0]).trim().toUpperCase()) !== -1;
-            ?>
-              <tr>
-                <td><b><?= o[0] ?></b></td>
-                <td><?= o[1] ?></td>
-                <td>$ <?= o[2] ?></td>
-                <td class="stock-cell"><?= esSinStock ? '-' : (o[4] || 0) ?></td>
-                <td>
-                  <input
-                    type="number"
-                    min="0"
-                    value="0"
-                    name="cant_<?= o[0] ?>"
-                    data-precio="<?= o[2] ?>"
-                  >
-                </td>
-              </tr>
-            <? } ?>
-          </tbody>
-        </table>
-
-        <? if (otros.length > 0) { ?>
-          <button type="button" class="btn-toggle-otros" id="btnToggleOtros" onclick="toggleOtrosFormularios()">
-            ➕ Ver otros formularios (08D, TP, 11, 57...)
-          </button>
-        <? } ?>
-
-        <button type="submit" class="btn">Emitir ticket</button>
-      </form>
-
-      <div id="mensaje"></div>
-      <div id="stockAviso"></div>
+      <div id="grid"></div>
 
       <div id="ticket">
-        <h3>Comprobante de formularios</h3>
-        <div id="ticketContenido"></div>
-
-        <button class="btn" type="button" onclick="imprimirTicket()">Imprimir</button>
-        <button
-          class="btn"
-          type="button"
-          style="background:#555; margin-left:10px;"
-          onclick="nuevaVenta()"
-        >
-          Nueva venta
-        </button>
+        <div id="ticket-vacio">Tocá los productos que se lleva el cliente.</div>
+        <div id="ticket-items"></div>
+        <div id="ticket-pie">
+          <div id="ticket-det"></div>
+          <div id="ticket-tot"><span>Total a cobrar</span><b class="num" id="tk-total">$0</b></div>
+        </div>
+        <div id="ticket-acc">
+          <button class="gh" id="btn-cancelar">Cancelar</button>
+          <button id="btn-cobrar">Cobrar</button>
+        </div>
       </div>
+
+      <div id="resumen-dia"></div>
+      <div id="dia-pie">
+        <span id="dia-txt"></span>
+        <button class="linkb" id="btn-undo">deshacer última venta</button>
+      </div>
+
+      <section>
+        <h2 id="vd-titulo">Ventas del día</h2>
+        <p class="lead">Cada tarjeta es una venta. <b>Repetir</b> la vuelve a cargar en el ticket (sirve para cargar varios combos iguales) y <b>Borrar</b> la elimina.</p>
+        <div id="lista-dia"></div>
+      </section>
     </div>
 
-    <script>
-      function toggleOtrosFormularios() {
-        var tbody = document.getElementById('tablaOtrosFormularios');
-        var btn = document.getElementById('btnToggleOtros');
-        if (tbody.style.display === 'none' || tbody.style.display === '') {
-          tbody.style.display = 'table-row-group';
-          btn.innerText = '➖ Ocultar otros formularios';
-        } else {
-          tbody.style.display = 'none';
-          btn.innerText = '➕ Ver otros formularios (08D, TP, 11, 57...)';
-        }
-      }
+    <!-- ============ NÚMEROS ============ -->
+    <div class="page" id="p-numeros">
+      <h2>Los números</h2>
+      <p class="lead">Todo se calcula solo con el costo de cada producto. No hay que cargar stock ni materia prima.</p>
+      <div class="filtros">
+        <div><label for="f-periodo">Período</label>
+          <select id="f-periodo">
+            <option value="1">Hoy</option>
+            <option value="7">Últimos 7 días</option>
+            <option value="30" selected>Últimos 30 días</option>
+            <option value="90">Últimos 90 días</option>
+            <option value="0">Todo</option>
+          </select></div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="lb">Bolsitas</div><div class="vl num" id="k-uds">0</div><div class="ft" id="k-uds-ft"></div></div>
+        <div class="kpi"><div class="lb">Facturación</div><div class="vl num" id="k-ing">$0</div><div class="ft">lo que entró</div></div>
+        <div class="kpi"><div class="lb">Costo</div><div class="vl num" id="k-cost">$0</div><div class="ft">insumos y packaging</div></div>
+        <div class="kpi g"><div class="lb">Ganancia</div><div class="vl num" id="k-gan">$0</div><div class="ft" id="k-mg"></div></div>
+      </div>
 
-      function recalcularTotal(){
-        var total = 0;
-        var ins = document.querySelectorAll('input[type="number"][data-precio]');
-        ins.forEach(function(inp){
-          var cant   = parseFloat(inp.value)  || 0;
-          var precio = parseFloat(inp.dataset.precio) || 0;
-          total += cant * precio;
-        });
-        document.getElementById('totalActual').innerText = total.toFixed(2);
-      }
+      <section>
+        <h2>Por producto</h2>
+        <p class="lead">Ordenado por lo que te deja cada uno.</p>
+        <div class="tw"><table id="t-prod">
+          <thead><tr><th>Producto</th><th>Bolsitas</th><th>Facturación</th><th>Ganancia</th><th>Margen</th><th></th></tr></thead>
+          <tbody></tbody><tfoot></tfoot></table></div>
+      </section>
 
-      function enviarVenta(){
-        document.getElementById('mensaje').innerText = 'Procesando...';
-        document.getElementById('stockAviso').innerText = '';
-        document.getElementById('ticket').style.display = 'none';
+      <section>
+        <h2>Día a día</h2>
+        <p class="lead">Los últimos 21 días con movimiento. Tocá cualquier día para ir a corregir sus ventas.</p>
+        <div class="tw"><table id="t-dia">
+          <thead><tr><th>Día</th><th>Ventas</th><th>Bolsitas</th><th>Cobrado</th><th>Ganancia</th><th></th></tr></thead>
+          <tbody></tbody></table></div>
+      </section>
 
-        var form = document.getElementById('ventaForm');
-        var fd = new FormData(form);
-        var obj = {};
-        fd.forEach(function(value, key){
-          obj[key] = value;
-        });
+      <section>
+        <h2>Semana a semana</h2>
+        <p class="lead">De lunes a domingo, las últimas 10 semanas.</p>
+        <div class="tw"><table id="t-sem">
+          <thead><tr><th>Semana</th><th>Bolsitas</th><th>Cobrado</th><th>Ganancia</th><th>Por día</th><th></th></tr></thead>
+          <tbody></tbody></table></div>
+      </section>
 
-        google.script.run
-          .withSuccessHandler(onRespuesta)
-          .withFailureHandler(onError)
-          .procesarVentaWeb(obj);
-      }
+      <section>
+        <h2>Mes a mes</h2>
+        <p class="lead">Los meses marcados como estimados se reconstruyeron desde las bolsitas compradas, no son ventas cargadas una por una.</p>
+        <div class="tw"><table id="t-mes">
+          <thead><tr><th>Mes</th><th>Bolsitas</th><th>Facturación</th><th>Ganancia</th><th>Por semana</th><th></th></tr></thead>
+          <tbody></tbody></table></div>
+      </section>
+    </div>
 
-      // Colores por código (para el ticket impreso)
-      function colorParaCodigo(codigo){
-        switch(String(codigo).trim().toUpperCase()){
-          case 'F08': return '#e6f4e6';  // verde suave
-          case 'F12': return '#fff9c4';  // amarillo
-          case '59U': return '#ffe0b2';  // naranja
-          case 'F02': return '#e1bee7';  // violeta
-          case 'F04': return '#c5cae9';  // lila
-          case '08D': return '#dcedc8';  // verde agua
-          case 'TP':  return '#b2dfdb';  // turquesa suave
-          case '11':  return '#ffccbc';  // coral suave
-          case '57':  return '#d1c4e9';  // lavanda
-          default:    return '#f5f5f5';
-        }
-      }
+    <!-- ============ PRODUCTOS ============ -->
+    <div class="page" id="p-productos">
+      <h2>Productos</h2>
+      <p class="lead">Acá mandás vos: cambiá el nombre, el costo o el precio y se recalcula todo, incluido el histórico. Destildá <b>En venta</b> para sacarlo de la pantalla de venta sin perder el historial.</p>
+      <div class="filtros"><button class="gh" id="btn-nuevo">+ Agregar producto</button></div>
+      <div class="tw"><table id="t-cat">
+        <thead><tr><th style="width:52px"></th><th>Producto</th><th>Costo</th><th>Precio</th><th>Ganancia</th><th>Margen</th><th title="Entra en el combo 3x$10.000">Combo</th><th>En venta</th><th></th></tr></thead>
+        <tbody></tbody></table></div>
+      <div class="nota"><b>Cómo se calculó cada costo:</b> materia prima más el doypack ($168) y la etiqueta ($78). Por ejemplo el chocolate con girasol y zapallo sale de una tanda de 930 g de semillas más 1 kg de chocolate Alpino, que rinde 30 bolsitas.<br><br>
+      Un producto que ya tiene ventas cargadas <b>no se puede borrar</b>, porque se rompería el historial: destildalo y listo. Los que nunca vendiste se borran sin problema.</div>
+    </div>
 
-      function onRespuesta(resp){
-        var msg        = document.getElementById('mensaje');
-        var stockAviso = document.getElementById('stockAviso');
-        msg.innerText = '';
-        stockAviso.innerText = '';
+    <!-- ============ HISTORIAL ============ -->
+    <div class="page" id="p-historial">
+      <h2>Historial</h2>
+      <p class="lead">Todas las ventas registradas. Podés borrar una si te equivocaste.</p>
 
-        if(!resp || !resp.ok){
-          msg.innerText = (resp && resp.error) ? resp.error : 'Error desconocido';
-          return;
-        }
+      <div id="abrmay"></div>
 
-        if (resp.lowStock && resp.lowStock.length > 0){
-          var texto = 'ATENCIÓN: stock bajo en ';
-          texto += resp.lowStock.map(function(it){
-            return it.codigo + ' (quedan ' + it.stock + ')';
-          }).join(', ');
-          stockAviso.innerText = texto;
-        }
+      <div id="bkbox">
+        <div class="bkt">Pasar los datos de un aparato a otro</div>
+        <p>La app guarda todo <b>dentro de este navegador</b>. El celular y la computadora no se hablan entre sí: cada uno tiene su propia copia. Para pasar lo del celular a la compu (o al revés): <b>Copiar backup</b> en el aparato que tiene los datos buenos, te lo mandás por WhatsApp o mail, y <b>Pegar backup</b> en el otro.</p>
+        <div class="bka">
+          <button class="gh" id="btn-export">Copiar backup</button>
+          <button class="gh" id="btn-bajar">Guardar en un archivo</button>
+          <button class="gh" id="btn-pegar">Pegar un backup</button>
+          <button class="gh" id="btn-import">Abrir un archivo guardado</button>
+          <input type="file" id="file-import" accept=".json" hidden>
+        </div>
+        <div id="pegar-box" hidden>
+          <textarea id="pegar-txt" rows="4" placeholder="Pegá acá el texto del backup y tocá Reemplazar"></textarea>
+          <div class="bka">
+            <button class="gh" id="btn-pegar-ok">Reemplazar todo con esto</button>
+            <button class="gh" id="btn-pegar-no">Cancelar</button>
+          </div>
+        </div>
+      </div>
 
-        var t = resp.ticket;
-        var html = '';
-        html += '<p><b>ID:</b> ' + t.idVenta + '</p>';
-        html += '<p><b>Fecha:</b> ' + t.fecha + '</p>';
-        if(t.cliente){
-          html += '<p><b>Cliente:</b> ' + t.cliente + '</p>';
-        }
+      <div class="filtros">
+        <div><label for="f-desde">Desde</label><input type="date" id="f-desde"></div>
+        <div><label for="f-hasta">Hasta</label><input type="date" id="f-hasta"></div>
+        <button class="gh" id="btn-limpiar-f">Ver todo</button>
+      </div>
+      <div class="tw"><table id="t-hist">
+        <thead><tr><th>Fecha</th><th>Producto</th><th>Cant.</th><th>Precio</th><th>Total</th><th></th></tr></thead>
+        <tbody></tbody></table></div>
+      <div class="nota"><b>Hacé backup una vez por semana.</b> Si borrás los datos del sitio o cambiás de celular, sin backup los perdés. Las ventas marcadas como <b>estimado</b> (abril-mayo) no son ventas cargadas una por una: se reconstruyeron desde las bolsitas compradas para que el total cierre.</div>
+    </div>
+  </main>
+</div>
+<div id="toast"></div>
+<script>
+(function () {
+'use strict';
 
-        html += '<table><tr><th>Código</th><th>Descripción</th><th>Precio</th><th>Cant.</th><th>Total</th></tr>';
-        for(var i = 0; i < t.items.length; i++){
-          var it = t.items[i];
-          var color = colorParaCodigo(it.codigo);
-          html += '<tr>' +
-                    '<td style="background:' + color + ';">' + it.codigo + '</td>' +
-                    '<td>' + (it.descripcion || '') + '</td>' +
-                    '<td>$ ' + it.precio + '</td>' +
-                    '<td>' + it.cantidad + '</td>' +
-                    '<td>$ ' + it.total + '</td>' +
-                  '</tr>';
-        }
-        html += '<tr><td colspan="4" style="text-align:right;"><b>Total</b></td><td><b>$ ' + t.total + '</b></td></tr>';
-        html += '</table>';
+// Limpia el service worker y los caches de la versión vieja de la app.
+try {
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations()
+      .then(function (rs) { rs.forEach(function (r) { r.unregister(); }); })
+      .catch(function () {});
+  }
+  if (window.caches) {
+    caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }).catch(function () {});
+  }
+} catch (e) {}
 
-        document.getElementById('ticketContenido').innerHTML = html;
-        document.getElementById('ticket').style.display = 'block';
+var SEED = {"p":[{"id":"choco-semillas","n":"Chocolate con girasol y zapallo","e":"🍫","pv":4000,"c":1024,"on":true,"cb":1},{"id":"choco-castanas","n":"Chocolate con castañas, girasol y zapallo","e":"🌰","pv":4000,"c":1214,"on":true,"cb":1},{"id":"choco-almendras","n":"Chocolate con almendra sola","e":"🥜","pv":4000,"c":1564,"on":true,"cb":1},{"id":"garrapinada","n":"Garrapiñada de girasol","e":"🍬","pv":4000,"c":568,"on":true,"cb":1},{"id":"girasol-salado","n":"Girasol salado en salmuera","e":"🧂","pv":4000,"c":678,"on":true,"cb":1},{"id":"caju-salado","n":"Castaña salada en salmuera","e":"🌰","pv":4000,"c":1938,"on":true,"cb":1},{"id":"choco-300","n":"Bolsa grande 300 g","e":"🎁","pv":20000,"c":6461,"on":false,"cb":0},{"id":"rocas-ramo","n":"Rocas de choco + semillas (ramo)","e":"🪨","pv":4667,"c":706,"on":false,"cb":0},{"id":"mix-premium","n":"Mix Premium","e":"👑","pv":3500,"c":1534,"on":false,"cb":0},{"id":"mix-energico","n":"Mix Enérgico","e":"⚡","pv":3000,"c":1324,"on":false,"cb":0},{"id":"castanas-caram","n":"Castañas Caramelizadas","e":"🍯","pv":3500,"c":1467,"on":false,"cb":0},{"id":"girasol-caram","n":"Semillas Caramelizadas","e":"🌻","pv":3000,"c":627,"on":false,"cb":0},{"id":"mix-caramelizado","n":"Mix Caramelizado","e":"🍬","pv":3500,"c":1119,"on":false,"cb":0},{"id":"est-abr-may","n":"Bolsitas abr-may (estimado)","e":"📋","pv":3189,"c":1341,"on":false,"cb":0}],"v":[["2026-03-22","mix-premium",3,3500],["2026-03-23","mix-premium",9,3500],["2026-03-24","mix-premium",5,3500],["2026-03-25","mix-premium",11,3500],["2026-03-26","mix-premium",4,3500],["2026-03-27","mix-premium",1,3500],["2026-03-28","mix-premium",3,3500],["2026-03-29","mix-premium",8,3500],["2026-03-30","castanas-caram",6,3000],["2026-03-30","girasol-caram",1,2500],["2026-03-30","mix-premium",1,3500],["2026-03-31","castanas-caram",5,3000],["2026-03-31","girasol-caram",3,2500],["2026-03-31","mix-premium",4,3500],["2026-04-01","castanas-caram",3,3000],["2026-04-01","girasol-caram",1,2500],["2026-04-01","mix-energico",3,3000],["2026-04-01","mix-premium",4,3500],["2026-04-02","castanas-caram",4,3000],["2026-04-02","girasol-caram",2,2500],["2026-04-02","mix-energico",1,3000],["2026-04-02","mix-premium",1,3500],["2026-04-03","castanas-caram",2,3000],["2026-04-03","girasol-caram",2,2500],["2026-04-03","mix-energico",1,3000],["2026-04-03","mix-premium",3,3500],["2026-04-04","castanas-caram",4,3000],["2026-04-04","girasol-caram",1,2500],["2026-04-05","castanas-caram",5,3000],["2026-04-05","girasol-caram",6,2500],["2026-04-05","mix-energico",2,3000],["2026-04-05","mix-premium",2,3500],["2026-04-06","girasol-caram",8,2500],["2026-04-06","mix-energico",1,3000],["2026-04-06","mix-premium",1,3500],["2026-04-07","castanas-caram",5,3000],["2026-04-07","mix-energico",1,3000],["2026-04-07","mix-premium",1,3500],["2026-04-08","mix-energico",1,3000],["2026-04-09","castanas-caram",3,3000],["2026-04-09","mix-energico",1,3000],["2026-04-10","castanas-caram",5,3000],["2026-04-10","mix-energico",1,3000],["2026-04-10","mix-premium",1,3500],["2026-04-11","castanas-caram",2,3000],["2026-04-11","mix-energico",1,3000],["2026-04-11","mix-premium",2,3500],["2026-04-12","mix-energico",2,3000],["2026-04-12","mix-premium",7,3500],["2026-04-13","mix-premium",2,3500],["2026-04-14","mix-premium",3,3500],["2026-04-15","mix-caramelizado",13,3500],["2026-04-16","est-abr-may",17,3189,"","est_2026-04-16"],["2026-04-17","est-abr-may",17,3189,"","est_2026-04-17"],["2026-04-20","est-abr-may",17,3189,"","est_2026-04-20"],["2026-04-21","est-abr-may",17,3189,"","est_2026-04-21"],["2026-04-22","est-abr-may",17,3189,"","est_2026-04-22"],["2026-04-23","est-abr-may",17,3189,"","est_2026-04-23"],["2026-04-24","est-abr-may",17,3189,"","est_2026-04-24"],["2026-04-27","est-abr-may",17,3189,"","est_2026-04-27"],["2026-04-28","est-abr-may",17,3189,"","est_2026-04-28"],["2026-04-29","est-abr-may",17,3189,"","est_2026-04-29"],["2026-04-30","est-abr-may",16,3189,"","est_2026-04-30"],["2026-05-01","est-abr-may",16,3189,"","est_2026-05-01"],["2026-05-04","est-abr-may",16,3189,"","est_2026-05-04"],["2026-05-05","est-abr-may",16,3189,"","est_2026-05-05"],["2026-05-06","est-abr-may",16,3189,"","est_2026-05-06"],["2026-05-07","est-abr-may",16,3189,"","est_2026-05-07"],["2026-05-08","est-abr-may",16,3189,"","est_2026-05-08"],["2026-05-11","est-abr-may",16,3189,"","est_2026-05-11"],["2026-05-12","est-abr-may",16,3189,"","est_2026-05-12"],["2026-05-13","est-abr-may",16,3189,"","est_2026-05-13"],["2026-05-14","est-abr-may",16,3189,"","est_2026-05-14"],["2026-05-15","est-abr-may",16,3189,"","est_2026-05-15"],["2026-05-18","est-abr-may",16,3189,"","est_2026-05-18"],["2026-05-22","choco-300",5,20000],["2026-05-22","choco-semillas",9,4000],["2026-05-22","choco-semillas",22,3333],["2026-05-22","garrapinada",1,4000],["2026-05-22","garrapinada",2,3333],["2026-05-29","choco-semillas",9,4000],["2026-05-29","choco-semillas",22,3333],["2026-05-29","garrapinada",1,4000],["2026-05-29","garrapinada",2,3333],["2026-06-05","choco-300",5,20000],["2026-06-05","choco-semillas",9,4000],["2026-06-05","choco-semillas",22,3333],["2026-06-05","garrapinada",1,4000],["2026-06-05","garrapinada",2,3333],["2026-06-12","choco-semillas",9,4000],["2026-06-12","choco-semillas",22,3333],["2026-06-12","garrapinada",1,4000],["2026-06-12","garrapinada",2,3333],["2026-06-19","choco-300",5,20000],["2026-06-19","choco-semillas",9,4000],["2026-06-19","choco-semillas",22,3333],["2026-06-19","garrapinada",1,4000],["2026-06-19","garrapinada",2,3333],["2026-06-26","choco-semillas",9,4000],["2026-06-26","choco-semillas",22,3333],["2026-06-26","garrapinada",1,4000],["2026-06-26","garrapinada",2,3333],["2026-07-03","choco-300",5,20000],["2026-07-03","choco-semillas",9,4000],["2026-07-03","choco-semillas",22,3333],["2026-07-03","garrapinada",1,4000],["2026-07-03","garrapinada",2,3333],["2026-07-10","choco-semillas",9,4000],["2026-07-10","choco-semillas",22,3333],["2026-07-10","garrapinada",1,4000],["2026-07-10","garrapinada",2,3333],["2026-07-17","choco-300",5,20000],["2026-07-17","choco-semillas",9,4000],["2026-07-17","choco-semillas",22,3333],["2026-07-17","garrapinada",1,3333],["2026-07-17","garrapinada",1,4000],["2026-07-24","choco-semillas",9,4000],["2026-07-24","choco-semillas",22,3333],["2026-07-24","garrapinada",1,3333],["2026-07-24","garrapinada",1,4000],["2026-07-31","choco-semillas",9,4000],["2026-07-31","choco-semillas",22,3333],["2026-07-31","garrapinada",1,3333],["2026-07-31","garrapinada",1,4000],["2026-08-07","choco-semillas",13,4000],["2026-08-07","choco-semillas",31,3333],["2026-08-07","garrapinada",1,4000],["2026-08-07","garrapinada",3,3333],["2026-08-14","choco-semillas",13,4000],["2026-08-14","choco-semillas",31,3333],["2026-08-14","garrapinada",1,4000],["2026-08-14","garrapinada",3,3333],["2026-08-21","choco-semillas",13,4000],["2026-08-21","choco-semillas",31,3333],["2026-08-21","garrapinada",1,4000],["2026-08-21","garrapinada",3,3333],["2026-08-28","choco-semillas",13,4000],["2026-08-28","choco-semillas",31,3333],["2026-08-28","garrapinada",1,4000],["2026-08-28","garrapinada",3,3333],["2026-09-04","choco-semillas",13,4000],["2026-09-04","choco-semillas",31,3333],["2026-09-04","garrapinada",1,4000],["2026-09-04","garrapinada",3,3333],["2026-09-11","choco-semillas",13,4000],["2026-09-11","choco-semillas",30,3333],["2026-09-11","garrapinada",1,4000],["2026-09-11","garrapinada",3,3333],["2026-09-18","choco-semillas",13,4000],["2026-09-18","choco-semillas",30,3333],["2026-09-18","garrapinada",1,4000],["2026-09-18","garrapinada",2,3333],["2026-09-25","choco-semillas",13,4000],["2026-09-25","choco-semillas",30,3333],["2026-09-25","garrapinada",1,4000],["2026-09-25","garrapinada",2,3333],["2026-09-28","garrapinada",1,3333,"tmuli7on1"],["2026-09-28","garrapinada",1,3333,"tmuli7on1"],["2026-09-28","garrapinada",1,3334,"tmuli7on1"],["2026-09-29","choco-semillas",1,3333,"tmumnfbjj"],["2026-09-29","choco-semillas",1,3333,"tmumnfbjj"],["2026-09-29","choco-semillas",1,3334,"tmumnfbjj"],["2026-09-29","choco-semillas",1,4000,"tmumq18vd"],["2026-09-29","choco-semillas",1,4000,"tmumq18vd"],["2026-09-30","garrapinada",1,4000,"tmuo345l2"],["2026-09-30","choco-semillas",1,4000,"tmuo345l2"],["2026-09-30","garrapinada",1,4000,"tmuo5wp46"],["2026-09-30","choco-semillas",1,3333,"tmuo7f9mw"],["2026-09-30","choco-semillas",1,3333,"tmuo7f9mw"],["2026-09-30","choco-semillas",1,3334,"tmuo7f9mw"],["2026-09-30","choco-semillas",1,3333,"tmuocgha3"],["2026-09-30","garrapinada",1,3333,"tmuocgha3"],["2026-09-30","choco-semillas",1,3334,"tmuocgha3"],["2026-09-30","choco-semillas",1,4000,"tmuofdca6"],["2026-09-30","choco-semillas",1,4000,"tmuofdca6"],["2026-10-01","garrapinada",1,3333,"tmupgy02q"],["2026-10-01","garrapinada",1,3333,"tmupgy02q"],["2026-10-01","choco-semillas",1,3334,"tmupgy02q"],["2026-10-01","choco-semillas",1,3333,"tmupiszt6"],["2026-10-01","garrapinada",1,3333,"tmupiszt6"],["2026-10-01","garrapinada",1,3334,"tmupiszt6"],["2026-10-01","choco-semillas",1,4000,"tmupit4ga"],["2026-10-01","choco-semillas",1,4000,"tmupit4ga"],["2026-10-02","choco-semillas",1,4000,"tmuqw4dix"],["2026-10-02","choco-semillas",1,4000,"tmur3hq33"],["2026-10-02","garrapinada",1,4000,"tmur3hq33"],["2026-10-02","choco-semillas",1,4000,"tmur4xugo"],["2026-10-06","choco-semillas",1,3333,"tmuwz20b2"],["2026-10-06","choco-semillas",1,3333,"tmuwz20b2"],["2026-10-06","choco-semillas",1,3334,"tmuwz20b2"],["2026-10-06","garrapinada",1,4000,"tmuwz2423"],["2026-10-06","garrapinada",1,4000,"tmuwz2423"],["2026-10-06","choco-semillas",1,3333,"tmuwz6tfc"],["2026-10-06","choco-semillas",1,3333,"tmuwz6tfc"],["2026-10-06","garrapinada",1,3334,"tmuwz6tfc"],["2026-10-07","choco-semillas",1,3333,"tmuyals00"],["2026-10-07","choco-semillas",1,3333,"tmuyals00"],["2026-10-07","choco-semillas",1,3334,"tmuyals00"],["2026-10-07","garrapinada",1,3333,"tmuyals00"],["2026-10-07","garrapinada",1,3333,"tmuyals00"],["2026-10-07","garrapinada",1,3334,"tmuyals00"],["2026-10-07","choco-semillas",1,3333,"tmuyals00"],["2026-10-07","choco-semillas",1,3333,"tmuyals00"],["2026-10-07","choco-semillas",1,3334,"tmuyals00"],["2026-10-07","choco-semillas",1,3333,"tmuybt83d"],["2026-10-07","choco-semillas",1,3333,"tmuybt83d"],["2026-10-07","choco-semillas",1,3334,"tmuybt83d"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k"],["2026-10-08","choco-almendras",1,3334,"tmuzntx8k"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k"],["2026-10-08","choco-semillas",1,3334,"tmuzntx8k"],["2026-10-08","choco-semillas",1,4000,"tmuzp9k1u"]],"del":[],"ts":0};
+// Las 378 bolsitas del 16 abr al 18 may que nunca se cargaron, listas para agregar de un toque.
+var FALTANTE = {"p":{"id":"est-abr-may","n":"Bolsitas abr-may (estimado)","e":"📋","pv":3189,"c":1341,"on":false,"cb":0},"v":[["2026-04-16","est-abr-may",17,3189,"","est_2026-04-16"],["2026-04-17","est-abr-may",17,3189,"","est_2026-04-17"],["2026-04-20","est-abr-may",17,3189,"","est_2026-04-20"],["2026-04-21","est-abr-may",17,3189,"","est_2026-04-21"],["2026-04-22","est-abr-may",17,3189,"","est_2026-04-22"],["2026-04-23","est-abr-may",17,3189,"","est_2026-04-23"],["2026-04-24","est-abr-may",17,3189,"","est_2026-04-24"],["2026-04-27","est-abr-may",17,3189,"","est_2026-04-27"],["2026-04-28","est-abr-may",17,3189,"","est_2026-04-28"],["2026-04-29","est-abr-may",17,3189,"","est_2026-04-29"],["2026-04-30","est-abr-may",16,3189,"","est_2026-04-30"],["2026-05-01","est-abr-may",16,3189,"","est_2026-05-01"],["2026-05-04","est-abr-may",16,3189,"","est_2026-05-04"],["2026-05-05","est-abr-may",16,3189,"","est_2026-05-05"],["2026-05-06","est-abr-may",16,3189,"","est_2026-05-06"],["2026-05-07","est-abr-may",16,3189,"","est_2026-05-07"],["2026-05-08","est-abr-may",16,3189,"","est_2026-05-08"],["2026-05-11","est-abr-may",16,3189,"","est_2026-05-11"],["2026-05-12","est-abr-may",16,3189,"","est_2026-05-12"],["2026-05-13","est-abr-may",16,3189,"","est_2026-05-13"],["2026-05-14","est-abr-may",16,3189,"","est_2026-05-14"],["2026-05-15","est-abr-may",16,3189,"","est_2026-05-15"],["2026-05-18","est-abr-may",16,3189,"","est_2026-05-18"]]};
+var KEY = 'nutcontrol_v3';
+var COMBO3 = 10000;
+var CORTE_REAL = '2026-09-27'; // desde acá, ventas cargadas a mano
 
-        document.querySelectorAll('input[type="number"][data-precio]').forEach(function(inp){
-          inp.value = 0;
-        });
-        recalcularTotal();
-      }
+var db = cargar();
+var comboBuf = [];
+var comboOn = false;
+var fechaCarga = hoy();
 
-      function onError(err){
-        document.getElementById('mensaje').innerText = 'Error del servidor.';
-        console.error(err);
-      }
+// ---------- almacenamiento ----------
+function p2(n) { return n < 10 ? '0' + n : '' + n; }
+function iso(d) { return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()); }
+function hoy() { return iso(new Date()); }
+function ayer() { var d = new Date(); d.setDate(d.getDate() - 1); return iso(d); }
+function corrDia(n) { var d = new Date(fechaCarga + 'T12:00:00'); d.setDate(d.getDate() + n); return iso(d); }
+function cargar() {
+  var o = null;
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) { var x = JSON.parse(raw); if (x && x.p && x.v) o = x; }
+  } catch (e) {}
+  if (!o) o = JSON.parse(JSON.stringify(SEED));
+  return normalizar(o);
+}
+function cargarNormalizado() { db = normalizar(db); }
+// Pone en orden datos que vengan de una versión anterior o de otro aparato.
+function normalizar(o) {
+  o.p.forEach(function (p) {
+    if (p.cb === undefined) p.cb = (p.pv === 4000) ? 1 : 0;
+    if (p.on === undefined) p.on = true;
+    if (!p.e) p.e = '•';
+    p.c = +p.c || 0; p.pv = +p.pv || 0;
+  });
+  o.v = o.v.filter(function (v) { return v && v.length >= 4; });
+  // Cada venta necesita un id propio para poder borrarla sin confundirla con otra.
+  o.v.forEach(function (v, i) { if (!v[5]) v[5] = 's' + i + '_' + v[0] + '_' + v[1]; });
+  if (!o.del) o.del = [];
+  if (!o.ts) o.ts = 0;
+  return o;
+}
+function guardar() {
+  db.ts = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(db)); }
+  catch (e) { toast('No se pudo guardar. Copiá un backup por las dudas.'); }
+}
+function nuevoId() { return 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
-      function nuevaVenta(){
-        document.getElementById('ticket').style.display = 'none';
+// ---------- helpers ----------
+function $(id) { return document.getElementById(id); }
+function plata(n) { return '$' + Math.round(n).toLocaleString('es-AR'); }
+function prod(id) { for (var i = 0; i < db.p.length; i++) if (db.p[i].id === id) return db.p[i]; return null; }
+function costoDe(id) { var p = prod(id); return p ? p.c : 0; }
+function fechaLarga(f) {
+  var ds = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  var ms = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  var d = new Date(f + 'T12:00:00');
+  return ds[d.getDay()] + ' ' + d.getDate() + ' de ' + ms[d.getMonth()];
+}
+function fechaCorta(f) { var x = f.split('-'); return x[2] + '/' + x[1]; }
+function toast(m) {
+  var t = $('toast'); t.textContent = m; t.classList.add('on');
+  clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('on'); }, 2100);
+}
 
-        var form = document.getElementById('ventaForm');
-        if (form) form.reset();
+// ---------- navegación ----------
+document.querySelectorAll('.tab').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('on'); });
+    document.querySelectorAll('.page').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    $('p-' + b.dataset.p).classList.add('on');
+    document.querySelector('main').scrollTop = 0;
+    if (b.dataset.p === 'numeros') pintarNumeros();
+    if (b.dataset.p === 'productos') pintarCatalogo();
+    if (b.dataset.p === 'historial') { pintarHistorial(); pintarAbrMay(); }
+  });
+});
 
-        document.querySelectorAll('input[type="number"][data-precio]').forEach(function(inp){
-          inp.value = 0;
-        });
+// ---------- VENDER ----------
+var ticket = [];        // ids de producto en la venta en curso
+var borrarVenta = null; // índice de la venta del día que está esperando confirmación
 
-        document.getElementById('mensaje').innerText = '';
-        document.getElementById('stockAviso').innerText = '';
-        recalcularTotal();
+function activos() { return db.p.filter(function (p) { return p.on; }); }
+function ventasDe(f) { return db.v.filter(function (v) { return v[0] === f; }); }
 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+// Cambia el día que se está cargando. No deja cargar días que todavía no pasaron.
+function irA(f) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(f)) return;
+  if (f > hoy()) { toast('Ese día todavía no pasó'); $('dia-sel').value = fechaCarga; return; }
+  fechaCarga = f; ticket = []; borrarVenta = null;
+  pintarVender();
+  if (f !== hoy()) toast('Cargando ' + fechaLarga(f));
+}
+function irTab(p) { var b = document.querySelector('.tab[data-p="' + p + '"]'); if (b) b.click(); }
 
-      function imprimirTicket(){
-        window.print();
-        setTimeout(nuevaVenta, 1000);
-      }
+// Las ventas de un día, agrupadas por ticket (una tarjeta = una venta).
+function ventasAgrupadas(f) {
+  var g = [], idx = {};
+  db.v.forEach(function (v, i) {
+    if (v[0] !== f) return;
+    var k = v[4] || ('@' + i);
+    if (idx[k] === undefined) { idx[k] = g.length; g.push({ tk: v[4] || '', lineas: [], uds: 0, monto: 0 }); }
+    var gg = g[idx[k]];
+    gg.lineas.push(v); gg.uds += v[2]; gg.monto += v[2] * v[3];
+  });
+  return g;
+}
 
-      window.addEventListener('load', function(){
-        document.querySelectorAll('input[type="number"][data-precio]').forEach(function(inp){
-          inp.addEventListener('input', recalcularTotal);
-        });
-        recalcularTotal();
-      });
-    </script>
-  </body>
+// El id del ticket guarda la hora en que se cobró; la mostramos si coincide con el día.
+function horaDeTk(tk, f) {
+  if (!tk || tk.charAt(0) !== 't') return '';
+  var ms = parseInt(tk.slice(1), 36);
+  if (!ms || ms < 1577836800000) return '';
+  var d = new Date(ms);
+  if (iso(d) !== f) return '';
+  return p2(d.getHours()) + ':' + p2(d.getMinutes());
+}
+
+function pintarListaDia() {
+  var g = ventasAgrupadas(fechaCarga);
+  $('vd-titulo').textContent = 'Ventas de ' + (fechaCarga === hoy() ? 'hoy' : fechaLarga(fechaCarga));
+  if (!g.length) {
+    $('lista-dia').innerHTML = '<div class="vacio">Todavía no hay nada cargado en este día.</div>';
+    return;
+  }
+  $('lista-dia').innerHTML = g.map(function (gg, k) {
+    var h = horaDeTk(gg.tk, fechaCarga);
+    var conteo = {}, orden = [];
+    gg.lineas.forEach(function (v) {
+      if (!conteo[v[1]]) { conteo[v[1]] = 0; orden.push(v[1]); }
+      conteo[v[1]] += v[2];
+    });
+    var esCombo = gg.uds === 3 && gg.monto === COMBO3;
+    return '<div class="vcard"><div class="vh"><span class="vt">Venta ' + (k + 1) + (h ? ' · ' + h : '') +
+      ' · ' + gg.uds + (gg.uds === 1 ? ' bolsita' : ' bolsitas') + (esCombo ? ' · combo' : '') + '</span>' +
+      '<span class="vm num">' + plata(gg.monto) + '</span></div><ul>' +
+      orden.map(function (id) {
+        var p = prod(id);
+        return '<li><span class="q num">' + conteo[id] + '×</span><b>' + (p ? p.e + ' ' + p.n : id) + '</b></li>';
+      }).join('') + '</ul>' +
+      '<div class="va"><button class="gh" data-rep="' + k + '">Repetir</button>' +
+      '<button class="gh' + (borrarVenta === k ? ' rojo' : '') + '" data-borrar="' + k + '">' +
+      (borrarVenta === k ? '¿Seguro? Tocá otra vez' : 'Borrar') + '</button></div></div>';
+  }).join('');
+}
+
+// Vuelve a cargar una venta en el ticket, para repetir combos iguales.
+function repetirVenta(k) {
+  var g = ventasAgrupadas(fechaCarga)[k]; if (!g) return;
+  g.lineas.forEach(function (v) { for (var i = 0; i < v[2]; i++) ticket.push(v[1]); });
+  borrarVenta = null; pintarVender();
+  toast('Cargado en el ticket. Tocá Cobrar para sumarlo otra vez.');
+}
+
+function borrarGrupo(k) {
+  var g = ventasAgrupadas(fechaCarga)[k]; if (!g) return;
+  var lineas = g.lineas;
+  db.v = db.v.filter(function (v) {
+    if (lineas.indexOf(v) === -1) return true;
+    if (v[5]) db.del.push(v[5]);
+    return false;
+  });
+  borrarVenta = null; guardar(); pintarVender();
+  toast('Venta borrada: ' + g.uds + (g.uds === 1 ? ' bolsita · ' : ' bolsitas · ') + plata(g.monto));
+}
+
+// El combo se aplica solo: cada 3 bolsitas combinables valen $10.000.
+function calcularTicket() {
+  var comb = [], otros = [];
+  ticket.forEach(function (id) { var p = prod(id); if (!p) return; (p.cb ? comb : otros).push(p); });
+  var grupos = Math.floor(comb.length / 3);
+  var sueltas = comb.length - grupos * 3;
+  var total = grupos * COMBO3;
+  comb.slice(grupos * 3).forEach(function (p) { total += p.pv; });
+  otros.forEach(function (p) { total += p.pv; });
+  return { total: total, grupos: grupos, sueltas: sueltas, otros: otros.length, comb: comb, resto: otros };
+}
+
+function pintarTicket() {
+  var vacio = ticket.length === 0;
+  $('ticket-vacio').hidden = !vacio;
+  $('ticket-items').hidden = vacio;
+  $('ticket-pie').hidden = vacio;
+  $('btn-cobrar').disabled = vacio;
+  $('btn-cancelar').hidden = vacio;
+  if (vacio) { $('btn-cobrar').textContent = 'Cobrar'; $('ticket-items').innerHTML = ''; return; }
+
+  var conteo = {}, orden = [];
+  ticket.forEach(function (id) { if (!conteo[id]) { conteo[id] = 0; orden.push(id); } conteo[id]++; });
+  $('ticket-items').innerHTML = orden.map(function (id) {
+    var p = prod(id);
+    return '<div class="ti"><span class="q">' + conteo[id] + '</span>' +
+      '<span class="nn">' + p.e + ' ' + p.n + '</span>' +
+      '<button class="x" data-quitar="' + id + '" title="Sacar uno">×</button></div>';
+  }).join('');
+
+  var t = calcularTicket();
+  var det = [];
+  if (t.grupos) det.push(t.grupos + (t.grupos === 1 ? ' combo de 3 · ' : ' combos de 3 · ') + plata(t.grupos * COMBO3));
+  if (t.sueltas) det.push(t.sueltas + (t.sueltas === 1 ? ' suelta' : ' sueltas'));
+  if (t.otros) det.push(t.otros + (t.otros === 1 ? ' fuera del combo' : ' fuera del combo'));
+  $('ticket-det').innerHTML = det.join('<br>');
+  $('tk-total').textContent = plata(t.total);
+  $('btn-cobrar').textContent = 'Cobrar ' + plata(t.total);
+}
+
+function cobrar() {
+  if (!ticket.length) return;
+  var t = calcularTicket();
+  var u = Math.round(COMBO3 / 3);
+  var enCombo = t.grupos * 3;
+  var tk = 't' + Date.now().toString(36);   // agrupa todas las líneas de esta misma venta
+  t.comb.forEach(function (p, k) {
+    var precio = (k < enCombo) ? ((k % 3 === 2) ? COMBO3 - 2 * u : u) : p.pv;
+    db.v.push([fechaCarga, p.id, 1, precio, tk, nuevoId()]);
+  });
+  t.resto.forEach(function (p) { db.v.push([fechaCarga, p.id, 1, p.pv, tk, nuevoId()]); });
+  ticket = [];
+  guardar(); pintarVender();
+  toast('Cobrado ' + plata(t.total));
+}
+
+// Borra la ÚLTIMA VENTA COMPLETA del día, no una bolsita suelta.
+function deshacerUltima() {
+  var idx = -1;
+  for (var i = db.v.length - 1; i >= 0; i--) if (db.v[i][0] === fechaCarga) { idx = i; break; }
+  if (idx < 0) { toast('No hay ventas cargadas ese día'); return; }
+  var tk = db.v[idx][4];
+  var borradas, monto = 0;
+  if (tk) {
+    var quedan = [];
+    borradas = 0;
+    db.v.forEach(function (v) {
+      if (v[4] === tk) { borradas += v[2]; monto += v[2] * v[3]; if (v[5]) db.del.push(v[5]); }
+      else quedan.push(v);
+    });
+    db.v = quedan;
+  } else {
+    borradas = db.v[idx][2]; monto = db.v[idx][2] * db.v[idx][3];
+    if (db.v[idx][5]) db.del.push(db.v[idx][5]);
+    db.v.splice(idx, 1);
+  }
+  guardar(); pintarVender();
+  toast('Venta borrada: ' + borradas + (borradas === 1 ? ' bolsita · ' : ' bolsitas · ') + plata(monto));
+}
+
+function pintarVender() {
+  var hs = ventasDe(fechaCarga);
+  var uds = 0, tot = 0, gan = 0;
+  hs.forEach(function (v) { uds += v[2]; tot += v[2] * v[3]; gan += v[2] * (v[3] - costoDe(v[1])); });
+
+  $('grid').innerHTML = activos().map(function (p) {
+    var enT = 0; ticket.forEach(function (x) { if (x === p.id) enT++; });
+    return '<div class="pwrap"><button class="pbtn" data-pid="' + p.id + '"><span class="em">' + p.e + '</span>' +
+      '<span class="tx"><b>' + p.n + '</b><i>' + plata(p.pv) + ' · te deja ' + plata(p.pv - p.c) + '</i></span>' +
+      '<span class="ct' + (enT ? '' : ' z') + '">' + enT + '</span></button>' +
+      '<button class="p3" data-p3="' + p.id + '" title="Cargar 3 de una (combo)">+3</button></div>';
+  }).join('');
+
+  var tks = {}, sueltas = 0;
+  hs.forEach(function (v) { if (v[4]) tks[v[4]] = 1; else sueltas++; });
+  var nVentas = Object.keys(tks).length + sueltas;
+  $('resumen-dia').innerHTML =
+    '<div><div class="lb">Ventas</div><div class="vl num">' + nVentas + '</div></div>' +
+    '<div><div class="lb">Bolsitas</div><div class="vl num">' + uds + '</div></div>' +
+    '<div><div class="lb">Cobrado</div><div class="vl num">' + plata(tot) + '</div></div>' +
+    '<div><div class="lb">Ganancia</div><div class="vl num" style="color:var(--accent)">' + plata(gan) + '</div></div>' +
+    '<div><div class="lb">Ticket promedio</div><div class="vl num">' + (nVentas ? plata(tot / nVentas) : '$0') + '</div></div>';
+
+  var esHoy = fechaCarga === hoy();
+  $('dia-sel').value = fechaCarga;
+  $('dia-sel').max = hoy();
+  $('dia-largo').textContent = (esHoy ? 'Hoy, ' : '') + fechaLarga(fechaCarga);
+  $('dia-txt').textContent = '';
+  $('dia-aviso').hidden = esHoy;
+  if (!esHoy) {
+    $('dia-aviso').innerHTML = 'Estás cargando <b>' + fechaLarga(fechaCarga) +
+      '</b>. Todo lo que cobres se guarda en ese día.<button class="linkb" data-dia="hoy">volver a hoy</button>';
+  }
+  document.querySelectorAll('#diabar [data-dia]').forEach(function (b) {
+    var d = b.dataset.dia;
+    b.classList.toggle('on', (d === 'hoy' && esHoy) || (d === 'ayer' && fechaCarga === ayer()));
+  });
+
+  pintarTicket();
+  pintarListaDia();
+}
+
+$('grid').addEventListener('click', function (e) {
+  var t3 = e.target.closest('[data-p3]');
+  if (t3) { for (var i = 0; i < 3; i++) ticket.push(t3.dataset.p3); pintarVender(); return; }
+  var b = e.target.closest('.pbtn'); if (!b) return;
+  ticket.push(b.dataset.pid); pintarVender();
+});
+$('lista-dia').addEventListener('click', function (e) {
+  var r = e.target.closest('[data-rep]');
+  if (r) { repetirVenta(+r.dataset.rep); return; }
+  var d = e.target.closest('[data-borrar]');
+  if (!d) return;
+  var k = +d.dataset.borrar;
+  if (borrarVenta !== k) { borrarVenta = k; pintarListaDia(); return; }
+  borrarGrupo(k);
+});
+$('ticket-items').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-quitar]'); if (!b) return;
+  var i = ticket.lastIndexOf(b.dataset.quitar);
+  if (i > -1) ticket.splice(i, 1);
+  pintarVender();
+});
+$('btn-cobrar').addEventListener('click', cobrar);
+$('btn-cancelar').addEventListener('click', function () { ticket = []; pintarVender(); });
+$('btn-undo').addEventListener('click', deshacerUltima);
+$('dia-sel').addEventListener('change', function () { irA(this.value); });
+$('p-vender').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-dia]'); if (!b) return;
+  var v = b.dataset.dia;
+  if (v === 'hoy') irA(hoy());
+  else if (v === 'ayer') irA(ayer());
+  else irA(corrDia(parseInt(v, 10)));
+});
+
+// ---------- NÚMEROS ----------
+function rango() {
+  var d = parseInt($('f-periodo').value, 10);
+  if (!d) return db.v.slice();
+  var lim = new Date(); lim.setDate(lim.getDate() - (d - 1));   // incluye hoy
+  var ls = iso(lim);
+  return db.v.filter(function (v) { return v[0] >= ls; });
+}
+function pintarNumeros() {
+  var vs = rango();
+  var uds = 0, ing = 0, cost = 0, porP = {};
+  vs.forEach(function (v) {
+    var c = costoDe(v[1]);
+    uds += v[2]; ing += v[2] * v[3]; cost += v[2] * c;
+    if (!porP[v[1]]) porP[v[1]] = { u: 0, i: 0, g: 0 };
+    porP[v[1]].u += v[2]; porP[v[1]].i += v[2] * v[3]; porP[v[1]].g += v[2] * (v[3] - c);
+  });
+  var gan = ing - cost;
+  $('k-uds').textContent = uds.toLocaleString('es-AR');
+  $('k-uds-ft').textContent = vs.length + ' registros';
+  $('k-ing').textContent = plata(ing);
+  $('k-cost').textContent = plata(cost);
+  $('k-gan').textContent = plata(gan);
+  $('k-mg').textContent = ing ? Math.round(gan / ing * 100) + '% de margen' : '';
+
+  var filas = Object.keys(porP).map(function (id) {
+    var p = prod(id); var d = porP[id];
+    return { n: p ? p.e + ' ' + p.n : id, u: d.u, i: d.i, g: d.g, m: d.i ? d.g / d.i : 0 };
+  }).sort(function (a, b) { return b.g - a.g; });
+  var maxG = filas.length ? filas[0].g : 1;
+  var tb = $('t-prod').querySelector('tbody');
+  tb.innerHTML = filas.length ? filas.map(function (f) {
+    return '<tr><td>' + f.n + '</td><td class="num">' + f.u + '</td><td class="num">' + plata(f.i) +
+      '</td><td class="num pos">' + plata(f.g) + '</td><td class="num">' + Math.round(f.m * 100) + '%</td>' +
+      '<td style="width:120px"><span class="bar" style="width:' + Math.max(3, f.g / maxG * 100) + '%"></span></td></tr>';
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:26px">Sin ventas en el período</td></tr>';
+  $('t-prod').querySelector('tfoot').innerHTML = filas.length
+    ? '<tr><td>Total</td><td class="num">' + uds + '</td><td class="num">' + plata(ing) +
+      '</td><td class="num">' + plata(gan) + '</td><td class="num">' + (ing ? Math.round(gan / ing * 100) : 0) + '%</td><td></td></tr>' : '';
+
+  // ---- día a día (últimos 14 con movimiento) ----
+  var dias = {};
+  db.v.forEach(function (v) {
+    if (!dias[v[0]]) dias[v[0]] = { u: 0, i: 0, g: 0, tk: {}, sueltas: 0 };
+    var d = dias[v[0]];
+    d.u += v[2]; d.i += v[2] * v[3]; d.g += v[2] * (v[3] - costoDe(v[1]));
+    if (v[4]) d.tk[v[4]] = 1; else d.sueltas++;
+  });
+  var kd = Object.keys(dias).sort().reverse().slice(0, 21);
+  var maxD = 1; kd.forEach(function (k) { if (dias[k].g > maxD) maxD = dias[k].g; });
+  var DS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+  $('t-dia').querySelector('tbody').innerHTML = kd.length ? kd.map(function (k) {
+    var d = dias[k], nv = Object.keys(d.tk).length + d.sueltas;
+    var dd = new Date(k + 'T12:00:00');
+    var esHoy = k === hoy();
+    return '<tr class="clic' + (esHoy ? ' hl' : '') + '" data-ir="' + k + '"><td>' + DS[dd.getDay()] + ' ' + fechaCorta(k) +
+      (esHoy ? ' <span class="chip">hoy</span>' : '') +
+      '</td><td class="num">' + nv + '</td><td class="num">' + d.u +
+      '</td><td class="num">' + plata(d.i) + '</td><td class="num pos">' + plata(d.g) +
+      '</td><td style="width:110px"><span class="bar" style="width:' + Math.max(3, d.g / maxD * 100) + '%"></span></td></tr>';
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:26px">Todavía no cargaste ventas</td></tr>';
+
+  // ---- semana a semana (lunes a domingo, últimas 10) ----
+  function lunesDe(f) {
+    var d = new Date(f + 'T12:00:00');
+    var dow = (d.getDay() + 6) % 7;            // 0 = lunes
+    d.setDate(d.getDate() - dow);
+    return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+  }
+  var sems = {};
+  db.v.forEach(function (v) {
+    var k = lunesDe(v[0]);
+    if (!sems[k]) sems[k] = { u: 0, i: 0, g: 0, dias: {} };
+    sems[k].u += v[2]; sems[k].i += v[2] * v[3];
+    sems[k].g += v[2] * (v[3] - costoDe(v[1]));
+    sems[k].dias[v[0]] = 1;
+  });
+  var ks = Object.keys(sems).sort().reverse().slice(0, 10);
+  var maxS = 1; ks.forEach(function (k) { if (sems[k].g > maxS) maxS = sems[k].g; });
+  var lunHoy = lunesDe(hoy());
+  $('t-sem').querySelector('tbody').innerHTML = ks.length ? ks.map(function (k) {
+    var s = sems[k], nd = Object.keys(s.dias).length;
+    var fin = new Date(k + 'T12:00:00'); fin.setDate(fin.getDate() + 6);
+    var rot = fechaCorta(k) + ' al ' + p2(fin.getDate()) + '/' + p2(fin.getMonth() + 1);
+    var actual = k === lunHoy;
+    return '<tr' + (actual ? ' class="hl"' : '') + '><td>' + rot +
+      (actual ? ' <span class="chip">en curso</span>' : '') +
+      '</td><td class="num">' + s.u + '</td><td class="num">' + plata(s.i) +
+      '</td><td class="num pos">' + plata(s.g) + '</td><td class="num">' + Math.round(s.u / nd) +
+      '</td><td style="width:110px"><span class="bar" style="width:' + Math.max(3, s.g / maxS * 100) + '%"></span></td></tr>';
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:26px">Todavía no cargaste ventas</td></tr>';
+
+  // mes a mes (siempre todo el historial)
+  var meses = {};
+  db.v.forEach(function (v) {
+    var k = v[0].slice(0, 7);
+    if (!meses[k]) meses[k] = { u: 0, i: 0, g: 0, real: 0, dias: {} };
+    var c = costoDe(v[1]);
+    meses[k].u += v[2]; meses[k].i += v[2] * v[3]; meses[k].g += v[2] * (v[3] - c);
+    meses[k].dias[v[0]] = 1;
+    if (v[0] >= CORTE_REAL) meses[k].real = 1;
+    // estimado = reconstruido desde las bolsitas compradas, no cargado venta por venta
+    if (v[1] === 'est-abr-may' || (v[0] >= '2026-05-01' && v[0] < CORTE_REAL)) meses[k].est = 1;
+  });
+  var MN = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  var ks = Object.keys(meses).sort();
+  var maxM = 1; ks.forEach(function (k) { if (meses[k].g > maxM) maxM = meses[k].g; });
+  $('t-mes').querySelector('tbody').innerHTML = ks.map(function (k) {
+    var m = meses[k];
+    var nd = Object.keys(m.dias).length;
+    var semanal = nd > 1 ? m.u / (nd / 7) : m.u;
+    var estimado = m.est ? 1 : 0;
+    return '<tr><td>' + MN[parseInt(k.slice(5), 10) - 1] + ' ' + k.slice(0, 4) +
+      (estimado ? ' <span class="chip est">estimado</span>' : '') +
+      '</td><td class="num">' + m.u + '</td><td class="num">' + plata(m.i) +
+      '</td><td class="num pos">' + plata(m.g) + '</td><td class="num">' + Math.round(semanal) +
+      '</td><td style="width:120px"><span class="bar" style="width:' + Math.max(3, m.g / maxM * 100) + '%"></span></td></tr>';
+  }).join('');
+}
+$('f-periodo').addEventListener('change', pintarNumeros);
+// Tocar un día de la tabla lleva a Vender con ese día cargado, listo para corregir.
+$('t-dia').addEventListener('click', function (e) {
+  var tr = e.target.closest('[data-ir]'); if (!tr) return;
+  irTab('vender'); irA(tr.dataset.ir);
+  document.querySelector('main').scrollTop = 0;
+});
+
+// ---------- PRODUCTOS ----------
+function ventasDeProd(id) { var n = 0; db.v.forEach(function (v) { if (v[1] === id) n += v[2]; }); return n; }
+var borrarArmado = null;
+
+function pintarCatalogo() {
+  $('t-cat').querySelector('tbody').innerHTML = db.p.map(function (p, i) {
+    var g = p.pv - p.c;
+    var nv = ventasDeProd(p.id);
+    var accion = nv
+      ? '<span class="chip" title="No se puede borrar sin romper el historial">' + nv + ' vendidas</span>'
+      : '<button class="del" data-del="' + i + '">' + (borrarArmado === i ? '¿Seguro?' : 'Borrar') + '</button>';
+    return '<tr class="' + (p.on ? '' : 'off') + '">' +
+      '<td><input type="text" data-i="' + i + '" data-f="e" value="' + p.e + '" maxlength="3" style="width:46px;text-align:center;padding:6px"></td>' +
+      '<td><input type="text" data-i="' + i + '" data-f="n" value="' + p.n.replace(/"/g, '&quot;') + '" style="width:100%;min-width:190px"></td>' +
+      '<td><input type="number" data-i="' + i + '" data-f="c" value="' + p.c + '" step="10" min="0"></td>' +
+      '<td><input type="number" data-i="' + i + '" data-f="pv" value="' + p.pv + '" step="100" min="0"></td>' +
+      '<td class="num ' + (g >= 0 ? 'pos' : 'neg') + '">' + plata(g) + '</td>' +
+      '<td class="num">' + (p.pv ? Math.round(g / p.pv * 100) : 0) + '%</td>' +
+      '<td><input type="checkbox" data-i="' + i + '" data-f="cb"' + (p.cb ? ' checked' : '') + '></td>' +
+      '<td><input type="checkbox" data-i="' + i + '" data-f="on"' + (p.on ? ' checked' : '') + '></td>' +
+      '<td>' + accion + '</td></tr>';
+  }).join('');
+}
+$('t-cat').addEventListener('change', function (e) {
+  var el = e.target; if (el.dataset.i === undefined) return;
+  var p = db.p[+el.dataset.i], f = el.dataset.f;
+  if (f === 'on') { p.on = el.checked; if (!p.on) ticket = ticket.filter(function (x) { return x !== p.id; }); }
+  else if (f === 'cb') p.cb = el.checked ? 1 : 0;
+  else if (f === 'n') { var t = el.value.trim(); if (t) p.n = t; }
+  else if (f === 'e') { p.e = el.value.trim() || '•'; }
+  else { var n = parseFloat(el.value); if (!isNaN(n) && n >= 0) p[f] = Math.round(n); }
+  borrarArmado = null;
+  guardar(); pintarCatalogo(); pintarVender(); toast('Guardado');
+});
+$('t-cat').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-del]'); if (!b) return;
+  var i = +b.dataset.del;
+  if (borrarArmado !== i) { borrarArmado = i; pintarCatalogo(); return; }
+  var n = db.p[i].n, idBorrado = db.p[i].id;
+  db.p.splice(i, 1); borrarArmado = null;
+  ticket = ticket.filter(function (x) { return x !== idBorrado; });
+  guardar(); pintarCatalogo(); pintarVender(); toast('Se borró ' + n);
+});
+$('btn-nuevo').addEventListener('click', function () {
+  var id = 'p' + Date.now().toString(36);
+  db.p.unshift({ id: id, n: 'Producto nuevo', e: '🥜', pv: 4000, c: 1000, on: true, cb: 1 });
+  borrarArmado = null; guardar(); pintarCatalogo(); pintarVender();
+  toast('Listo: cambiale el nombre, el costo y el precio');
+  var inp = $('t-cat').querySelector('input[data-f="n"]');
+  if (inp) { inp.focus(); inp.select(); }
+});
+
+// ---------- HISTORIAL ----------
+function pintarHistorial() {
+  var d = $('f-desde').value, h = $('f-hasta').value;
+  var vs = db.v.map(function (v, i) { return { i: i, v: v }; })
+    .filter(function (x) { return (!d || x.v[0] >= d) && (!h || x.v[0] <= h); })
+    .sort(function (a, b) { return a.v[0] < b.v[0] ? 1 : a.v[0] > b.v[0] ? -1 : b.i - a.i; })
+    .slice(0, 400);
+  $('t-hist').querySelector('tbody').innerHTML = vs.length ? vs.map(function (x) {
+    var p = prod(x.v[1]);
+    return '<tr><td class="num">' + fechaCorta(x.v[0]) + '</td><td>' + (p ? p.e + ' ' + p.n : x.v[1]) +
+      '</td><td class="num">' + x.v[2] + '</td><td class="num">' + plata(x.v[3]) +
+      '</td><td class="num">' + plata(x.v[2] * x.v[3]) +
+      '</td><td><button class="del" data-i="' + x.i + '">Borrar</button></td></tr>';
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:26px">Sin ventas en ese rango</td></tr>';
+}
+$('t-hist').addEventListener('click', function (e) {
+  if (!e.target.classList.contains('del')) return;
+  var vv = db.v[+e.target.dataset.i];
+  if (vv && vv[5]) db.del.push(vv[5]);
+  db.v.splice(+e.target.dataset.i, 1); guardar(); pintarHistorial(); pintarVender(); toast('Venta borrada');
+});
+$('f-desde').addEventListener('change', pintarHistorial);
+$('f-hasta').addEventListener('change', pintarHistorial);
+$('btn-limpiar-f').addEventListener('click', function () { $('f-desde').value = ''; $('f-hasta').value = ''; pintarHistorial(); });
+
+// ---------- las 378 bolsitas de abril-mayo ----------
+function tieneAbrMay() {
+  for (var i = 0; i < db.v.length; i++) if (db.v[i][1] === FALTANTE.p.id) return true;
+  return false;
+}
+function pintarAbrMay() {
+  var el = $('abrmay');
+  var uds = 0; FALTANTE.v.forEach(function (v) { uds += v[2]; });
+  if (tieneAbrMay()) {
+    el.className = 'listo';
+    el.innerHTML = '<div class="amt">Historial completo</div>' +
+      '<p>Las <b>' + uds + ' bolsitas del 16 de abril al 18 de mayo</b> están cargadas como estimadas. ' +
+      'Son reconstruidas desde las bolsitas que compraste, no ventas cargadas una por una.</p>' +
+      '<button id="btn-abrmay-no">Sacarlas del historial</button>';
+  } else {
+    el.className = '';
+    el.innerHTML = '<div class="amt">Faltan ' + uds + ' bolsitas en tu historial</div>' +
+      '<p>Del <b>16 de abril al 18 de mayo</b> no quedó nada cargado. Son ' + uds + ' bolsitas que vendiste ' +
+      'y que se pueden reconstruir desde las que compraste, a $' + FALTANTE.p.pv.toLocaleString('es-AR') +
+      ' promedio. Entran como producto aparte, <b>marcado como estimado</b>, así no ensucian el análisis del resto.</p>' +
+      '<button id="btn-abrmay-si">Cargar las ' + uds + ' bolsitas</button>';
+  }
+}
+$('abrmay').addEventListener('click', function (e) {
+  if (e.target.id === 'btn-abrmay-si') {
+    if (!prod(FALTANTE.p.id)) db.p.push(JSON.parse(JSON.stringify(FALTANTE.p)));
+    JSON.parse(JSON.stringify(FALTANTE.v)).forEach(function (v) { db.v.push(v); });
+    db.v.sort(function (a, b) { return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0; });
+    guardar(); pintarTodo();
+    toast('Listo, historial completo');
+  } else if (e.target.id === 'btn-abrmay-no') {
+    db.v = db.v.filter(function (v) { return v[1] !== FALTANTE.p.id; });
+    guardar(); pintarTodo();
+    toast('Se sacaron las estimadas de abril-mayo');
+  }
+});
+
+function backupTxt() { return JSON.stringify({ p: db.p, v: db.v, del: db.del || [], ts: db.ts || 0 }); }
+
+$('btn-export').addEventListener('click', function () {
+  var txt = backupTxt();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(function () {
+      toast('Backup copiado. Mandátelo por WhatsApp o mail y guardalo.');
+    }).catch(verlo);
+  } else verlo();
+  function verlo() {
+    $('pegar-box').hidden = false;
+    $('pegar-txt').value = txt;
+    $('pegar-txt').select();
+    toast('Copiá a mano el texto de abajo');
+  }
+});
+$('btn-bajar').addEventListener('click', function () {
+  try {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([backupTxt()], { type: 'application/json' }));
+    a.download = 'nutcontrol_' + hoy() + '.json'; a.click();
+    toast('Backup descargado');
+  } catch (e) { toast('No se pudo descargar. Usá Copiar backup.'); }
+});
+
+// Reemplazar todo pegando el texto del backup del otro aparato.
+var pegarArmado = false;
+$('btn-pegar').addEventListener('click', function () {
+  var b = $('pegar-box');
+  b.hidden = !b.hidden;
+  if (!b.hidden) { $('pegar-txt').value = ''; $('pegar-txt').focus(); }
+  pegarArmado = false; $('btn-pegar-ok').textContent = 'Reemplazar todo con esto';
+});
+$('btn-pegar-no').addEventListener('click', function () {
+  $('pegar-box').hidden = true; pegarArmado = false;
+  $('btn-pegar-ok').textContent = 'Reemplazar todo con esto';
+});
+$('btn-pegar-ok').addEventListener('click', function () {
+  var o;
+  try { o = JSON.parse($('pegar-txt').value.trim()); } catch (x) { toast('Ese texto no es un backup válido'); return; }
+  if (!o || !o.p || !o.v) { toast('Ese texto no es un backup válido'); return; }
+  if (!pegarArmado) {
+    pegarArmado = true;
+    this.textContent = '¿Seguro? Pisa las ' + db.v.length + ' ventas de este aparato';
+    return;
+  }
+  db = o; cargarNormalizado(); guardar(); pintarTodo();
+  $('pegar-box').hidden = true; pegarArmado = false;
+  this.textContent = 'Reemplazar todo con esto';
+  toast('Listo: ' + db.v.length + ' ventas cargadas');
+});
+$('btn-import').addEventListener('click', function () { $('file-import').click(); });
+$('file-import').addEventListener('change', function (e) {
+  var f = e.target.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function (ev) {
+    try {
+      var o = JSON.parse(ev.target.result);
+      if (o && o.p && o.v) { db = o; cargarNormalizado(); guardar(); pintarTodo(); toast('Backup restaurado: ' + db.v.length + ' ventas'); }
+      else toast('Ese archivo no tiene el formato correcto');
+    } catch (x) { toast('No se pudo leer el archivo'); }
+  };
+  r.readAsText(f);
+});
+
+// ---------- arranque ----------
+function pintarTodo() { pintarVender(); pintarNumeros(); pintarCatalogo(); pintarHistorial(); pintarAbrMay(); }
+$('fecha-hoy').textContent = fechaLarga(hoy()).charAt(0).toUpperCase() + fechaLarga(hoy()).slice(1);
+pintarTodo();
+})();
+</script>
+
+</body>
 </html>
