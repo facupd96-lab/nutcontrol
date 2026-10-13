@@ -42,6 +42,25 @@ input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);ou
 .tab.on{background:var(--raise);color:var(--ink);border-color:var(--line2)}
 #nav .spacer{flex:1}
 #nav .hoy{font-size:.85rem;color:var(--ink3);white-space:nowrap}
+#cajaresumen{border:1px solid var(--line2);background:var(--surface);border-radius:12px;padding:14px 16px;margin-bottom:18px}
+#cajaresumen .bkt{font-family:var(--disp);font-weight:600;font-size:1rem;margin-bottom:5px}
+#cajaresumen p{margin:0 0 12px;font-size:.85rem;color:var(--ink2);line-height:1.5}
+#cajaresumen .bka{display:flex;gap:8px;flex-wrap:wrap}
+#resumen-box{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line2)}
+#resumen-txt{width:100%;font-family:ui-monospace,Menlo,monospace;font-size:.7rem;resize:vertical;
+  background:var(--surface2);color:var(--ink2);border:1px solid var(--line2);border-radius:8px;padding:9px 10px}
+
+/* ---------- vista de sólo lectura (el link del celular) ---------- */
+#solo-lectura{display:flex;flex-direction:column;height:100%}
+#solo-lectura .rl-nav{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:12px 20px;
+  padding-top:calc(12px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);background:var(--surface)}
+#solo-lectura .logo{font-family:var(--disp);font-weight:700;font-size:1.15rem;letter-spacing:-.02em}
+#solo-lectura .logo span{color:var(--accent)}
+.rl-chip{padding:4px 11px;border-radius:20px;font-size:.72rem;font-weight:600;background:var(--raise);color:var(--ink2)}
+.rl-fecha{color:var(--ink3);font-size:.84rem;margin:0 0 20px}
+.rl-nota{font-size:.82rem;color:var(--ink2);margin-top:26px;padding-left:12px;border-left:2px solid var(--accent)}
+.rl-nota b{color:var(--ink)}
+
 #abrmay:not(:empty){border:1px solid #4A3A18;background:var(--accent-dim);border-radius:12px;
   padding:14px 16px;margin-bottom:14px}
 #abrmay .amt{font-family:var(--disp);font-weight:600;font-size:1rem;color:var(--accent);margin-bottom:5px}
@@ -265,6 +284,19 @@ input[type=number]{width:96px;text-align:right}
     <div class="page" id="p-numeros">
       <h2>Los números</h2>
       <p class="lead">Todo se calcula solo con el costo de cada producto. No hay que cargar stock ni materia prima.</p>
+      <div id="cajaresumen">
+        <div class="bkt">Mirar los números desde el celular</div>
+        <p>Genera un link con el resumen adentro. Mandátelo por WhatsApp o mail y abrilo en el celular cuando no estés acá: vas a ver los totales por día, semana, mes y producto. <b>Es sólo para mirar</b> — no se puede cargar nada desde ahí, así no se te desordenan los datos.</p>
+        <div class="bka">
+          <button class="gh" id="btn-resumen">Copiar el link del resumen</button>
+          <button class="gh" id="btn-resumen-ver">Ver cómo queda</button>
+        </div>
+        <div id="resumen-box" hidden>
+          <textarea id="resumen-txt" rows="3" readonly></textarea>
+          <p style="margin:8px 0 0">Copiá todo ese texto y mandátelo. Es largo porque lleva los números adentro: no depende de ningún servidor, funciona aunque esta página desaparezca.</p>
+        </div>
+      </div>
+
       <div class="filtros">
         <div><label for="f-periodo">Período</label>
           <select id="f-periodo">
@@ -335,8 +367,8 @@ input[type=number]{width:96px;text-align:right}
       <div id="abrmay"></div>
 
       <div id="bkbox">
-        <div class="bkt">Pasar los datos de un aparato a otro</div>
-        <p>La app guarda todo <b>dentro de este navegador</b>. El celular y la computadora no se hablan entre sí: cada uno tiene su propia copia. Para pasar lo del celular a la compu (o al revés): <b>Copiar backup</b> en el aparato que tiene los datos buenos, te lo mandás por WhatsApp o mail, y <b>Pegar backup</b> en el otro.</p>
+        <div class="bkt">Copia de seguridad</div>
+        <p>Todo se guarda <b>en este navegador</b>. Una vez por semana tocá <b>Guardar en un archivo</b> y mandátelo por mail: es tu única red si se rompe la compu o borrás los datos del sitio sin querer.</p>
         <div class="bka">
           <button class="gh" id="btn-export">Copiar backup</button>
           <button class="gh" id="btn-bajar">Guardar en un archivo</button>
@@ -361,9 +393,18 @@ input[type=number]{width:96px;text-align:right}
       <div class="tw"><table id="t-hist">
         <thead><tr><th>Fecha</th><th>Producto</th><th>Cant.</th><th>Precio</th><th>Total</th><th></th></tr></thead>
         <tbody></tbody></table></div>
-      <div class="nota"><b>Hacé backup una vez por semana.</b> Si borrás los datos del sitio o cambiás de celular, sin backup los perdés. Las ventas marcadas como <b>estimado</b> (abril-mayo) no son ventas cargadas una por una: se reconstruyeron desde las bolsitas compradas para que el total cierre.</div>
+      <div class="nota">Las ventas marcadas como <b>estimado</b> (abril-mayo) no son ventas cargadas una por una: se reconstruyeron desde las bolsitas compradas para que el total cierre. Todo lo demás son ventas reales.</div>
     </div>
   </main>
+</div>
+
+<!-- ======= SOLO LECTURA: lo que se ve al abrir el link del resumen ======= -->
+<div id="solo-lectura" hidden>
+  <div class="rl-nav">
+    <div class="logo">Nut<span>Control</span></div>
+    <span class="rl-chip">sólo lectura</span>
+  </div>
+  <main><div class="page on" id="rl-cuerpo"></div></main>
 </div>
 <div id="toast"></div>
 <script>
@@ -382,7 +423,7 @@ try {
   }
 } catch (e) {}
 
-var SEED = {"p":[{"id":"choco-semillas","n":"Chocolate con girasol y zapallo","e":"🍫","pv":4000,"c":1024,"on":true,"cb":1},{"id":"choco-castanas","n":"Chocolate con castañas, girasol y zapallo","e":"🌰","pv":4000,"c":1214,"on":true,"cb":1},{"id":"choco-almendras","n":"Chocolate con almendra sola","e":"🥜","pv":4000,"c":1564,"on":true,"cb":1},{"id":"garrapinada","n":"Garrapiñada de girasol","e":"🍬","pv":4000,"c":568,"on":true,"cb":1},{"id":"girasol-salado","n":"Girasol salado en salmuera","e":"🧂","pv":4000,"c":678,"on":true,"cb":1},{"id":"caju-salado","n":"Castaña salada en salmuera","e":"🌰","pv":4000,"c":1938,"on":true,"cb":1},{"id":"choco-300","n":"Bolsa grande 300 g","e":"🎁","pv":20000,"c":6461,"on":false,"cb":0},{"id":"rocas-ramo","n":"Rocas de choco + semillas (ramo)","e":"🪨","pv":4667,"c":706,"on":false,"cb":0},{"id":"mix-premium","n":"Mix Premium","e":"👑","pv":3500,"c":1534,"on":false,"cb":0},{"id":"mix-energico","n":"Mix Enérgico","e":"⚡","pv":3000,"c":1324,"on":false,"cb":0},{"id":"castanas-caram","n":"Castañas Caramelizadas","e":"🍯","pv":3500,"c":1467,"on":false,"cb":0},{"id":"girasol-caram","n":"Semillas Caramelizadas","e":"🌻","pv":3000,"c":627,"on":false,"cb":0},{"id":"mix-caramelizado","n":"Mix Caramelizado","e":"🍬","pv":3500,"c":1119,"on":false,"cb":0},{"id":"est-abr-may","n":"Bolsitas abr-may (estimado)","e":"📋","pv":3189,"c":1341,"on":false,"cb":0}],"v":[["2026-03-22","mix-premium",3,3500],["2026-03-23","mix-premium",9,3500],["2026-03-24","mix-premium",5,3500],["2026-03-25","mix-premium",11,3500],["2026-03-26","mix-premium",4,3500],["2026-03-27","mix-premium",1,3500],["2026-03-28","mix-premium",3,3500],["2026-03-29","mix-premium",8,3500],["2026-03-30","castanas-caram",6,3000],["2026-03-30","girasol-caram",1,2500],["2026-03-30","mix-premium",1,3500],["2026-03-31","castanas-caram",5,3000],["2026-03-31","girasol-caram",3,2500],["2026-03-31","mix-premium",4,3500],["2026-04-01","castanas-caram",3,3000],["2026-04-01","girasol-caram",1,2500],["2026-04-01","mix-energico",3,3000],["2026-04-01","mix-premium",4,3500],["2026-04-02","castanas-caram",4,3000],["2026-04-02","girasol-caram",2,2500],["2026-04-02","mix-energico",1,3000],["2026-04-02","mix-premium",1,3500],["2026-04-03","castanas-caram",2,3000],["2026-04-03","girasol-caram",2,2500],["2026-04-03","mix-energico",1,3000],["2026-04-03","mix-premium",3,3500],["2026-04-04","castanas-caram",4,3000],["2026-04-04","girasol-caram",1,2500],["2026-04-05","castanas-caram",5,3000],["2026-04-05","girasol-caram",6,2500],["2026-04-05","mix-energico",2,3000],["2026-04-05","mix-premium",2,3500],["2026-04-06","girasol-caram",8,2500],["2026-04-06","mix-energico",1,3000],["2026-04-06","mix-premium",1,3500],["2026-04-07","castanas-caram",5,3000],["2026-04-07","mix-energico",1,3000],["2026-04-07","mix-premium",1,3500],["2026-04-08","mix-energico",1,3000],["2026-04-09","castanas-caram",3,3000],["2026-04-09","mix-energico",1,3000],["2026-04-10","castanas-caram",5,3000],["2026-04-10","mix-energico",1,3000],["2026-04-10","mix-premium",1,3500],["2026-04-11","castanas-caram",2,3000],["2026-04-11","mix-energico",1,3000],["2026-04-11","mix-premium",2,3500],["2026-04-12","mix-energico",2,3000],["2026-04-12","mix-premium",7,3500],["2026-04-13","mix-premium",2,3500],["2026-04-14","mix-premium",3,3500],["2026-04-15","mix-caramelizado",13,3500],["2026-04-16","est-abr-may",17,3189,"","est_2026-04-16"],["2026-04-17","est-abr-may",17,3189,"","est_2026-04-17"],["2026-04-20","est-abr-may",17,3189,"","est_2026-04-20"],["2026-04-21","est-abr-may",17,3189,"","est_2026-04-21"],["2026-04-22","est-abr-may",17,3189,"","est_2026-04-22"],["2026-04-23","est-abr-may",17,3189,"","est_2026-04-23"],["2026-04-24","est-abr-may",17,3189,"","est_2026-04-24"],["2026-04-27","est-abr-may",17,3189,"","est_2026-04-27"],["2026-04-28","est-abr-may",17,3189,"","est_2026-04-28"],["2026-04-29","est-abr-may",17,3189,"","est_2026-04-29"],["2026-04-30","est-abr-may",16,3189,"","est_2026-04-30"],["2026-05-01","est-abr-may",16,3189,"","est_2026-05-01"],["2026-05-04","est-abr-may",16,3189,"","est_2026-05-04"],["2026-05-05","est-abr-may",16,3189,"","est_2026-05-05"],["2026-05-06","est-abr-may",16,3189,"","est_2026-05-06"],["2026-05-07","est-abr-may",16,3189,"","est_2026-05-07"],["2026-05-08","est-abr-may",16,3189,"","est_2026-05-08"],["2026-05-11","est-abr-may",16,3189,"","est_2026-05-11"],["2026-05-12","est-abr-may",16,3189,"","est_2026-05-12"],["2026-05-13","est-abr-may",16,3189,"","est_2026-05-13"],["2026-05-14","est-abr-may",16,3189,"","est_2026-05-14"],["2026-05-15","est-abr-may",16,3189,"","est_2026-05-15"],["2026-05-18","est-abr-may",16,3189,"","est_2026-05-18"],["2026-05-22","choco-300",5,20000],["2026-05-22","choco-semillas",9,4000],["2026-05-22","choco-semillas",22,3333],["2026-05-22","garrapinada",1,4000],["2026-05-22","garrapinada",2,3333],["2026-05-29","choco-semillas",9,4000],["2026-05-29","choco-semillas",22,3333],["2026-05-29","garrapinada",1,4000],["2026-05-29","garrapinada",2,3333],["2026-06-05","choco-300",5,20000],["2026-06-05","choco-semillas",9,4000],["2026-06-05","choco-semillas",22,3333],["2026-06-05","garrapinada",1,4000],["2026-06-05","garrapinada",2,3333],["2026-06-12","choco-semillas",9,4000],["2026-06-12","choco-semillas",22,3333],["2026-06-12","garrapinada",1,4000],["2026-06-12","garrapinada",2,3333],["2026-06-19","choco-300",5,20000],["2026-06-19","choco-semillas",9,4000],["2026-06-19","choco-semillas",22,3333],["2026-06-19","garrapinada",1,4000],["2026-06-19","garrapinada",2,3333],["2026-06-26","choco-semillas",9,4000],["2026-06-26","choco-semillas",22,3333],["2026-06-26","garrapinada",1,4000],["2026-06-26","garrapinada",2,3333],["2026-07-03","choco-300",5,20000],["2026-07-03","choco-semillas",9,4000],["2026-07-03","choco-semillas",22,3333],["2026-07-03","garrapinada",1,4000],["2026-07-03","garrapinada",2,3333],["2026-07-10","choco-semillas",9,4000],["2026-07-10","choco-semillas",22,3333],["2026-07-10","garrapinada",1,4000],["2026-07-10","garrapinada",2,3333],["2026-07-17","choco-300",5,20000],["2026-07-17","choco-semillas",9,4000],["2026-07-17","choco-semillas",22,3333],["2026-07-17","garrapinada",1,3333],["2026-07-17","garrapinada",1,4000],["2026-07-24","choco-semillas",9,4000],["2026-07-24","choco-semillas",22,3333],["2026-07-24","garrapinada",1,3333],["2026-07-24","garrapinada",1,4000],["2026-07-31","choco-semillas",9,4000],["2026-07-31","choco-semillas",22,3333],["2026-07-31","garrapinada",1,3333],["2026-07-31","garrapinada",1,4000],["2026-08-07","choco-semillas",13,4000],["2026-08-07","choco-semillas",31,3333],["2026-08-07","garrapinada",1,4000],["2026-08-07","garrapinada",3,3333],["2026-08-14","choco-semillas",13,4000],["2026-08-14","choco-semillas",31,3333],["2026-08-14","garrapinada",1,4000],["2026-08-14","garrapinada",3,3333],["2026-08-21","choco-semillas",13,4000],["2026-08-21","choco-semillas",31,3333],["2026-08-21","garrapinada",1,4000],["2026-08-21","garrapinada",3,3333],["2026-08-28","choco-semillas",13,4000],["2026-08-28","choco-semillas",31,3333],["2026-08-28","garrapinada",1,4000],["2026-08-28","garrapinada",3,3333],["2026-09-04","choco-semillas",13,4000],["2026-09-04","choco-semillas",31,3333],["2026-09-04","garrapinada",1,4000],["2026-09-04","garrapinada",3,3333],["2026-09-11","choco-semillas",13,4000],["2026-09-11","choco-semillas",30,3333],["2026-09-11","garrapinada",1,4000],["2026-09-11","garrapinada",3,3333],["2026-09-18","choco-semillas",13,4000],["2026-09-18","choco-semillas",30,3333],["2026-09-18","garrapinada",1,4000],["2026-09-18","garrapinada",2,3333],["2026-09-25","choco-semillas",13,4000],["2026-09-25","choco-semillas",30,3333],["2026-09-25","garrapinada",1,4000],["2026-09-25","garrapinada",2,3333],["2026-09-28","garrapinada",1,3333,"tmuli7on1"],["2026-09-28","garrapinada",1,3333,"tmuli7on1"],["2026-09-28","garrapinada",1,3334,"tmuli7on1"],["2026-09-29","choco-semillas",1,3333,"tmumnfbjj"],["2026-09-29","choco-semillas",1,3333,"tmumnfbjj"],["2026-09-29","choco-semillas",1,3334,"tmumnfbjj"],["2026-09-29","choco-semillas",1,4000,"tmumq18vd"],["2026-09-29","choco-semillas",1,4000,"tmumq18vd"],["2026-09-30","garrapinada",1,4000,"tmuo345l2"],["2026-09-30","choco-semillas",1,4000,"tmuo345l2"],["2026-09-30","garrapinada",1,4000,"tmuo5wp46"],["2026-09-30","choco-semillas",1,3333,"tmuo7f9mw"],["2026-09-30","choco-semillas",1,3333,"tmuo7f9mw"],["2026-09-30","choco-semillas",1,3334,"tmuo7f9mw"],["2026-09-30","choco-semillas",1,3333,"tmuocgha3"],["2026-09-30","garrapinada",1,3333,"tmuocgha3"],["2026-09-30","choco-semillas",1,3334,"tmuocgha3"],["2026-09-30","choco-semillas",1,4000,"tmuofdca6"],["2026-09-30","choco-semillas",1,4000,"tmuofdca6"],["2026-10-01","garrapinada",1,3333,"tmupgy02q"],["2026-10-01","garrapinada",1,3333,"tmupgy02q"],["2026-10-01","choco-semillas",1,3334,"tmupgy02q"],["2026-10-01","choco-semillas",1,3333,"tmupiszt6"],["2026-10-01","garrapinada",1,3333,"tmupiszt6"],["2026-10-01","garrapinada",1,3334,"tmupiszt6"],["2026-10-01","choco-semillas",1,4000,"tmupit4ga"],["2026-10-01","choco-semillas",1,4000,"tmupit4ga"],["2026-10-02","choco-semillas",1,4000,"tmuqw4dix"],["2026-10-02","choco-semillas",1,4000,"tmur3hq33"],["2026-10-02","garrapinada",1,4000,"tmur3hq33"],["2026-10-02","choco-semillas",1,4000,"tmur4xugo"],["2026-10-06","choco-semillas",1,3333,"tmuwz20b2"],["2026-10-06","choco-semillas",1,3333,"tmuwz20b2"],["2026-10-06","choco-semillas",1,3334,"tmuwz20b2"],["2026-10-06","garrapinada",1,4000,"tmuwz2423"],["2026-10-06","garrapinada",1,4000,"tmuwz2423"],["2026-10-06","choco-semillas",1,3333,"tmuwz6tfc"],["2026-10-06","choco-semillas",1,3333,"tmuwz6tfc"],["2026-10-06","garrapinada",1,3334,"tmuwz6tfc"],["2026-10-07","choco-semillas",1,3333,"tmuyals00"],["2026-10-07","choco-semillas",1,3333,"tmuyals00"],["2026-10-07","choco-semillas",1,3334,"tmuyals00"],["2026-10-07","garrapinada",1,3333,"tmuyals00"],["2026-10-07","garrapinada",1,3333,"tmuyals00"],["2026-10-07","garrapinada",1,3334,"tmuyals00"],["2026-10-07","choco-semillas",1,3333,"tmuyals00"],["2026-10-07","choco-semillas",1,3333,"tmuyals00"],["2026-10-07","choco-semillas",1,3334,"tmuyals00"],["2026-10-07","choco-semillas",1,3333,"tmuybt83d"],["2026-10-07","choco-semillas",1,3333,"tmuybt83d"],["2026-10-07","choco-semillas",1,3334,"tmuybt83d"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k"],["2026-10-08","choco-almendras",1,3334,"tmuzntx8k"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k"],["2026-10-08","choco-semillas",1,3334,"tmuzntx8k"],["2026-10-08","choco-semillas",1,4000,"tmuzp9k1u"]],"del":[],"ts":0};
+var SEED = {"p":[{"id":"choco-semillas","n":"Chocolate con girasol y zapallo","e":"🍫","pv":4000,"c":1024,"on":true,"cb":1},{"id":"choco-castanas","n":"Chocolate con castañas, girasol y zapallo","e":"🌰","pv":4000,"c":1214,"on":true,"cb":1},{"id":"choco-almendras","n":"Chocolate con almendra sola","e":"🥜","pv":4000,"c":1265,"on":true,"cb":1},{"id":"garrapinada","n":"Garrapiñada de girasol","e":"🍬","pv":4000,"c":568,"on":true,"cb":1},{"id":"girasol-salado","n":"Girasol salado en salmuera","e":"🧂","pv":4000,"c":678,"on":true,"cb":1},{"id":"caju-salado","n":"Castaña salada en salmuera","e":"🌰","pv":4000,"c":1938,"on":true,"cb":1},{"id":"choco-300","n":"Bolsa grande 300 g","e":"🎁","pv":20000,"c":6461,"on":false,"cb":0},{"id":"rocas-ramo","n":"Rocas de choco + semillas (ramo)","e":"🪨","pv":4667,"c":706,"on":false,"cb":0},{"id":"mix-premium","n":"Mix Premium","e":"👑","pv":3500,"c":1534,"on":false,"cb":0},{"id":"mix-energico","n":"Mix Enérgico","e":"⚡","pv":3000,"c":1324,"on":false,"cb":0},{"id":"castanas-caram","n":"Castañas Caramelizadas","e":"🍯","pv":3500,"c":1467,"on":false,"cb":0},{"id":"girasol-caram","n":"Semillas Caramelizadas","e":"🌻","pv":3000,"c":627,"on":false,"cb":0},{"id":"mix-caramelizado","n":"Mix Caramelizado","e":"🍬","pv":3500,"c":1119,"on":false,"cb":0},{"id":"est-abr-may","n":"Bolsitas abr-may (estimado)","e":"📋","pv":3189,"c":1341,"on":false,"cb":0}],"v":[["2026-03-22","mix-premium",3,3500,null,"s0_2026-03-22_mix-premium"],["2026-03-23","mix-premium",9,3500,null,"s1_2026-03-23_mix-premium"],["2026-03-24","mix-premium",5,3500,null,"s2_2026-03-24_mix-premium"],["2026-03-25","mix-premium",11,3500,null,"s3_2026-03-25_mix-premium"],["2026-03-26","mix-premium",4,3500,null,"s4_2026-03-26_mix-premium"],["2026-03-27","mix-premium",1,3500,null,"s5_2026-03-27_mix-premium"],["2026-03-28","mix-premium",3,3500,null,"s6_2026-03-28_mix-premium"],["2026-03-29","mix-premium",8,3500,null,"s7_2026-03-29_mix-premium"],["2026-03-30","mix-premium",1,3500,null,"s10_2026-03-30_mix-premium"],["2026-03-30","castanas-caram",6,3000,null,"s8_2026-03-30_castanas-caram"],["2026-03-30","girasol-caram",1,2500,null,"s9_2026-03-30_girasol-caram"],["2026-03-31","castanas-caram",5,3000,null,"s11_2026-03-31_castanas-caram"],["2026-03-31","girasol-caram",3,2500,null,"s12_2026-03-31_girasol-caram"],["2026-03-31","mix-premium",4,3500,null,"s13_2026-03-31_mix-premium"],["2026-04-01","castanas-caram",3,3000,null,"s14_2026-04-01_castanas-caram"],["2026-04-01","girasol-caram",1,2500,null,"s15_2026-04-01_girasol-caram"],["2026-04-01","mix-energico",3,3000,null,"s16_2026-04-01_mix-energico"],["2026-04-01","mix-premium",4,3500,null,"s17_2026-04-01_mix-premium"],["2026-04-02","castanas-caram",4,3000,null,"s18_2026-04-02_castanas-caram"],["2026-04-02","girasol-caram",2,2500,null,"s19_2026-04-02_girasol-caram"],["2026-04-02","mix-energico",1,3000,null,"s20_2026-04-02_mix-energico"],["2026-04-02","mix-premium",1,3500,null,"s21_2026-04-02_mix-premium"],["2026-04-03","castanas-caram",2,3000,null,"s22_2026-04-03_castanas-caram"],["2026-04-03","girasol-caram",2,2500,null,"s23_2026-04-03_girasol-caram"],["2026-04-03","mix-energico",1,3000,null,"s24_2026-04-03_mix-energico"],["2026-04-03","mix-premium",3,3500,null,"s25_2026-04-03_mix-premium"],["2026-04-04","castanas-caram",4,3000,null,"s26_2026-04-04_castanas-caram"],["2026-04-04","girasol-caram",1,2500,null,"s27_2026-04-04_girasol-caram"],["2026-04-05","castanas-caram",5,3000,null,"s28_2026-04-05_castanas-caram"],["2026-04-05","girasol-caram",6,2500,null,"s29_2026-04-05_girasol-caram"],["2026-04-05","mix-energico",2,3000,null,"s30_2026-04-05_mix-energico"],["2026-04-05","mix-premium",2,3500,null,"s31_2026-04-05_mix-premium"],["2026-04-06","girasol-caram",8,2500,null,"s32_2026-04-06_girasol-caram"],["2026-04-06","mix-energico",1,3000,null,"s33_2026-04-06_mix-energico"],["2026-04-06","mix-premium",1,3500,null,"s34_2026-04-06_mix-premium"],["2026-04-07","castanas-caram",5,3000,null,"s35_2026-04-07_castanas-caram"],["2026-04-07","mix-energico",1,3000,null,"s36_2026-04-07_mix-energico"],["2026-04-07","mix-premium",1,3500,null,"s37_2026-04-07_mix-premium"],["2026-04-08","mix-energico",1,3000,null,"s38_2026-04-08_mix-energico"],["2026-04-09","castanas-caram",3,3000,null,"s39_2026-04-09_castanas-caram"],["2026-04-09","mix-energico",1,3000,null,"s40_2026-04-09_mix-energico"],["2026-04-10","castanas-caram",5,3000,null,"s41_2026-04-10_castanas-caram"],["2026-04-10","mix-energico",1,3000,null,"s42_2026-04-10_mix-energico"],["2026-04-10","mix-premium",1,3500,null,"s43_2026-04-10_mix-premium"],["2026-04-11","castanas-caram",2,3000,null,"s44_2026-04-11_castanas-caram"],["2026-04-11","mix-energico",1,3000,null,"s45_2026-04-11_mix-energico"],["2026-04-11","mix-premium",2,3500,null,"s46_2026-04-11_mix-premium"],["2026-04-12","mix-energico",2,3000,null,"s47_2026-04-12_mix-energico"],["2026-04-12","mix-premium",7,3500,null,"s48_2026-04-12_mix-premium"],["2026-04-13","mix-premium",2,3500,null,"s49_2026-04-13_mix-premium"],["2026-04-14","mix-premium",3,3500,null,"s50_2026-04-14_mix-premium"],["2026-04-15","mix-caramelizado",13,3500,null,"s51_2026-04-15_mix-caramelizado"],["2026-04-16","est-abr-may",17,3189,"","est_2026-04-16"],["2026-04-17","est-abr-may",17,3189,"","est_2026-04-17"],["2026-04-20","est-abr-may",17,3189,"","est_2026-04-20"],["2026-04-21","est-abr-may",17,3189,"","est_2026-04-21"],["2026-04-22","est-abr-may",17,3189,"","est_2026-04-22"],["2026-04-23","est-abr-may",17,3189,"","est_2026-04-23"],["2026-04-24","est-abr-may",17,3189,"","est_2026-04-24"],["2026-04-27","est-abr-may",17,3189,"","est_2026-04-27"],["2026-04-28","est-abr-may",17,3189,"","est_2026-04-28"],["2026-04-29","est-abr-may",17,3189,"","est_2026-04-29"],["2026-04-30","est-abr-may",16,3189,"","est_2026-04-30"],["2026-05-01","est-abr-may",16,3189,"","est_2026-05-01"],["2026-05-04","est-abr-may",16,3189,"","est_2026-05-04"],["2026-05-05","est-abr-may",16,3189,"","est_2026-05-05"],["2026-05-06","est-abr-may",16,3189,"","est_2026-05-06"],["2026-05-07","est-abr-may",16,3189,"","est_2026-05-07"],["2026-05-08","est-abr-may",16,3189,"","est_2026-05-08"],["2026-05-11","est-abr-may",16,3189,"","est_2026-05-11"],["2026-05-12","est-abr-may",16,3189,"","est_2026-05-12"],["2026-05-13","est-abr-may",16,3189,"","est_2026-05-13"],["2026-05-14","est-abr-may",16,3189,"","est_2026-05-14"],["2026-05-15","est-abr-may",16,3189,"","est_2026-05-15"],["2026-05-18","est-abr-may",16,3189,"","est_2026-05-18"],["2026-05-22","choco-300",5,20000,null,"s52_2026-05-22_choco-300"],["2026-05-22","choco-semillas",9,4000,null,"s53_2026-05-22_choco-semillas"],["2026-05-22","choco-semillas",22,3333,null,"s54_2026-05-22_choco-semillas"],["2026-05-22","garrapinada",1,4000,null,"s55_2026-05-22_garrapinada"],["2026-05-22","garrapinada",2,3333,null,"s56_2026-05-22_garrapinada"],["2026-05-29","choco-semillas",9,4000,null,"s57_2026-05-29_choco-semillas"],["2026-05-29","choco-semillas",22,3333,null,"s58_2026-05-29_choco-semillas"],["2026-05-29","garrapinada",1,4000,null,"s59_2026-05-29_garrapinada"],["2026-05-29","garrapinada",2,3333,null,"s60_2026-05-29_garrapinada"],["2026-06-05","choco-300",5,20000,null,"s61_2026-06-05_choco-300"],["2026-06-05","choco-semillas",9,4000,null,"s62_2026-06-05_choco-semillas"],["2026-06-05","choco-semillas",22,3333,null,"s63_2026-06-05_choco-semillas"],["2026-06-05","garrapinada",1,4000,null,"s64_2026-06-05_garrapinada"],["2026-06-05","garrapinada",2,3333,null,"s65_2026-06-05_garrapinada"],["2026-06-12","choco-semillas",9,4000,null,"s66_2026-06-12_choco-semillas"],["2026-06-12","choco-semillas",22,3333,null,"s67_2026-06-12_choco-semillas"],["2026-06-12","garrapinada",1,4000,null,"s68_2026-06-12_garrapinada"],["2026-06-12","garrapinada",2,3333,null,"s69_2026-06-12_garrapinada"],["2026-06-19","choco-300",5,20000,null,"s70_2026-06-19_choco-300"],["2026-06-19","choco-semillas",9,4000,null,"s71_2026-06-19_choco-semillas"],["2026-06-19","choco-semillas",22,3333,null,"s72_2026-06-19_choco-semillas"],["2026-06-19","garrapinada",1,4000,null,"s73_2026-06-19_garrapinada"],["2026-06-19","garrapinada",2,3333,null,"s74_2026-06-19_garrapinada"],["2026-06-26","choco-semillas",9,4000,null,"s75_2026-06-26_choco-semillas"],["2026-06-26","choco-semillas",22,3333,null,"s76_2026-06-26_choco-semillas"],["2026-06-26","garrapinada",1,4000,null,"s77_2026-06-26_garrapinada"],["2026-06-26","garrapinada",2,3333,null,"s78_2026-06-26_garrapinada"],["2026-07-03","choco-300",5,20000,null,"s79_2026-07-03_choco-300"],["2026-07-03","choco-semillas",9,4000,null,"s80_2026-07-03_choco-semillas"],["2026-07-03","choco-semillas",22,3333,null,"s81_2026-07-03_choco-semillas"],["2026-07-03","garrapinada",1,4000,null,"s82_2026-07-03_garrapinada"],["2026-07-03","garrapinada",2,3333,null,"s83_2026-07-03_garrapinada"],["2026-07-10","choco-semillas",9,4000,null,"s84_2026-07-10_choco-semillas"],["2026-07-10","choco-semillas",22,3333,null,"s85_2026-07-10_choco-semillas"],["2026-07-10","garrapinada",1,4000,null,"s86_2026-07-10_garrapinada"],["2026-07-10","garrapinada",2,3333,null,"s87_2026-07-10_garrapinada"],["2026-07-17","choco-300",5,20000,null,"s88_2026-07-17_choco-300"],["2026-07-17","choco-semillas",9,4000,null,"s89_2026-07-17_choco-semillas"],["2026-07-17","choco-semillas",22,3333,null,"s90_2026-07-17_choco-semillas"],["2026-07-17","garrapinada",1,3333,null,"s91_2026-07-17_garrapinada"],["2026-07-17","garrapinada",1,4000,null,"s92_2026-07-17_garrapinada"],["2026-07-24","choco-semillas",9,4000,null,"s93_2026-07-24_choco-semillas"],["2026-07-24","choco-semillas",22,3333,null,"s94_2026-07-24_choco-semillas"],["2026-07-24","garrapinada",1,3333,null,"s95_2026-07-24_garrapinada"],["2026-07-24","garrapinada",1,4000,null,"s96_2026-07-24_garrapinada"],["2026-07-31","garrapinada",1,4000,null,"s100_2026-07-31_garrapinada"],["2026-07-31","choco-semillas",9,4000,null,"s97_2026-07-31_choco-semillas"],["2026-07-31","choco-semillas",22,3333,null,"s98_2026-07-31_choco-semillas"],["2026-07-31","garrapinada",1,3333,null,"s99_2026-07-31_garrapinada"],["2026-08-07","choco-semillas",13,4000,null,"s101_2026-08-07_choco-semillas"],["2026-08-07","choco-semillas",31,3333,null,"s102_2026-08-07_choco-semillas"],["2026-08-07","garrapinada",1,4000,null,"s103_2026-08-07_garrapinada"],["2026-08-07","garrapinada",3,3333,null,"s104_2026-08-07_garrapinada"],["2026-08-14","choco-semillas",13,4000,null,"s105_2026-08-14_choco-semillas"],["2026-08-14","choco-semillas",31,3333,null,"s106_2026-08-14_choco-semillas"],["2026-08-14","garrapinada",1,4000,null,"s107_2026-08-14_garrapinada"],["2026-08-14","garrapinada",3,3333,null,"s108_2026-08-14_garrapinada"],["2026-08-21","choco-semillas",13,4000,null,"s109_2026-08-21_choco-semillas"],["2026-08-21","choco-semillas",31,3333,null,"s110_2026-08-21_choco-semillas"],["2026-08-21","garrapinada",1,4000,null,"s111_2026-08-21_garrapinada"],["2026-08-21","garrapinada",3,3333,null,"s112_2026-08-21_garrapinada"],["2026-08-28","choco-semillas",13,4000,null,"s113_2026-08-28_choco-semillas"],["2026-08-28","choco-semillas",31,3333,null,"s114_2026-08-28_choco-semillas"],["2026-08-28","garrapinada",1,4000,null,"s115_2026-08-28_garrapinada"],["2026-08-28","garrapinada",3,3333,null,"s116_2026-08-28_garrapinada"],["2026-09-04","choco-semillas",13,4000,null,"s117_2026-09-04_choco-semillas"],["2026-09-04","choco-semillas",31,3333,null,"s118_2026-09-04_choco-semillas"],["2026-09-04","garrapinada",1,4000,null,"s119_2026-09-04_garrapinada"],["2026-09-04","garrapinada",3,3333,null,"s120_2026-09-04_garrapinada"],["2026-09-11","choco-semillas",13,4000,null,"s121_2026-09-11_choco-semillas"],["2026-09-11","choco-semillas",30,3333,null,"s122_2026-09-11_choco-semillas"],["2026-09-11","garrapinada",1,4000,null,"s123_2026-09-11_garrapinada"],["2026-09-11","garrapinada",3,3333,null,"s124_2026-09-11_garrapinada"],["2026-09-18","choco-semillas",13,4000,null,"s125_2026-09-18_choco-semillas"],["2026-09-18","choco-semillas",30,3333,null,"s126_2026-09-18_choco-semillas"],["2026-09-18","garrapinada",1,4000,null,"s127_2026-09-18_garrapinada"],["2026-09-18","garrapinada",2,3333,null,"s128_2026-09-18_garrapinada"],["2026-09-25","choco-semillas",13,4000,null,"s129_2026-09-25_choco-semillas"],["2026-09-25","choco-semillas",30,3333,null,"s130_2026-09-25_choco-semillas"],["2026-09-25","garrapinada",1,4000,null,"s131_2026-09-25_garrapinada"],["2026-09-25","garrapinada",2,3333,null,"s132_2026-09-25_garrapinada"],["2026-09-28","garrapinada",1,3333,"tmuli7on1","s133_2026-09-28_garrapinada"],["2026-09-28","garrapinada",1,3333,"tmuli7on1","s134_2026-09-28_garrapinada"],["2026-09-28","garrapinada",1,3334,"tmuli7on1","s135_2026-09-28_garrapinada"],["2026-09-29","choco-semillas",1,3333,"tmumnfbjj","s136_2026-09-29_choco-semillas"],["2026-09-29","choco-semillas",1,3333,"tmumnfbjj","s137_2026-09-29_choco-semillas"],["2026-09-29","choco-semillas",1,3334,"tmumnfbjj","s138_2026-09-29_choco-semillas"],["2026-09-29","choco-semillas",1,4000,"tmumq18vd","s139_2026-09-29_choco-semillas"],["2026-09-29","choco-semillas",1,4000,"tmumq18vd","s140_2026-09-29_choco-semillas"],["2026-09-30","garrapinada",1,4000,"tmuo345l2","s141_2026-09-30_garrapinada"],["2026-09-30","choco-semillas",1,4000,"tmuo345l2","s142_2026-09-30_choco-semillas"],["2026-09-30","garrapinada",1,4000,"tmuo5wp46","s143_2026-09-30_garrapinada"],["2026-09-30","choco-semillas",1,3333,"tmuo7f9mw","s144_2026-09-30_choco-semillas"],["2026-09-30","choco-semillas",1,3333,"tmuo7f9mw","s145_2026-09-30_choco-semillas"],["2026-09-30","choco-semillas",1,3334,"tmuo7f9mw","s146_2026-09-30_choco-semillas"],["2026-09-30","choco-semillas",1,3333,"tmuocgha3","s147_2026-09-30_choco-semillas"],["2026-09-30","garrapinada",1,3333,"tmuocgha3","s148_2026-09-30_garrapinada"],["2026-09-30","choco-semillas",1,3334,"tmuocgha3","s149_2026-09-30_choco-semillas"],["2026-09-30","choco-semillas",1,4000,"tmuofdca6","s150_2026-09-30_choco-semillas"],["2026-09-30","choco-semillas",1,4000,"tmuofdca6","s151_2026-09-30_choco-semillas"],["2026-10-01","garrapinada",1,3333,"tmupgy02q","s152_2026-10-01_garrapinada"],["2026-10-01","garrapinada",1,3333,"tmupgy02q","s153_2026-10-01_garrapinada"],["2026-10-01","choco-semillas",1,3334,"tmupgy02q","s154_2026-10-01_choco-semillas"],["2026-10-01","choco-semillas",1,3333,"tmupiszt6","s155_2026-10-01_choco-semillas"],["2026-10-01","garrapinada",1,3333,"tmupiszt6","s156_2026-10-01_garrapinada"],["2026-10-01","garrapinada",1,3334,"tmupiszt6","s157_2026-10-01_garrapinada"],["2026-10-01","choco-semillas",1,4000,"tmupit4ga","s158_2026-10-01_choco-semillas"],["2026-10-01","choco-semillas",1,4000,"tmupit4ga","s159_2026-10-01_choco-semillas"],["2026-10-02","choco-semillas",1,4000,"tmuqw4dix","s160_2026-10-02_choco-semillas"],["2026-10-02","choco-semillas",1,4000,"tmur3hq33","s161_2026-10-02_choco-semillas"],["2026-10-02","garrapinada",1,4000,"tmur3hq33","s162_2026-10-02_garrapinada"],["2026-10-02","choco-semillas",1,4000,"tmur4xugo","s163_2026-10-02_choco-semillas"],["2026-10-06","choco-semillas",1,3333,"tmuwz20b2","s164_2026-10-06_choco-semillas"],["2026-10-06","choco-semillas",1,3333,"tmuwz20b2","s165_2026-10-06_choco-semillas"],["2026-10-06","choco-semillas",1,3334,"tmuwz20b2","s166_2026-10-06_choco-semillas"],["2026-10-06","garrapinada",1,4000,"tmuwz2423","s167_2026-10-06_garrapinada"],["2026-10-06","garrapinada",1,4000,"tmuwz2423","s168_2026-10-06_garrapinada"],["2026-10-06","choco-semillas",1,3333,"tmuwz6tfc","s169_2026-10-06_choco-semillas"],["2026-10-06","choco-semillas",1,3333,"tmuwz6tfc","s170_2026-10-06_choco-semillas"],["2026-10-06","garrapinada",1,3334,"tmuwz6tfc","s171_2026-10-06_garrapinada"],["2026-10-07","choco-semillas",1,3333,"tmuyals00","s172_2026-10-07_choco-semillas"],["2026-10-07","choco-semillas",1,3333,"tmuyals00","s173_2026-10-07_choco-semillas"],["2026-10-07","choco-semillas",1,3334,"tmuyals00","s174_2026-10-07_choco-semillas"],["2026-10-07","garrapinada",1,3333,"tmuyals00","s175_2026-10-07_garrapinada"],["2026-10-07","garrapinada",1,3333,"tmuyals00","s176_2026-10-07_garrapinada"],["2026-10-07","garrapinada",1,3334,"tmuyals00","s177_2026-10-07_garrapinada"],["2026-10-07","choco-semillas",1,3333,"tmuyals00","s178_2026-10-07_choco-semillas"],["2026-10-07","choco-semillas",1,3333,"tmuyals00","s179_2026-10-07_choco-semillas"],["2026-10-07","choco-semillas",1,3334,"tmuyals00","s180_2026-10-07_choco-semillas"],["2026-10-07","choco-semillas",1,3333,"tmuybt83d","s181_2026-10-07_choco-semillas"],["2026-10-07","choco-semillas",1,3333,"tmuybt83d","s182_2026-10-07_choco-semillas"],["2026-10-07","choco-semillas",1,3334,"tmuybt83d","s183_2026-10-07_choco-semillas"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k","s184_2026-10-08_choco-semillas"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k","s185_2026-10-08_choco-semillas"],["2026-10-08","choco-almendras",1,3334,"tmuzntx8k","s186_2026-10-08_choco-almendras"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k","s187_2026-10-08_choco-semillas"],["2026-10-08","choco-semillas",1,3333,"tmuzntx8k","s188_2026-10-08_choco-semillas"],["2026-10-08","choco-semillas",1,3334,"tmuzntx8k","s189_2026-10-08_choco-semillas"],["2026-10-08","choco-semillas",1,4000,"tmuzp9k1u","s190_2026-10-08_choco-semillas"],["2026-10-08","garrapinada",1,3333,"tmv10peeb","vmv10peeb0puxh"],["2026-10-08","choco-semillas",1,3333,"tmv10peeb","vmv10peeb1148e"],["2026-10-08","choco-semillas",1,3334,"tmv10peeb","vmv10peeb6ac1w"],["2026-10-08","choco-semillas",1,3333,"tmv10peeb","vmv10peeba0tjr"],["2026-10-08","choco-semillas",1,3334,"tmv10peeb","vmv10peebcslsp"],["2026-10-08","choco-semillas",1,3333,"tmv10peeb","vmv10peebfqo9h"],["2026-10-08","garrapinada",1,3333,"tmv10peeb","vmv10peebhbh49"],["2026-10-08","choco-semillas",1,3333,"tmv10peeb","vmv10peebn0wee"],["2026-10-08","choco-semillas",1,3333,"tmv10peeb","vmv10peebpd29a"],["2026-10-08","choco-semillas",1,3333,"tmv10peeb","vmv10peebprrs3"],["2026-10-08","choco-semillas",1,3334,"tmv10peeb","vmv10peebr0r3y"],["2026-10-08","garrapinada",1,3334,"tmv10peeb","vmv10peebwtwfy"],["2026-10-09","choco-almendras",1,4000,"tmv10vtst","vmv10vtstqjuyw"],["2026-10-09","choco-almendras",1,4000,"tmv114s6y","vmv114s6yg81yi"],["2026-10-09","choco-almendras",1,4000,"tmv114s6y","vmv114s6ynxaty"],["2026-10-09","choco-almendras",1,3333,"tmv11agpu","vmv11agpu0dz3u"],["2026-10-09","choco-almendras",1,3333,"tmv11agpu","vmv11agpunl1dc"],["2026-10-09","choco-almendras",1,3334,"tmv11agpu","vmv11agpus6kq5"],["2026-10-09","choco-almendras",1,3334,"tmv147bjw","vmv147bjw49jn9"],["2026-10-09","choco-almendras",1,3333,"tmv147bjw","vmv147bjwm7pjf"],["2026-10-09","choco-almendras",1,3333,"tmv147bjw","vmv147bjwwtke9"],["2026-10-09","choco-semillas",1,4000,"tmv14big4","vmv14big4ri68a"],["2026-10-13","girasol-salado",1,3333,"tmv6p4ltd","vmv6p4ltd5nuaz"],["2026-10-13","girasol-salado",1,3334,"tmv6p4ltd","vmv6p4ltdcwv4q"],["2026-10-13","girasol-salado",1,3333,"tmv6p4ltd","vmv6p4ltdjslkh"],["2026-10-13","choco-almendras",1,3333,"tmv6p4spk","vmv6p4spk8xews"],["2026-10-13","choco-almendras",1,3333,"tmv6p4spk","vmv6p4spkbr9o0"],["2026-10-13","girasol-salado",1,3334,"tmv6p4spk","vmv6p4spkejtl0"]],"del":["vmv10pjxgj7ciu","vmv10pjxgr2uwj"],"ts":0};
 // Las 378 bolsitas del 16 abr al 18 may que nunca se cargaron, listas para agregar de un toque.
 var FALTANTE = {"p":{"id":"est-abr-may","n":"Bolsitas abr-may (estimado)","e":"📋","pv":3189,"c":1341,"on":false,"cb":0},"v":[["2026-04-16","est-abr-may",17,3189,"","est_2026-04-16"],["2026-04-17","est-abr-may",17,3189,"","est_2026-04-17"],["2026-04-20","est-abr-may",17,3189,"","est_2026-04-20"],["2026-04-21","est-abr-may",17,3189,"","est_2026-04-21"],["2026-04-22","est-abr-may",17,3189,"","est_2026-04-22"],["2026-04-23","est-abr-may",17,3189,"","est_2026-04-23"],["2026-04-24","est-abr-may",17,3189,"","est_2026-04-24"],["2026-04-27","est-abr-may",17,3189,"","est_2026-04-27"],["2026-04-28","est-abr-may",17,3189,"","est_2026-04-28"],["2026-04-29","est-abr-may",17,3189,"","est_2026-04-29"],["2026-04-30","est-abr-may",16,3189,"","est_2026-04-30"],["2026-05-01","est-abr-may",16,3189,"","est_2026-05-01"],["2026-05-04","est-abr-may",16,3189,"","est_2026-05-04"],["2026-05-05","est-abr-may",16,3189,"","est_2026-05-05"],["2026-05-06","est-abr-may",16,3189,"","est_2026-05-06"],["2026-05-07","est-abr-may",16,3189,"","est_2026-05-07"],["2026-05-08","est-abr-may",16,3189,"","est_2026-05-08"],["2026-05-11","est-abr-may",16,3189,"","est_2026-05-11"],["2026-05-12","est-abr-may",16,3189,"","est_2026-05-12"],["2026-05-13","est-abr-may",16,3189,"","est_2026-05-13"],["2026-05-14","est-abr-may",16,3189,"","est_2026-05-14"],["2026-05-15","est-abr-may",16,3189,"","est_2026-05-15"],["2026-05-18","est-abr-may",16,3189,"","est_2026-05-18"]]};
 var KEY = 'nutcontrol_v3';
@@ -425,12 +466,14 @@ function normalizar(o) {
   if (!o.ts) o.ts = 0;
   return o;
 }
+// Copia local: para que la app abra al instante y para poder vender sin señal.
 function guardar() {
   db.ts = Date.now();
   try { localStorage.setItem(KEY, JSON.stringify(db)); }
   catch (e) { toast('No se pudo guardar. Copiá un backup por las dudas.'); }
 }
 function nuevoId() { return 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function fechasDe(vs) { var s = {}; vs.forEach(function (v) { s[v[0]] = 1; }); return Object.keys(s); }
 
 // ---------- helpers ----------
 function $(id) { return document.getElementById(id); }
@@ -541,10 +584,10 @@ function repetirVenta(k) {
 
 function borrarGrupo(k) {
   var g = ventasAgrupadas(fechaCarga)[k]; if (!g) return;
-  var lineas = g.lineas;
+  var lineas = g.lineas, ids = [];
   db.v = db.v.filter(function (v) {
     if (lineas.indexOf(v) === -1) return true;
-    if (v[5]) db.del.push(v[5]);
+    ids.push(v[5]);
     return false;
   });
   borrarVenta = null; guardar(); pintarVender();
@@ -613,18 +656,18 @@ function deshacerUltima() {
   for (var i = db.v.length - 1; i >= 0; i--) if (db.v[i][0] === fechaCarga) { idx = i; break; }
   if (idx < 0) { toast('No hay ventas cargadas ese día'); return; }
   var tk = db.v[idx][4];
-  var borradas, monto = 0;
+  var borradas, monto = 0, ids = [];
   if (tk) {
     var quedan = [];
     borradas = 0;
     db.v.forEach(function (v) {
-      if (v[4] === tk) { borradas += v[2]; monto += v[2] * v[3]; if (v[5]) db.del.push(v[5]); }
+      if (v[4] === tk && v[0] === fechaCarga) { borradas += v[2]; monto += v[2] * v[3]; ids.push(v[5]); }
       else quedan.push(v);
     });
     db.v = quedan;
   } else {
     borradas = db.v[idx][2]; monto = db.v[idx][2] * db.v[idx][3];
-    if (db.v[idx][5]) db.del.push(db.v[idx][5]);
+    ids.push(db.v[idx][5]);
     db.v.splice(idx, 1);
   }
   guardar(); pintarVender();
@@ -903,8 +946,10 @@ function pintarHistorial() {
 $('t-hist').addEventListener('click', function (e) {
   if (!e.target.classList.contains('del')) return;
   var vv = db.v[+e.target.dataset.i];
-  if (vv && vv[5]) db.del.push(vv[5]);
-  db.v.splice(+e.target.dataset.i, 1); guardar(); pintarHistorial(); pintarVender(); toast('Venta borrada');
+  if (!vv) return;
+  var f = vv[0];
+  db.v.splice(+e.target.dataset.i, 1);
+  guardar(); pintarHistorial(); pintarVender(); toast('Venta borrada');
 });
 $('f-desde').addEventListener('change', pintarHistorial);
 $('f-hasta').addEventListener('change', pintarHistorial);
@@ -935,12 +980,14 @@ function pintarAbrMay() {
 }
 $('abrmay').addEventListener('click', function (e) {
   if (e.target.id === 'btn-abrmay-si') {
-    if (!prod(FALTANTE.p.id)) db.p.push(JSON.parse(JSON.stringify(FALTANTE.p)));
-    JSON.parse(JSON.stringify(FALTANTE.v)).forEach(function (v) { db.v.push(v); });
+    if (!prod(FALTANTE.p.id)) { db.p.push(JSON.parse(JSON.stringify(FALTANTE.p))); }
+    var nuevas = JSON.parse(JSON.stringify(FALTANTE.v));
+    nuevas.forEach(function (v) { db.v.push(v); });
     db.v.sort(function (a, b) { return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0; });
     guardar(); pintarTodo();
     toast('Listo, historial completo');
   } else if (e.target.id === 'btn-abrmay-no') {
+    var fuera = db.v.filter(function (v) { return v[1] === FALTANTE.p.id; });
     db.v = db.v.filter(function (v) { return v[1] !== FALTANTE.p.id; });
     guardar(); pintarTodo();
     toast('Se sacaron las estimadas de abril-mayo');
@@ -1012,10 +1059,144 @@ $('file-import').addEventListener('change', function (e) {
   r.readAsText(f);
 });
 
+// ---------- EL RESUMEN PARA EL CELULAR ----------
+// Arma un link que lleva los totales adentro. No hay servidor ni base: los
+// números viajan en el propio link, así que funciona en cualquier teléfono
+// y seguiría funcionando aunque esta página desapareciera.
+
+function armarResumen() {
+  var dias = {}, prods = {};
+  db.v.forEach(function (v) {
+    var g = v[2] * (v[3] - costoDe(v[1]));
+    var d = dias[v[0]] || (dias[v[0]] = [0, 0, 0]);
+    d[0] += v[2]; d[1] += v[2] * v[3]; d[2] += g;
+    var p = prod(v[1]);
+    var n = p ? p.e + ' ' + p.n : v[1];
+    var q = prods[n] || (prods[n] = [0, 0, 0]);
+    q[0] += v[2]; q[1] += v[2] * v[3]; q[2] += g;
+  });
+  return {
+    f: hoy(),
+    d: Object.keys(dias).sort().map(function (k) {
+      return [k.replace(/-/g, ''), dias[k][0], Math.round(dias[k][1]), Math.round(dias[k][2])];
+    }),
+    p: Object.keys(prods).map(function (n) {
+      return [n, prods[n][0], Math.round(prods[n][1]), Math.round(prods[n][2])];
+    }).sort(function (a, b) { return b[3] - a[3]; })
+  };
+}
+// base64 que aguanta acentos y emojis
+function aB64(s) { return btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+function deB64(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); return decodeURIComponent(escape(atob(s))); }
+function linkResumen() {
+  return location.origin + location.pathname + '#r=' + aB64(JSON.stringify(armarResumen()));
+}
+
+$('btn-resumen').addEventListener('click', function () {
+  var url = linkResumen();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function () {
+      toast('Link copiado. Mandátelo por WhatsApp y abrilo en el celular.');
+    }).catch(mostrar);
+  } else mostrar();
+  function mostrar() {
+    $('resumen-box').hidden = false;
+    $('resumen-txt').value = url;
+    $('resumen-txt').select();
+    toast('Copiá el texto de abajo');
+  }
+});
+$('btn-resumen-ver').addEventListener('click', function () {
+  pintarSoloLectura(armarResumen());
+});
+
+function pintarSoloLectura(R) {
+  var MN = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  var DS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+  function fecha(c) { return c.slice(0, 4) + '-' + c.slice(4, 6) + '-' + c.slice(6, 8); }
+
+  var uds = 0, ing = 0, gan = 0;
+  R.d.forEach(function (x) { uds += x[1]; ing += x[2]; gan += x[3]; });
+
+  function tabla(tit, sub, cab, filas) {
+    var max = 1; filas.forEach(function (f) { if (f.g > max) max = f.g; });
+    return '<section><h2>' + tit + '</h2><p class="lead">' + sub + '</p><div class="tw"><table>' +
+      '<thead><tr>' + cab.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '<th></th></tr></thead><tbody>' +
+      filas.map(function (f) {
+        return '<tr><td>' + f.n + '</td><td class="num">' + f.u + '</td><td class="num">' + plata(f.i) +
+          '</td><td class="num pos">' + plata(f.g) + '</td>' +
+          '<td style="width:110px"><span class="bar" style="width:' + Math.max(3, f.g / max * 100) + '%"></span></td></tr>';
+      }).join('') + '</tbody></table></div></section>';
+  }
+
+  // semanas de lunes a domingo
+  function lunesDe(f) {
+    var d = new Date(f + 'T12:00:00');
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return iso(d);
+  }
+  var sem = {}, mes = {};
+  R.d.forEach(function (x) {
+    var f = fecha(x[0]);
+    var k = lunesDe(f), s = sem[k] || (sem[k] = [0, 0, 0]);
+    s[0] += x[1]; s[1] += x[2]; s[2] += x[3];
+    var m = f.slice(0, 7), q = mes[m] || (mes[m] = [0, 0, 0]);
+    q[0] += x[1]; q[1] += x[2]; q[2] += x[3];
+  });
+
+  var html =
+    '<h2>Los números</h2>' +
+    '<p class="rl-fecha">Resumen al ' + fechaLarga(R.f) + '</p>' +
+    '<div class="kpis">' +
+      '<div class="kpi"><div class="lb">Bolsitas</div><div class="vl num">' + uds.toLocaleString('es-AR') + '</div></div>' +
+      '<div class="kpi"><div class="lb">Facturación</div><div class="vl num">' + plata(ing) + '</div></div>' +
+      '<div class="kpi"><div class="lb">Costo</div><div class="vl num">' + plata(ing - gan) + '</div></div>' +
+      '<div class="kpi g"><div class="lb">Ganancia</div><div class="vl num">' + plata(gan) + '</div>' +
+        '<div class="ft">' + (ing ? Math.round(gan / ing * 100) : 0) + '% de margen</div></div>' +
+    '</div>' +
+    tabla('Semana a semana', 'De lunes a domingo, las últimas 10.', ['Semana', 'Bolsitas', 'Cobrado', 'Ganancia'],
+      Object.keys(sem).sort().reverse().slice(0, 10).map(function (k) {
+        var fin = new Date(k + 'T12:00:00'); fin.setDate(fin.getDate() + 6);
+        return { n: fechaCorta(k) + ' al ' + p2(fin.getDate()) + '/' + p2(fin.getMonth() + 1),
+                 u: sem[k][0], i: sem[k][1], g: sem[k][2] };
+      })) +
+    tabla('Día a día', 'Los últimos 21 días con movimiento.', ['Día', 'Bolsitas', 'Cobrado', 'Ganancia'],
+      R.d.slice().reverse().slice(0, 21).map(function (x) {
+        var f = fecha(x[0]);
+        return { n: DS[new Date(f + 'T12:00:00').getDay()] + ' ' + fechaCorta(f), u: x[1], i: x[2], g: x[3] };
+      })) +
+    tabla('Mes a mes', 'Todo el historial.', ['Mes', 'Bolsitas', 'Facturación', 'Ganancia'],
+      Object.keys(mes).sort().map(function (k) {
+        return { n: MN[parseInt(k.slice(5), 10) - 1] + ' ' + k.slice(0, 4), u: mes[k][0], i: mes[k][1], g: mes[k][2] };
+      })) +
+    tabla('Por producto', 'Ordenado por lo que te deja cada uno.', ['Producto', 'Bolsitas', 'Facturación', 'Ganancia'],
+      R.p.map(function (x) { return { n: x[0], u: x[1], i: x[2], g: x[3] }; })) +
+    '<div class="rl-nota"><b>Esto es una foto, no la app.</b> Son los números tal como estaban el ' +
+      fechaLarga(R.f) + '. Para cargar ventas, entrá desde la computadora. Cuando quieras el resumen actualizado, ' +
+      'generá un link nuevo desde ahí.</div>';
+
+  $('rl-cuerpo').innerHTML = html;
+  $('app').hidden = true;
+  $('solo-lectura').hidden = false;
+  document.title = 'NutControl — resumen';
+}
+
+// ¿Vinimos por un link de resumen?
+function talVezResumen() {
+  var h = location.hash || '';
+  if (h.indexOf('#r=') !== 0) return false;
+  try {
+    pintarSoloLectura(JSON.parse(deB64(h.slice(3))));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 // ---------- arranque ----------
 function pintarTodo() { pintarVender(); pintarNumeros(); pintarCatalogo(); pintarHistorial(); pintarAbrMay(); }
 $('fecha-hoy').textContent = fechaLarga(hoy()).charAt(0).toUpperCase() + fechaLarga(hoy()).slice(1);
-pintarTodo();
+if (!talVezResumen()) pintarTodo();
 })();
 </script>
 
